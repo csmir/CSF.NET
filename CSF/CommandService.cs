@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Info;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,17 +19,11 @@ namespace CSF
         public Dictionary<string, CommandInfo> CommandMap { get; private set; }
 
         /// <summary>
-        ///     Represents the service container used to 
-        /// </summary>
-        public IServiceProvider Services { get; }
-
-        /// <summary>
         ///     Creates a new instance of the <see cref="CommandService"/> for the target assembly.
         /// </summary>
         /// <param name="assembly"></param>
-        public CommandService(IServiceProvider services = null)
+        public CommandService()
         {
-            Services = services;
             CommandMap = new Dictionary<string, CommandInfo>();
         }
 
@@ -92,11 +87,26 @@ namespace CSF
         /// <param name="commandContext"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<IResult> ExecuteCommandAsync<T>(T commandContext) where T : ICommandContext
+        public async Task<IResult> ExecuteCommandAsync<T>(T commandContext, IServiceProvider provider = null) where T : ICommandContext
         {
+            if (provider is null)
+                provider = EmptyServiceProvider.Instance;
+
             if (CommandMap.TryGetValue(commandContext.Name, out var info))
             {
-                var obj = info.Constructor.Invoke(null);
+                var parameters = new List<object>();
+                foreach (var param in info.Module.Parameters)
+                {
+                    if (param.Type is IServiceProvider)
+                        parameters.Add(provider);
+                    else
+                    {
+                        var t = provider.GetService(param.Type);
+                        parameters.Add(t);
+                    }
+                }
+
+                var obj = info.Module.Constructor.Invoke(parameters.ToArray());
 
                 if (obj is CommandBase<T> module)
                 {

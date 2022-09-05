@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CSF
+namespace CSF.Info
 {
     /// <summary>
     ///     Represents the information required to execute commands.
@@ -25,19 +25,14 @@ namespace CSF
         public string Description { get; }
 
         /// <summary>
-        ///     The constructor used to create an instance of the command type.
+        ///     The command module.
         /// </summary>
-        public ConstructorInfo Constructor { get; }
+        public ModuleInfo Module { get; }
 
         /// <summary>
-        ///     The method used to execute the command.
+        ///     The command method.
         /// </summary>
         public MethodInfo Method { get; }
-
-        /// <summary>
-        ///     The range of attributes present on this command.
-        /// </summary>
-        public IEnumerable<Attribute> Attributes { get; }
 
         /// <summary>
         ///     Creates a new instance of <see cref="CommandInfo"/> from the provided data.
@@ -46,21 +41,11 @@ namespace CSF
         /// <param name="method"></param>
         internal CommandInfo(ConstructorInfo constructor, MethodInfo method, Type type, object[] attributes, string name, string description)
         {
-            IEnumerable<Attribute> GetAttributes()
-            {
-                foreach (var attr in attributes)
-                {
-                    if (attr is Attribute attribute)
-                        yield return attribute;
-                }
-            }
-
             Name = name;
             Description = description;
-            Attributes = GetAttributes();
-            Type = type;
-            Constructor = constructor;
+            Module = new ModuleInfo(attributes, constructor);
             Method = method;
+            Type = type;
         }
     }
 }
