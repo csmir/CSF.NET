@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SystemParameter = System.Reflection.ParameterInfo;
 
 namespace CSF.Info
 {
@@ -22,6 +23,11 @@ namespace CSF.Info
         public bool IsOptional { get; }
 
         /// <summary>
+        ///     Defines the parameter is nullable.
+        /// </summary>
+        public bool IsNullable { get; }
+
+        /// <summary>
         ///     The typereader for this parameter.
         /// </summary>
         public ITypeReader Reader { get; }
@@ -31,21 +37,22 @@ namespace CSF.Info
         /// </summary>
         public IReadOnlyCollection<Attribute> Attributes { get; }
 
-        internal ParameterInfo(System.Reflection.ParameterInfo info, ITypeReader reader)
+        internal ParameterInfo(SystemParameter paramInfo, ITypeReader reader, bool isNullable)
         {
-            IEnumerable<Attribute> GetAttributes()
-            {
-                foreach (var attribute in info.GetCustomAttributes(false))
-                {
-                    if (attribute is Attribute attr)
-                        yield return attr;
-                }
-            }
-
-            IsOptional = info.IsOptional;
-            Type = info.ParameterType;
+            IsNullable = isNullable;
+            IsOptional = paramInfo.IsOptional;
+            Type = paramInfo.ParameterType;
             Reader = reader;
-            Attributes = GetAttributes().ToList();
+            Attributes = GetAttributes(paramInfo).ToList();
+        }
+
+        private IEnumerable<Attribute> GetAttributes(SystemParameter paramInfo)
+        {
+            foreach (var attribute in paramInfo.GetCustomAttributes(false))
+            {
+                if (attribute is Attribute attr)
+                    yield return attr;
+            }
         }
     }
 }

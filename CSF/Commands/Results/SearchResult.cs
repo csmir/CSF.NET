@@ -1,20 +1,24 @@
-﻿using System;
+﻿using CSF.Info;
+using System;
 
 namespace CSF
 {
     /// <summary>
-    ///     Represents internal failures when creating and running modules.
+    ///     Represents search results.
     /// </summary>
-    public readonly struct ModuleResult : IResult
+    public readonly struct SearchResult : IResult
     {
         public bool IsSuccess { get; }
 
         public string Message { get; }
 
+        public CommandInfo Match { get; }
+
         public Exception Exception { get; }
 
-        private ModuleResult(bool success, string msg = null, Exception exception = null)
+        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
         {
+            Match = match;
             IsSuccess = success;
             Message = msg;
             Exception = exception;
@@ -26,14 +30,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ModuleResult FromError(string errorMessage, Exception exception = null)
-            => new ModuleResult(false, errorMessage, exception);
+        public static SearchResult FromError(string errorMessage, Exception exception = null)
+            => new SearchResult(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ModuleResult FromSuccess()
-            => new ModuleResult(true);
+        public static SearchResult FromSuccess(CommandInfo match)
+            => new SearchResult(true, match);
     }
 }

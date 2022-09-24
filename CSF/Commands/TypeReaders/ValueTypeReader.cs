@@ -74,4 +74,46 @@ namespace CSF.TypeReaders
             return callback;
         }
     }
+
+    internal static class ValueTypeReader
+    {
+        public static Dictionary<Type, ITypeReader> RegisterAll()
+        {
+            var callback = new Dictionary<Type, ITypeReader>
+            {
+                // char
+                [typeof(char)] = new ValueTypeReader<char>(),
+
+                // bit / boolean
+                [typeof(bool)] = new ValueTypeReader<bool>(),
+
+                // 8 bit int
+                [typeof(byte)] = new ValueTypeReader<byte>(),
+                [typeof(sbyte)] = new ValueTypeReader<sbyte>(),
+
+                // 16 bit int
+                [typeof(short)] = new ValueTypeReader<short>(),
+                [typeof(ushort)] = new ValueTypeReader<ushort>(),
+
+                // 32 bit int
+                [typeof(int)] = new ValueTypeReader<int>(),
+                [typeof(uint)] = new ValueTypeReader<uint>(),
+
+                // 64 bit int
+                [typeof(long)] = new ValueTypeReader<long>(),
+                [typeof(ulong)] = new ValueTypeReader<ulong>(),
+
+                // floating point int
+                [typeof(float)] = new ValueTypeReader<float>(),
+                [typeof(double)] = new ValueTypeReader<double>(),
+                [typeof(decimal)] = new ValueTypeReader<decimal>(),
+
+                // time
+                [typeof(DateTime)] = new ValueTypeReader<DateTime>(),
+                [typeof(DateTimeOffset)] = new ValueTypeReader<DateTimeOffset>(),
+            };
+
+            return callback;
+        }
+    }
 }

@@ -10,6 +10,11 @@ namespace CSF.Info
     public class ServiceInfo
     {
         /// <summary>
+        ///     Defines if the service is nullable.
+        /// </summary>
+        public bool IsNullable { get; }
+
+        /// <summary>
         ///     Defines if the service is optional.
         /// </summary>
         public bool IsOptional { get; }
@@ -17,12 +22,13 @@ namespace CSF.Info
         /// <summary>
         ///     The service type.
         /// </summary>
-        public Type Type { get; }
+        public Type ServiceType { get; }
 
-        internal ServiceInfo(System.Reflection.ParameterInfo info)
+        internal ServiceInfo(Type type, bool isOptional, bool isNullable)
         {
-            IsOptional = info.IsOptional;
-            Type = info.ParameterType;
+            ServiceType = type;
+            IsNullable = isNullable;
+            IsOptional = isOptional;
         }
     }
 }

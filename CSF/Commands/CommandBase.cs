@@ -27,8 +27,8 @@ namespace CSF.Commands
         /// <summary>
         ///     The command service used to execute this command.
         /// </summary>
-        public CommandService Service { get; private set; }
-        internal void SetService(CommandService service)
+        public CommandStandardizationFramework Service { get; private set; }
+        internal void SetService(CommandStandardizationFramework service)
             => Service = service;
 
         /// <summary>
