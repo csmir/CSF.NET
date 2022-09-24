@@ -1,23 +1,29 @@
 ﻿using System;
 
-namespace CSF
+namespace CSF.Results
 {
     /// <summary>
-    ///     Represents internal failures when creating and running modules.
+    ///     Represents type reader results.
     /// </summary>
-    public readonly struct ModuleResult : IResult
+    public readonly struct TypeReaderResult : IResult
     {
         public bool IsSuccess { get; }
 
         public string Message { get; }
 
+        /// <summary>
+        ///     The result object of this reader.
+        /// </summary>
+        public object Result { get; }
+
         public Exception Exception { get; }
 
-        private ModuleResult(bool success, string msg = null, Exception exception = null)
+        private TypeReaderResult(bool success, object result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             Message = msg;
             Exception = exception;
+            Result = result;
         }
 
         /// <summary>
@@ -26,14 +32,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ModuleResult FromError(string errorMessage, Exception exception = null)
-            => new ModuleResult(false, errorMessage, exception);
+        public static TypeReaderResult FromError(string errorMessage, Exception exception = null)
+            => new TypeReaderResult(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ModuleResult FromSuccess()
-            => new ModuleResult(true);
+        public static TypeReaderResult FromSuccess(object value)
+            => new TypeReaderResult(true, value);
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace CSF
+namespace CSF.Results
 {
     /// <summary>
-    ///     Represents internal failures when creating and running modules.
+    ///     Represents precondition results.
     /// </summary>
-    public readonly struct ModuleResult : IResult
+    public readonly struct PreconditionResult : IResult
     {
         public bool IsSuccess { get; }
 
@@ -13,7 +15,7 @@ namespace CSF
 
         public Exception Exception { get; }
 
-        private ModuleResult(bool success, string msg = null, Exception exception = null)
+        private PreconditionResult(bool success, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             Message = msg;
@@ -26,14 +28,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ModuleResult FromError(string errorMessage, Exception exception = null)
-            => new ModuleResult(false, errorMessage, exception);
+        public static PreconditionResult FromError(string errorMessage, Exception exception = null)
+            => new PreconditionResult(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ModuleResult FromSuccess()
-            => new ModuleResult(true);
+        public static PreconditionResult FromSuccess()
+            => new PreconditionResult(true);
     }
 }

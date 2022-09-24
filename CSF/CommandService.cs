@@ -1,4 +1,7 @@
-﻿using CSF.Info;
+﻿using CSF.Commands;
+using CSF.Info;
+using CSF.Results;
+using CSF.TypeReaders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,12 +22,18 @@ namespace CSF
         public Dictionary<string, CommandInfo> CommandMap { get; private set; }
 
         /// <summary>
+        ///     The range of registered typereaders.
+        /// </summary>
+        public Dictionary<Type, ITypeReader> TypeReaders { get; private set; }
+
+        /// <summary>
         ///     Creates a new instance of the <see cref="CommandService"/> for the target assembly.
         /// </summary>
         /// <param name="assembly"></param>
         public CommandService()
         {
             CommandMap = new Dictionary<string, CommandInfo>();
+            TypeReaders = new Dictionary<Type, ITypeReader>();
         }
 
         /// <summary>
@@ -47,103 +56,166 @@ namespace CSF
         {
             await Task.CompletedTask;
 
-            var method = type.GetMethod("ExecuteAsync");
+            var module = new ModuleInfo(type);
 
-            if (method is null)
-                throw new InvalidOperationException($"An unexpected error has occurred while trying to find execution method of type {type.FullName}.");
+            var methods = type.GetMethods();
 
-            var ctor = type.GetConstructors().First();
-
-            if (ctor is null)
-                throw new InvalidOperationException($"An unexpected error has occurred while trying to find primary constructor of type {type.FullName}");
-
-            var attr = type.GetCustomAttributes(false);
-
-            foreach (var a in attr)
+            foreach (var method in methods)
             {
-                if (a is CommandAttribute cmd)
+                var attributes = method.GetCustomAttributes(true);
+
+                string name = null;
+                string[] aliases = Array.Empty<string>();
+                foreach (var attribute in attributes)
                 {
-                    var commandInfo = new CommandInfo(ctor, method, type, attr, cmd.Name, cmd.Description);
+                    if (attribute is CommandAttribute commandAttribute)
+                        name = commandAttribute.Name;
 
-                    if (attr.Where(x => x is AliasesAttribute).FirstOrDefault() is AliasesAttribute ali)
-                    {
-                        string[] aliases = ali.Aliases;
-                        foreach (var alias in aliases)
-                        {
-                            CommandMap.Add(alias, commandInfo);
-                        }
-                    }
-
-                    CommandMap.Add(cmd.Name, commandInfo);
+                    if (attribute is AliasesAttribute aliasesAttribute)
+                        aliases = aliasesAttribute.Aliases;
                 }
-                else
-                    continue;
+
+                if (string.IsNullOrEmpty(name))
+                    break;
+
+                var command = new CommandInfo(TypeReaders, module, method, name);
+
+                CommandMap.Add(name, command);
+
+                foreach (var alias in aliases)
+                {
+                    CommandMap.Add(alias, command);
+                }
             }
         }
 
         /// <summary>
-        ///     Executes the found command with the provided context.
+        ///     Adds a <see cref="ITypeReader"/> to the framework.
         /// </summary>
-        /// <param name="commandContext"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="replaceExisting"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<IResult> ExecuteCommandAsync<T>(T commandContext, IServiceProvider provider = null) where T : ICommandContext
+        public bool RegisterTypeReader<T>(ITypeReader reader, bool replaceExisting = true)
+        {
+            var type = typeof(T);
+
+            if (!(reader is TypeReader<T> realReader))
+                throw new InvalidOperationException($"This {nameof(ITypeReader)} is not supported for {type.FullName}.");
+
+            if (TypeReaders.ContainsKey(type)) 
+            {
+                if (replaceExisting)
+                {
+                    TypeReaders[type] = realReader;
+                    return true;
+                }
+                return false;
+            }
+
+            TypeReaders.Add(type, realReader);
+            return true;
+        }
+
+        public bool RemoveTypeReader<T>()
+            => TypeReaders.Remove(typeof(T));
+
+        /// <summary>
+        ///     Executes the found command with the provided context.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<IResult> ExecuteCommandAsync<T>(T context, IServiceProvider provider = null) where T : ICommandContext
         {
             if (provider is null)
                 provider = EmptyServiceProvider.Instance;
 
-            if (CommandMap.TryGetValue(commandContext.Name, out var info))
+            if (CommandMap.TryGetValue(context.Name, out var command))
             {
-                var parameters = new List<object>();
-                foreach (var param in info.Module.Parameters)
+                var services = new List<object>();
+                foreach (var param in command.Module.ServiceTypes)
                 {
                     if (param.Type is IServiceProvider)
-                        parameters.Add(provider);
+                        services.Add(provider);
                     else
                     {
                         var t = provider.GetService(param.Type);
-                        parameters.Add(t);
+                        services.Add(t);
                     }
                 }
 
-                var obj = info.Module.Constructor.Invoke(parameters.ToArray());
+                var obj = command.Module.Constructor.Invoke(services.ToArray());
 
                 if (obj is CommandBase<T> module)
                 {
+                    int index = 0;
+                    var parameters = new List<object>();
+
+                    foreach (var param in command.Parameters)
+                    {
+                        if (!param.IsOptional && context.Parameters.Count <= index)
+                            return TypeReaderResult.FromError("Not enough parameters have been provided.");
+
+                        if (param.IsOptional && context.Parameters.Count <= index)
+                            break;
+
+                        var result = await param.Reader.ReadAsync(context, param, context.Parameters[index], provider);
+
+                        if (!result.IsSuccess)
+                            return result;
+                        parameters.Add(result.Result);
+                        index++;
+                    }
+
+                    foreach (var precon in command.Preconditions)
+                    {
+                        var result = await precon.CheckAsync(context, command, provider);
+
+                        if (!result.IsSuccess)
+                            return result;
+                    }
 
                     try
                     {
-                        await ExecuteInternalAsync(commandContext, module, info);
+                        module.SetContext(context);
+                        module.SetInformation(command);
+                        module.SetService(this);
+
+                        var stopwatch = Stopwatch.StartNew();
+
+                        await module.BeforeExecuteAsync(command, context);
+
+                        var result = command.Method.Invoke(module, parameters.ToArray());
+
+                        if (result is Task t)
+                            await t;
+
+                        if (result is Task<ExecuteResult> ct)
+                        {
+                            var executeResult = await ct;
+
+                            if (!executeResult.IsSuccess)
+                                return executeResult;
+                        }
+
+                        await module.AfterExecuteAsync(command, context);
+
+                        stopwatch.Stop();
+
+                        return ExecuteResult.FromSuccess();
                     }
                     catch (Exception ex)
                     {
-                        return CommandResult.FromError(ex.Message, ex);
+                        return ExecuteResult.FromError(ex.Message, ex);
                     }
-
-                    return CommandResult.FromSuccess();
                 }
                 else
                     return ModuleResult.FromError($"Failed to interpret module type with matching type of {nameof(CommandBase<T>)}");
             }
 
-            return SearchResult.FromError($"Failed to find command with name: {commandContext.Name}");
-        }
-
-        private async Task ExecuteInternalAsync<T>(T context, CommandBase<T> module, CommandInfo info) where T : ICommandContext
-        {
-            module.SetContext(context);
-            module.SetInformation(info);
-            module.SetService(this);
-
-            var stopwatch = Stopwatch.StartNew();
-
-            await module.BeforeExecuteAsync(info, context);
-
-            await module.ExecuteAsync();
-
-            await module.AfterExecuteAsync(info, context);
-
-            stopwatch.Stop();
+            return SearchResult.FromError($"Failed to find command with name: {context.Name}");
         }
     }
 }

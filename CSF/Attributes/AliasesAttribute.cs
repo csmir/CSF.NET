@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     An attribute that represents multiple command aliases for quick execution.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class AliasesAttribute : Attribute
     {
         /// <summary>

@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     Represents internal failures in commands.
     /// </summary>
-    public readonly struct CommandResult : IResult
+    public readonly struct ExecuteResult : IResult
     {
         public bool IsSuccess { get; }
 
@@ -13,7 +13,7 @@ namespace CSF
 
         public Exception Exception { get; }
 
-        private CommandResult(bool success, string msg = null, Exception exception = null)
+        private ExecuteResult(bool success, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             Message = msg;
@@ -26,14 +26,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static IResult FromError(string errorMessage, Exception exception = null)
-            => new CommandResult(false, errorMessage, exception);
+        public static ExecuteResult FromError(string errorMessage, Exception exception = null)
+            => new ExecuteResult(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static IResult FromSuccess()
-            => new CommandResult(true);
+        public static ExecuteResult FromSuccess()
+            => new ExecuteResult(true);
     }
 }

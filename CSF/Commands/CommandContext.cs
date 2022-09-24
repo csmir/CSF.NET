@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CSF
+namespace CSF.Commands
 {
     /// <summary>
     ///     Represents a class thats used to describe data from the command.

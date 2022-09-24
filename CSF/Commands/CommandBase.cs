@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace CSF
+namespace CSF.Commands
 {
     /// <summary>
     ///     Represents a generic commandbase to implement commands with.
@@ -13,30 +13,23 @@ namespace CSF
         /// <summary>
         ///     Gets the command's context.
         /// </summary>
-        public T Context { get; private set; } 
+        public T Context { get; private set; }
         internal void SetContext(T context)
             => Context = context;
 
         /// <summary>
         ///     Displays all information about the command thats currently in scope.
         /// </summary>
-        public CommandInfo CommandInfo { get; private set; } 
+        public CommandInfo CommandInfo { get; private set; }
         internal void SetInformation(CommandInfo info)
             => CommandInfo = info;
 
         /// <summary>
         ///     The command service used to execute this command.
         /// </summary>
-        public CommandService Service { get; private set; } 
+        public CommandService Service { get; private set; }
         internal void SetService(CommandService service)
             => Service = service;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public abstract Task ExecuteAsync();
 
         /// <summary>
         ///     
@@ -59,7 +52,7 @@ namespace CSF
         {
             return Task.CompletedTask;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     Represents the required info to map a command.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class CommandAttribute : Attribute
     {
         /// <summary>
@@ -14,19 +14,13 @@ namespace CSF
         public string Name { get; }
 
         /// <summary>
-        ///     The command description.
-        /// </summary>
-        public string Description { get; }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        public CommandAttribute(string name, string description)
+        public CommandAttribute(string name)
         {
             Name = name;
-            Description = description;
         }
     }
 }

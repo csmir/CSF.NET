@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CSF
+namespace CSF.Commands
 {
     /// <summary>
     ///     Represents a default interface for the <see cref="CommandContext"/> class.

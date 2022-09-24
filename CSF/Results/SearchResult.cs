@@ -26,14 +26,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static IResult FromError(string errorMessage, Exception exception = null)
+        public static SearchResult FromError(string errorMessage, Exception exception = null)
             => new SearchResult(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static IResult FromSuccess()
+        public static SearchResult FromSuccess()
             => new SearchResult(true);
     }
 }
