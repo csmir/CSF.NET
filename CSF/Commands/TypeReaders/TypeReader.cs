@@ -1,12 +1,9 @@
-﻿using CSF.Commands;
-using CSF.Info;
-using CSF.Results;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSF.TypeReaders
+namespace CSF
 {
     public abstract class TypeReader<T> : ITypeReader
     {

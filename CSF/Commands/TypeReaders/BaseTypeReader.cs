@@ -1,18 +1,15 @@
-﻿using CSF.Commands;
-using CSF.Info;
-using CSF.Results;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSF.TypeReaders
+namespace CSF
 {
-    internal class ValueTypeReader<T> : TypeReader<T>
+    internal class BaseTypeReader<T> : TypeReader<T>
     {
         private delegate bool Tpd<TValue>(string str, out TValue value);
 
-        private static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new Lazy<IReadOnlyDictionary<Type, Delegate>>(ValueGenerator);
+        private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new Lazy<IReadOnlyDictionary<Type, Delegate>>(ValueGenerator);
 
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, ParameterInfo info, string value, IServiceProvider provider)
         {
@@ -75,42 +72,42 @@ namespace CSF.TypeReaders
         }
     }
 
-    internal static class ValueTypeReader
+    internal static class BaseTypeReader
     {
         public static Dictionary<Type, ITypeReader> RegisterAll()
         {
             var callback = new Dictionary<Type, ITypeReader>
             {
                 // char
-                [typeof(char)] = new ValueTypeReader<char>(),
+                [typeof(char)] = new BaseTypeReader<char>(),
 
                 // bit / boolean
-                [typeof(bool)] = new ValueTypeReader<bool>(),
+                [typeof(bool)] = new BaseTypeReader<bool>(),
 
                 // 8 bit int
-                [typeof(byte)] = new ValueTypeReader<byte>(),
-                [typeof(sbyte)] = new ValueTypeReader<sbyte>(),
+                [typeof(byte)] = new BaseTypeReader<byte>(),
+                [typeof(sbyte)] = new BaseTypeReader<sbyte>(),
 
                 // 16 bit int
-                [typeof(short)] = new ValueTypeReader<short>(),
-                [typeof(ushort)] = new ValueTypeReader<ushort>(),
+                [typeof(short)] = new BaseTypeReader<short>(),
+                [typeof(ushort)] = new BaseTypeReader<ushort>(),
 
                 // 32 bit int
-                [typeof(int)] = new ValueTypeReader<int>(),
-                [typeof(uint)] = new ValueTypeReader<uint>(),
+                [typeof(int)] = new BaseTypeReader<int>(),
+                [typeof(uint)] = new BaseTypeReader<uint>(),
 
                 // 64 bit int
-                [typeof(long)] = new ValueTypeReader<long>(),
-                [typeof(ulong)] = new ValueTypeReader<ulong>(),
+                [typeof(long)] = new BaseTypeReader<long>(),
+                [typeof(ulong)] = new BaseTypeReader<ulong>(),
 
                 // floating point int
-                [typeof(float)] = new ValueTypeReader<float>(),
-                [typeof(double)] = new ValueTypeReader<double>(),
-                [typeof(decimal)] = new ValueTypeReader<decimal>(),
+                [typeof(float)] = new BaseTypeReader<float>(),
+                [typeof(double)] = new BaseTypeReader<double>(),
+                [typeof(decimal)] = new BaseTypeReader<decimal>(),
 
                 // time
-                [typeof(DateTime)] = new ValueTypeReader<DateTime>(),
-                [typeof(DateTimeOffset)] = new ValueTypeReader<DateTimeOffset>(),
+                [typeof(DateTime)] = new BaseTypeReader<DateTime>(),
+                [typeof(DateTimeOffset)] = new BaseTypeReader<DateTimeOffset>(),
             };
 
             return callback;

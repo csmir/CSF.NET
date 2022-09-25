@@ -7,7 +7,7 @@ namespace CSF
     /// <summary>
     ///     Represents an empty service provider.
     /// </summary>
-    public class EmptyServiceProvider : IServiceProvider
+    internal class EmptyServiceProvider : IServiceProvider
     {
         /// <summary>
         ///     Represents the instance for this empty provider.

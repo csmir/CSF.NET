@@ -1,9 +1,8 @@
-﻿using CSF.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSF.Results
+namespace CSF
 {
     /// <summary>
     ///     Represents constructor results.
@@ -12,7 +11,7 @@ namespace CSF.Results
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         /// <summary>
         ///     The result object of this reader.
@@ -24,7 +23,7 @@ namespace CSF.Results
         private ConstructionResult(bool success, ICommandBase result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = msg;
             Exception = exception;
             Result = result;
         }

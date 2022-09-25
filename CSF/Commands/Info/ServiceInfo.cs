@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSF.Info
+namespace CSF
 {
     /// <summary>
     ///     Represents information about a service to be injected into the class constructor.

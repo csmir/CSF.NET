@@ -1,8 +1,7 @@
-﻿using CSF.Info;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
-namespace CSF.Commands
+namespace CSF
 {
     /// <summary>
     ///     Represents a generic commandbase to implement commands with.

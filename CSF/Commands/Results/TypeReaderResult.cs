@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CSF.Results
+namespace CSF
 {
     /// <summary>
     ///     Represents type reader results.
@@ -9,7 +9,7 @@ namespace CSF.Results
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         /// <summary>
         ///     The result object of this reader.
@@ -21,7 +21,7 @@ namespace CSF.Results
         private TypeReaderResult(bool success, object result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = msg;
             Exception = exception;
             Result = result;
         }

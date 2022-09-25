@@ -1,11 +1,10 @@
-﻿using CSF.Preconditions;
-using CSF.TypeReaders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SystemParameter = System.Reflection.ParameterInfo;
 
-namespace CSF.Info
+namespace CSF
 {
     /// <summary>
     ///     Represents the information required to execute commands.
@@ -68,23 +67,38 @@ namespace CSF.Info
             Attributes = Module.Attributes.Concat(GetAttributes(Method)).ToList();
             Preconditions = module.Preconditions.Concat(GetPreconditions(Attributes)).ToList();
             Parameters = GetParameters(typeReaders, Method).ToList();
+
+            var remainderParameters = Parameters.Where(x => x.IsRemainder);
+            if (remainderParameters.Any())
+            {
+                if (remainderParameters.Count() > 1)
+                    throw new InvalidOperationException($"{nameof(RemainderAttribute)} cannot exist on multiple parameters at once.");
+
+                if (!Parameters.Last().IsRemainder)
+                    throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
+            }
         }
 
         private IEnumerable<ParameterInfo> GetParameters(IReadOnlyDictionary<Type, ITypeReader> typeReaders, MethodInfo method)
         {
+            var parameters = method.GetParameters();
+
             foreach (var param in method.GetParameters())
             {
-                var parserType = param.ParameterType;
+                var paramType = param.ParameterType;
                 var nullableType = Nullable.GetUnderlyingType(param.ParameterType);
                 var isNullable = !(nullableType is null);
 
                 if (isNullable)
-                    parserType = nullableType;
+                    paramType = nullableType;
 
-                if (typeReaders.TryGetValue(parserType, out var value))
+                if (paramType == typeof(string))
+                    yield return new ParameterInfo(param, null, isNullable);
+
+                if (typeReaders.TryGetValue(paramType, out var value))
                     yield return new ParameterInfo(param, value, isNullable);
                 else
-                    throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {param.ParameterType.FullName}");
+                    throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {paramType}");
             }
         }
 

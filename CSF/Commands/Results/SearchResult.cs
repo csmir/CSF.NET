@@ -1,5 +1,4 @@
-﻿using CSF.Info;
-using System;
+﻿using System;
 
 namespace CSF
 {
@@ -10,7 +9,7 @@ namespace CSF
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         public CommandInfo Match { get; }
 
@@ -20,7 +19,7 @@ namespace CSF
         {
             Match = match;
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = msg;
             Exception = exception;
         }
 

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace CSF.Commands
+namespace CSF
 {
     /// <summary>
     ///     

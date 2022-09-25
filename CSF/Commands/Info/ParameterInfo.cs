@@ -1,11 +1,10 @@
-﻿using CSF.TypeReaders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SystemParameter = System.Reflection.ParameterInfo;
 
-namespace CSF.Info
+namespace CSF
 {
     /// <summary>
     ///     Represents a single parameter for the method.
@@ -15,7 +14,7 @@ namespace CSF.Info
         /// <summary>
         ///     The parameter type.
         /// </summary>
-        public Type Type { get; }
+        public Type ParameterType { get; }
 
         /// <summary>
         ///     Defines if the parameter is optional.
@@ -26,6 +25,11 @@ namespace CSF.Info
         ///     Defines the parameter is nullable.
         /// </summary>
         public bool IsNullable { get; }
+
+        /// <summary>
+        ///     Defines if the parameter is the parameterized remainder of the command.
+        /// </summary>
+        public bool IsRemainder { get; }
 
         /// <summary>
         ///     The typereader for this parameter.
@@ -41,9 +45,19 @@ namespace CSF.Info
         {
             IsNullable = isNullable;
             IsOptional = paramInfo.IsOptional;
-            Type = paramInfo.ParameterType;
+            ParameterType = paramInfo.ParameterType;
             Reader = reader;
             Attributes = GetAttributes(paramInfo).ToList();
+
+            if (Attributes.Any(x => x is RemainderAttribute))
+            {
+                if (ParameterType != typeof(string))
+                    throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on string parameters.");
+
+                IsRemainder = true;
+            }
+            else
+                IsRemainder = false;
         }
 
         private IEnumerable<Attribute> GetAttributes(SystemParameter paramInfo)

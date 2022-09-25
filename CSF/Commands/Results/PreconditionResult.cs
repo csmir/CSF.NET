@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSF.Results
+namespace CSF
 {
     /// <summary>
     ///     Represents precondition results.
@@ -11,14 +11,14 @@ namespace CSF.Results
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         public Exception Exception { get; }
 
         private PreconditionResult(bool success, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = msg;
             Exception = exception;
         }
 

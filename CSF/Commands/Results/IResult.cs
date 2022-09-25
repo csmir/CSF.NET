@@ -15,7 +15,7 @@ namespace CSF
         /// <summary>
         ///     The error message. <c>null</c> if not applicable.
         /// </summary>
-        string Message { get; }
+        string ErrorMessage { get; }
 
         /// <summary>
         ///     The result's inner exception. <c>null</c> if not applicable.

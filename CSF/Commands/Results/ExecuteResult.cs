@@ -9,14 +9,14 @@ namespace CSF
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         public Exception Exception { get; }
 
-        private ExecuteResult(bool success, string msg = null, Exception exception = null)
+        private ExecuteResult(bool success, string errorMessage = null, Exception exception = null)
         {
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = errorMessage;
             Exception = exception;
         }
 

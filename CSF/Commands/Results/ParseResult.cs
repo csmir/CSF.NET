@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSF.Results
+namespace CSF
 {
     /// <summary>
     ///     Represents typereader parsing results.
@@ -11,10 +11,10 @@ namespace CSF.Results
     {
         public bool IsSuccess { get; }
 
-        public string Message { get; }
+        public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The result object of this reader.
+        ///     The result objects of this parse result.
         /// </summary>
         public object[] Result { get; }
 
@@ -23,7 +23,7 @@ namespace CSF.Results
         private ParseResult(bool success, object[] result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
-            Message = msg;
+            ErrorMessage = msg;
             Exception = exception;
             Result = result;
         }

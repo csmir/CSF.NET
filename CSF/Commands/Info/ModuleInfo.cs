@@ -1,11 +1,10 @@
-﻿using CSF.Preconditions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace CSF.Info
+namespace CSF
 {
     /// <summary>
     ///     Represents information about the module this command is executed in.
