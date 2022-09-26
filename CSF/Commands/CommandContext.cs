@@ -14,21 +14,20 @@ namespace CSF
 
         public List<string> Parameters { get; }
 
-        private CommandContext(string name, string rawInput, List<string> parameters)
+        public CommandContext(string rawInput, string expectedPrefix)
         {
+            rawInput = rawInput.Substring(expectedPrefix.Length);
+
+            (string name, var @params) = ParseParameters(rawInput);
+
             Name = name;
             RawInput = rawInput;
-            Parameters = parameters;
+            Parameters = @params;
         }
 
-        /// <summary>
-        ///     Creates a new <see cref="CommandContext"/> from the input provider.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandContext Create(string command)
+        private (string, List<string>) ParseParameters(string rawInput)
         {
-            var range = command.Split(' ');
+            var range = rawInput.Split(' ');
 
             string commandName = string.Empty;
 
@@ -56,7 +55,6 @@ namespace CSF
                     continue;
                 }
 
-                // start checking the command.
                 if (entry.StartsWith("\""))
                 {
                     if (entry.EndsWith("\""))
@@ -69,7 +67,7 @@ namespace CSF
                 commandParams.Add(entry);
             }
 
-            return new CommandContext(commandName, command, commandParams);
+            return (commandName, commandParams);
         }
     }
 }

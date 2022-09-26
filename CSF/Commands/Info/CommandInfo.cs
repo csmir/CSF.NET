@@ -9,13 +9,8 @@ namespace CSF
     /// <summary>
     ///     Represents the information required to execute commands.
     /// </summary>
-    public class CommandInfo
+    public sealed class CommandInfo
     {
-        /// <summary>
-        ///     The module type.
-        /// </summary>
-        public Type Type { get; }
-
         /// <summary>
         ///     The command name.
         /// </summary>
@@ -94,8 +89,7 @@ namespace CSF
 
                 if (paramType == typeof(string))
                     yield return new ParameterInfo(param, null, isNullable);
-
-                if (typeReaders.TryGetValue(paramType, out var value))
+                else if (typeReaders.TryGetValue(paramType, out var value))
                     yield return new ParameterInfo(param, value, isNullable);
                 else
                     throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {paramType}");
@@ -113,7 +107,7 @@ namespace CSF
 
         private IEnumerable<Attribute> GetAttributes(MethodInfo method)
         {
-            foreach (var attribute in method.GetCustomAttributes(true))
+            foreach (var attribute in method.GetCustomAttributes(false))
             {
                 if (attribute is Attribute attr)
                     yield return attr;

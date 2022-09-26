@@ -1,25 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CSF
 {
     /// <summary>
-    ///     Represents search results.
+    ///     Represents module building results.
     /// </summary>
-    public readonly struct SearchResult : IResult
+    public readonly struct BuildResult : IResult
     {
         public bool IsSuccess { get; }
 
         public string ErrorMessage { get; }
 
-        public CommandInfo Match { get; }
-
         public Exception Exception { get; }
 
-        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
+        private BuildResult(bool success, string errorMessage = null, Exception exception = null)
         {
-            Match = match;
             IsSuccess = success;
-            ErrorMessage = msg;
+            ErrorMessage = errorMessage;
             Exception = exception;
         }
 
@@ -29,14 +28,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static SearchResult FromError(string errorMessage, Exception exception = null)
-            => new SearchResult(false, null, errorMessage, exception);
+        public static BuildResult FromError(string errorMessage, Exception exception = null)
+            => new BuildResult(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static SearchResult FromSuccess(CommandInfo match)
-            => new SearchResult(true, match);
+        public static BuildResult FromSuccess()
+            => new BuildResult(true);
     }
 }

@@ -9,12 +9,17 @@ namespace CSF
     /// <summary>
     ///     Represents a single parameter for the method.
     /// </summary>
-    public class ParameterInfo
+    public sealed class ParameterInfo
     {
         /// <summary>
         ///     The parameter type.
         /// </summary>
         public Type ParameterType { get; }
+
+        /// <summary>
+        ///     The parameter name.
+        /// </summary>
+        public string Name { get; }
 
         /// <summary>
         ///     Defines if the parameter is optional.
@@ -46,6 +51,7 @@ namespace CSF
             IsNullable = isNullable;
             IsOptional = paramInfo.IsOptional;
             ParameterType = paramInfo.ParameterType;
+            Name = paramInfo.Name;
             Reader = reader;
             Attributes = GetAttributes(paramInfo).ToList();
 

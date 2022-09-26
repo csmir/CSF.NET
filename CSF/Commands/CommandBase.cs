@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents a generic commandbase to implement commands with.
+    ///     Represents a generic command base to implement commands with.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The <see cref="ICommandContext"/> expected to use for this command.</typeparam>
     public abstract class CommandBase<T> : ICommandBase where T : ICommandContext
     {
         /// <summary>
@@ -26,83 +26,86 @@ namespace CSF
         /// <summary>
         ///     The command service used to execute this command.
         /// </summary>
-        public CommandStandardizationFramework Service { get; private set; }
-        internal void SetService(CommandStandardizationFramework service)
-            => Service = service;
+        public CommandStandardizationFramework Framework { get; private set; }
+        internal void SetSource(CommandStandardizationFramework service)
+            => Framework = service;
 
         /// <summary>
-        ///     
+        ///     Invoked right before a command is executed.
         /// </summary>
+        /// <remarks>
+        ///     This method executes after all pipeline steps have resolved, it will always enter the command directly after.
+        /// </remarks>
         /// <param name="info"></param>
         /// <param name="context"></param>
-        /// <returns></returns>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual Task BeforeExecuteAsync(CommandInfo info, T context)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        ///     
+        ///     Invoked right after a command is executed.
         /// </summary>
+        /// <remarks>
+        ///     This method does not execute if the command fails to finish execution or returns an error.
+        /// </remarks>
         /// <param name="info"></param>
         /// <param name="context"></param>
-        /// <returns></returns>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual Task AfterExecuteAsync(CommandInfo info, T context)
         {
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        public virtual void Error(string message)
+        public virtual void RespondError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ResetColor();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public abstract Task ErrorAsync(string message);
+        public virtual Task RespondErrorAsync(string message)
+        {
+            RespondError(message);
+            return Task.CompletedTask;
+        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        public virtual void Success(string message)
+        public virtual void RespondSuccess(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ResetColor();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public abstract Task SuccessAsync(string message);
+        public virtual Task RespondSuccessAsync(string message)
+        {
+            RespondSuccess(message);
+            return Task.CompletedTask;
+        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        public virtual void Information(string message)
+        public virtual void RespondInformation(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ResetColor();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task InformationAsync();
+        public virtual Task RespondInformationAsync(string message)
+        {
+            RespondInformation(message);
+            return Task.CompletedTask;
+        }
+
+        public virtual void Respond(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        public virtual Task RespondAsync(string message)
+        {
+            Respond(message);
+            return Task.CompletedTask;
+        }
     }
 }

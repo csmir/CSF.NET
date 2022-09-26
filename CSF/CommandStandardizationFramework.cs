@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CSF.Utils;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -27,18 +27,35 @@ namespace CSF
         /// </summary>
         public CommandConfiguration Configuration { get; private set; }
 
-        /// <summary>
-        ///     Invoked when a command is registered.
-        /// </summary>
-        public event Func<CommandInfo, Task> CommandRegistered;
-
+        private readonly AsyncEvent<Func<ICommandContext, IResult, Task>> _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
         /// <summary>
         ///     Invoked when a command is executed.
         /// </summary>
         /// <remarks>
         ///     This is the only way to do post-execution processing when <see cref="CommandConfiguration.DoAsynchronousExecution"/> is set to <see cref="true"/>.
         /// </remarks>
-        public event Func<ICommandContext, IResult, ICommandBase, Task> CommandExecuted;
+        public event Func<ICommandContext, IResult, Task> CommandExecuted
+        {
+            add
+                => _commandExecuted.Add(value);
+            remove
+                => _commandExecuted.Remove(value);
+        }
+
+        private readonly AsyncEvent<Func<CommandInfo, Task>> _commandRegistered = new AsyncEvent<Func<CommandInfo, Task>>();
+        /// <summary>
+        ///     Invoked when a command is registered.
+        /// </summary>
+        /// <remarks>
+        ///     This event can be used to do additional registration steps for certain services.
+        /// </remarks>
+        public event Func<CommandInfo, Task> CommandRegistered
+        {
+            add
+                => _commandRegistered.Add(value);
+            remove
+                => _commandRegistered.Remove(value);
+        }
 
         /// <summary>
         ///     Creates a new instance of <see cref="CommandStandardizationFramework"/> with default configuration.
@@ -58,6 +75,8 @@ namespace CSF
             CommandMap = new List<CommandInfo>();
             TypeReaders = BaseTypeReader.RegisterAll();
             Configuration = config;
+
+            _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
         }
 
         /// <summary>
@@ -68,15 +87,24 @@ namespace CSF
         /// </remarks>
         /// <param name="assembly">The assembly to find all modules for.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual async Task RegisterModulesAsync(Assembly assembly)
+        public virtual async Task<IResult> BuildModulesAsync(Assembly assembly)
         {
             var types = assembly.GetTypes();
 
             var baseType = typeof(ICommandBase);
 
             foreach (var type in types)
+            {
                 if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
-                    await RegisterModuleAsync(type);
+                {
+                    var result = await BuildModuleAsync(type);
+
+                    if (!result.IsSuccess)
+                        return result;
+                }
+            }
+
+            return BuildResult.FromSuccess();
         }
 
         /// <summary>
@@ -87,10 +115,8 @@ namespace CSF
         /// </remarks>
         /// <param name="type">The <see cref="CommandBase{T}"/> to register.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual async Task RegisterModuleAsync(Type type)
+        public virtual async Task<BuildResult> BuildModuleAsync(Type type)
         {
-            await Task.CompletedTask;
-
             var module = new ModuleInfo(type);
 
             var methods = type.GetMethods();
@@ -104,21 +130,42 @@ namespace CSF
                 foreach (var attribute in attributes)
                 {
                     if (attribute is CommandAttribute commandAttribute)
+                    {
+                        if (string.IsNullOrEmpty(commandAttribute.Name))
+                            return BuildResult.FromError($"Commands cannot have a null or empty name. Failed at method: '{method.Name}'");
                         name = commandAttribute.Name;
+                    }
 
                     if (attribute is AliasesAttribute aliasesAttribute)
                         aliases = aliasesAttribute.Aliases;
                 }
 
                 if (string.IsNullOrEmpty(name))
-                    break;
+                    return BuildResult.FromSuccess();
 
                 aliases = new[] { name }.Concat(aliases).ToArray();
 
-                var command = new CommandInfo(TypeReaders, module, method, aliases);
+                try
+                {
+                    var command = new CommandInfo(TypeReaders, module, method, aliases);
 
-                CommandMap.Add(command);
+                    if (Configuration.InvokeOnlyNameRegistrations)
+                    {
+                        if (!CommandMap.Any(x => x.Aliases.SequenceEqual(command.Aliases)))
+                            await _commandRegistered.InvokeAsync(command);
+                    }
+                    else
+                        await _commandRegistered.InvokeAsync(command);
+
+                    CommandMap.Add(command);
+                }
+                catch (Exception ex)
+                {
+                    return BuildResult.FromError(ex.Message, ex);
+                }
             }
+
+            return BuildResult.FromSuccess();
         }
 
         /// <summary>
@@ -132,24 +179,21 @@ namespace CSF
         /// <param name="replaceExisting"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public virtual bool RegisterTypeReader<T>(ITypeReader reader, bool replaceExisting = true)
+        public virtual bool RegisterTypeReader<T>(TypeReader<T> reader, bool replaceExisting = true)
         {
             var type = typeof(T);
-
-            if (!(reader is TypeReader<T> realReader))
-                throw new InvalidOperationException($"This {nameof(ITypeReader)} is not supported for {type.FullName}.");
 
             if (TypeReaders.ContainsKey(type)) 
             {
                 if (replaceExisting)
                 {
-                    TypeReaders[type] = realReader;
+                    TypeReaders[type] = reader;
                     return true;
                 }
                 return false;
             }
 
-            TypeReaders.Add(type, realReader);
+            TypeReaders.Add(type, reader);
             return true;
         }
 
@@ -189,7 +233,7 @@ namespace CSF
                 _ = Task.Run(async () =>
                 {
                     var result = await RunPipelineAsync(context, provider);
-                    // invoke command executed event
+                    await _commandExecuted.InvokeAsync(context, result);
                 });
                 return ExecuteResult.FromSuccess();
             }
@@ -197,7 +241,7 @@ namespace CSF
             else
             {
                 var result = await RunPipelineAsync(context, provider);
-                // invoke command executed event
+                await _commandExecuted.InvokeAsync(context, result);
                 return result;
             }
         }
@@ -262,7 +306,7 @@ namespace CSF
             await Task.CompletedTask;
 
             var commands = CommandMap
-                .Where(command => command.Aliases.Any(alias => string.Equals(alias == context.Name, StringComparison.OrdinalIgnoreCase)))
+                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
@@ -413,7 +457,7 @@ namespace CSF
 
             commandBase.SetContext(context);
             commandBase.SetInformation(command);
-            commandBase.SetService(this);
+            commandBase.SetSource(this);
 
             return ConstructionResult.FromSuccess(commandBase);
         }
@@ -471,12 +515,19 @@ namespace CSF
             {
                 if (param.IsRemainder)
                 {
-                    parameters.Add(string.Join(" ", context.Parameters.GetRange(index, context.Parameters.Count - (index - 1))));
+                    parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
                     break;
                 }
 
                 if (param.IsOptional && context.Parameters.Count <= index)
                     break;
+
+                if (param.ParameterType == typeof(string))
+                {
+                    parameters.Add(context.Parameters[index]);
+                    index++;
+                    continue;
+                }    
 
                 var result = await param.Reader.ReadAsync(context, param, context.Parameters[index], provider);
 
@@ -502,7 +553,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="parameters">The parsed parameters required to populate the command method.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ExecuteResult"/> of this executed command.</returns>
-        protected virtual async Task<ExecuteResult> ExecuteAsync<T>(T context, CommandBase<T> commandBase, CommandInfo command, object[] parameters)
+        protected virtual async Task<IResult> ExecuteAsync<T>(T context, CommandBase<T> commandBase, CommandInfo command, object[] parameters)
             where T : ICommandContext
         {
             try
@@ -511,14 +562,22 @@ namespace CSF
 
                 var result = command.Method.Invoke(commandBase, parameters.ToArray());
 
-                if (result is Task task)
-                    await task;
-
-                if (result is Task<ExecuteResult> resultTask)
+                switch (result) 
                 {
-                    var executeResult = await resultTask;
-
-                    return executeResult;
+                    case Task<IResult> execTask:
+                        var asyncResult = await execTask;
+                        if (!asyncResult.IsSuccess)
+                            return asyncResult;
+                        break;
+                    case Task task:
+                        await task;
+                        break;
+                    case ExecuteResult syncResult:
+                        if (!syncResult.IsSuccess)
+                            return syncResult;
+                        break;
+                    default:
+                        break;
                 }
 
                 await commandBase.AfterExecuteAsync(command, context);

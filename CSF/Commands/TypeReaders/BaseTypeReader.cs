@@ -18,7 +18,7 @@ namespace CSF
                 if (parser(value, out var result))
                     return Task.FromResult(TypeReaderResult.FromSuccess(result));
             }
-            return Task.FromResult(TypeReaderResult.FromError($"Input invalid! Expected {nameof(T)}, got {value}."));
+            return Task.FromResult(TypeReaderResult.FromError($"Invalid input! Expected {typeof(T).FullName}, got {value}. At: '{info.Name}'"));
         }
 
         private static bool TryGetParser(out Tpd<T> parser)
@@ -66,6 +66,9 @@ namespace CSF
                 // time
                 [typeof(DateTime)] = (Tpd<DateTime>)DateTime.TryParse,
                 [typeof(DateTimeOffset)] = (Tpd<DateTimeOffset>)DateTimeOffset.TryParse,
+
+                // guid
+                [typeof(Guid)] = (Tpd<Guid>)Guid.TryParse
             };
 
             return callback;
@@ -108,6 +111,9 @@ namespace CSF
                 // time
                 [typeof(DateTime)] = new BaseTypeReader<DateTime>(),
                 [typeof(DateTimeOffset)] = new BaseTypeReader<DateTimeOffset>(),
+
+                // guid
+                [typeof(Guid)] = new BaseTypeReader<Guid>()
             };
 
             return callback;

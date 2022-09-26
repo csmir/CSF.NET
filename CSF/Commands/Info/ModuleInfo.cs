@@ -9,7 +9,7 @@ namespace CSF
     /// <summary>
     ///     Represents information about the module this command is executed in.
     /// </summary>
-    public class ModuleInfo
+    public sealed class ModuleInfo
     {
         /// <summary>
         ///     The type of this module.
