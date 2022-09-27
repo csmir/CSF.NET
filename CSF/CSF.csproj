@@ -7,9 +7,10 @@
 	<AssemblyVersion>0.1.0</AssemblyVersion>
 	<FileVersion>0.1.0.0</FileVersion>
 
-	<PackageProjectUrl>https://github.com/Rozen4334/Chrono</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/Rozen4334/Chrono</RepositoryUrl>
-
+	<PackageProjectUrl>https://github.com/Rozen4334/CSF.NET</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/Rozen4334/CSF.NET</RepositoryUrl>
+	  
+	<PackageVersion>0.1.0-beta</PackageVersion>
 	<PackageReleaseNotes>Early access version 0.1; Made for netstandard2.0</PackageReleaseNotes>
 	<PackageTags>Text, Console, Commands, Framework</PackageTags>
 	<Description>The command standardization framework has been designed to give the developer an enjoyable and clean experience when implementing commands into their programs.</Description>
