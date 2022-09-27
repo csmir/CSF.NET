@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{97B147
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{482309D9-7953-4D55-B299-60986CAE77C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Console", "Samples\CSF.Console\CSF.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Samples.Console", "Samples\CSF.Samples.Console\CSF.Samples.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{EAF52E04-0252-4652-A812-11D50160A68B}"
 EndProject
