@@ -42,22 +42,55 @@ namespace CSF.TShock
             return Task.CompletedTask;
         }
 
+        public override void Respond(string message)
+        {
+            Respond(message, Color.LightGray);
+        }
+
+        public override Task RespondAsync(string message)
+        {
+            Respond(message, Color.LightGray);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Responds with the provided color.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <param name="color">The color to send this message in.</param>
         public void Respond(string message, Color color)
         {
             Context.Player.SendMessage(message, color.R, color.G, color.B);
         }
 
+        /// <summary>
+        ///     Responds with the provided color.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <param name="color">The color to send this message in.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public Task RespondAsync(string message, Color color)
         {
             Respond(message, color);
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        ///     Announce a message to the entire server with provided color.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <param name="color">The color to send this message in.</param>
         public void Announce(string message, Color color)
         {
             TSPlayer.Server.SendMessage(message, color.R, color.G, color.B);
         }
 
+        /// <summary>
+        ///     Announce a message to the entire server with provided color.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <param name="color">The color to send this message in.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public Task AnnounceAsync(string message, Color color)
         {
             Announce(message, color);

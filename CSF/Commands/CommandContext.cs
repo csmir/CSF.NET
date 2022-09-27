@@ -14,9 +14,10 @@ namespace CSF
 
         public List<string> Parameters { get; }
 
-        public CommandContext(string rawInput, string expectedPrefix)
+        public CommandContext(string rawInput, string expectedPrefix = null)
         {
-            rawInput = rawInput.Substring(expectedPrefix.Length);
+            if (!string.IsNullOrEmpty(expectedPrefix))
+                rawInput = rawInput.Substring(expectedPrefix.Length);
 
             (string name, var @params) = ParseParameters(rawInput);
 

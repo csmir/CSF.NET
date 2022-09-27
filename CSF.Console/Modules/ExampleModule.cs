@@ -58,7 +58,7 @@ namespace CSF.Console
         //
         // 'require-unix' will fail if the platform is not unix. 
         [Command("require-unix")]
-        [RequireOperationSystem(PlatformID.Unix)]
+        [RequireOperatingSystem(PlatformID.Unix)]
         public IResult UnixAsync()
         {
             RespondSuccess("Success!");
