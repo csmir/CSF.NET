@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF", "CSF\CSF.csproj", "{A06BC4BA-8D5F-43C5-8959-53BF6F0A0CAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF", "Source\CSF\CSF.csproj", "{A06BC4BA-8D5F-43C5-8959-53BF6F0A0CAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{97B1472D-82E8-4E7F-B9C3-9718584BF992}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{482309D9-7953-4D55-B299-60986CAE77C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Console", "CSF.Console\CSF.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Console", "Samples\CSF.Console\CSF.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{EAF52E04-0252-4652-A812-11D50160A68B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.TShock", "CSF.TShock\CSF.TShock.csproj", "{CA734A9C-2E3A-4E61-8CD0-0476AD88F94C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.TShock", "Extensions\CSF.TShock\CSF.TShock.csproj", "{CA734A9C-2E3A-4E61-8CD0-0476AD88F94C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Spectre", "CSF.Spectre\CSF.Spectre.csproj", "{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Spectre", "Extensions\CSF.Spectre\CSF.Spectre.csproj", "{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
