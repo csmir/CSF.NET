@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CSF.Console
+﻿namespace CSF.Console
 {
     // Preconditions are allowed to exist on class & method level.
     // This precondition will return if the provided ICommandContext does not directly match CommandContext.
@@ -22,7 +16,7 @@ namespace CSF.Console
             // You can return execute results to get error or success results out to the post-execution handler.
             return ExecuteResult.FromSuccess();
         }
-        
+
         // This is a simple command with 2 parameters, one of which will throw an error if it's not provided as integer.
         //
         // 'example "this is an example input" 14' will succeed.

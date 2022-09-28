@@ -18,7 +18,7 @@ namespace CSF.Utils
         /// <summary>
         ///     Checks if the event has any subscribers.
         /// </summary>
-        public bool HasSubscribers 
+        public bool HasSubscribers
             => _subscriptions.Count != 0;
 
         /// <summary>

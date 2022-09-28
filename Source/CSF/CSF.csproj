@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -18,7 +18,7 @@
 	<PackageTags>Text, Console, Commands, Framework</PackageTags>
 	  
 	<Title>Command Standardization Framework</Title>
-	<Description>The command standardization framework has been designed to give the developer an enjoyable and clean experience when implementing commands into their programs.</Description>
+	  <Description>The Command Standardization Framework (CSF) has been designed to give the developer a streamlined experience when implementing commands into their projects.</Description>
 	
 	<NeutralLanguage>en-US</NeutralLanguage>
 

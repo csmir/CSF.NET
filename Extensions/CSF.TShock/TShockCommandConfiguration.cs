@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CSF.TShock
+﻿namespace CSF.TShock
 {
     public class TShockCommandConfiguration : CommandConfiguration
     {

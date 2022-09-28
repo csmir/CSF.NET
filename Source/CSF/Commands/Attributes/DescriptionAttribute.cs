@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CSF
 {
@@ -11,7 +9,7 @@ namespace CSF
         ///     The description of this parameter, command or module.
         /// </summary>
         public string Description { get; }
-        
+
         /// <summary>
         ///     Sets up a new <see cref="DescriptionAttribute"/> with provided value.
         /// </summary>

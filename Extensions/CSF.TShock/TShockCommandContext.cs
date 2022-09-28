@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TShockAPI;
 
 namespace CSF.TShock
@@ -36,7 +34,7 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="args"></param>
         /// <param name="rawInput"></param>
-        public TShockCommandContext(CommandArgs args, string rawInput) 
+        public TShockCommandContext(CommandArgs args, string rawInput)
         {
             CommandArguments = args;
             RawInput = rawInput;

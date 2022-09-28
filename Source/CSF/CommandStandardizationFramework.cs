@@ -10,7 +10,7 @@ namespace CSF
     /// <summary>
     ///     Represents the handler for registered commands.
     /// </summary>
-    public class CommandStandardizationFramework 
+    public class CommandStandardizationFramework
     {
         /// <summary>
         ///     The range of registered commands.
@@ -183,7 +183,7 @@ namespace CSF
         {
             var type = typeof(T);
 
-            if (TypeReaders.ContainsKey(type)) 
+            if (TypeReaders.ContainsKey(type))
             {
                 if (replaceExisting)
                 {
@@ -222,7 +222,7 @@ namespace CSF
         /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
-        public async Task<IResult> ExecuteCommandAsync<T>(T context, IServiceProvider provider = null) 
+        public async Task<IResult> ExecuteCommandAsync<T>(T context, IServiceProvider provider = null)
             where T : ICommandContext
         {
             if (provider is null)
@@ -257,7 +257,7 @@ namespace CSF
         /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
-        protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider) 
+        protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider)
             where T : ICommandContext
         {
             // search input for command
@@ -527,7 +527,7 @@ namespace CSF
                     parameters.Add(context.Parameters[index]);
                     index++;
                     continue;
-                }    
+                }
 
                 var result = await param.Reader.ReadAsync(context, param, context.Parameters[index], provider);
 
@@ -562,7 +562,7 @@ namespace CSF
 
                 var result = command.Method.Invoke(commandBase, parameters.ToArray());
 
-                switch (result) 
+                switch (result)
                 {
                     case Task<IResult> execTask:
                         var asyncResult = await execTask;
