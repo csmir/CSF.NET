@@ -14,7 +14,7 @@ namespace CSF
         /// <summary>
         ///     The result objects of this parse result.
         /// </summary>
-        public object[] Result { get; }
+        internal object[] Result { get; }
 
         public Exception Exception { get; }
 
@@ -32,14 +32,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ParseResult FromError(string errorMessage, Exception exception = null)
+        internal static ParseResult FromError(string errorMessage, Exception exception = null)
             => new ParseResult(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ParseResult FromSuccess(object[] value)
+        internal static ParseResult FromSuccess(object[] value)
             => new ParseResult(true, value);
     }
 }

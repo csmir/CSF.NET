@@ -14,7 +14,7 @@ namespace CSF
         /// <summary>
         ///     The result object of this reader.
         /// </summary>
-        public object Result { get; }
+        internal object Result { get; }
 
         public Exception Exception { get; }
 

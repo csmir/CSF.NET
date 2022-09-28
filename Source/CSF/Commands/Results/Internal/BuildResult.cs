@@ -26,14 +26,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static BuildResult FromError(string errorMessage, Exception exception = null)
+        internal static BuildResult FromError(string errorMessage, Exception exception = null)
             => new BuildResult(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static BuildResult FromSuccess()
+        internal static BuildResult FromSuccess()
             => new BuildResult(true);
     }
 }

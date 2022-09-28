@@ -3,27 +3,27 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents constructor results.
+    ///     Represents search results.
     /// </summary>
-    public readonly struct ConstructionResult : IResult
+    public readonly struct SearchResult : IResult
     {
         public bool IsSuccess { get; }
 
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The result object of this reader.
+        ///     The command that matched the search best, and will be used for continuing the pipeline.
         /// </summary>
-        public ICommandBase Result { get; }
+        internal CommandInfo Match { get; }
 
         public Exception Exception { get; }
 
-        private ConstructionResult(bool success, ICommandBase result = null, string msg = null, Exception exception = null)
+        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
         {
+            Match = match;
             IsSuccess = success;
             ErrorMessage = msg;
             Exception = exception;
-            Result = result;
         }
 
         /// <summary>
@@ -32,14 +32,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ConstructionResult FromError(string errorMessage, Exception exception = null)
-            => new ConstructionResult(false, null, errorMessage, exception);
+        internal static SearchResult FromError(string errorMessage, Exception exception = null)
+            => new SearchResult(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ConstructionResult FromSuccess(ICommandBase value)
-            => new ConstructionResult(true, value);
+        internal static SearchResult FromSuccess(CommandInfo match)
+            => new SearchResult(true, match);
     }
 }

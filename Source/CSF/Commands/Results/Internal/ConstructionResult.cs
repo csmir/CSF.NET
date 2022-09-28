@@ -3,27 +3,27 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents search results.
+    ///     Represents constructor results.
     /// </summary>
-    public readonly struct SearchResult : IResult
+    public readonly struct ConstructionResult : IResult
     {
         public bool IsSuccess { get; }
 
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The command that matched the search best, and will be used for continuing the pipeline.
+        ///     The result object of this reader.
         /// </summary>
-        public CommandInfo Match { get; }
+        internal ICommandBase Result { get; }
 
         public Exception Exception { get; }
 
-        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
+        private ConstructionResult(bool success, ICommandBase result = null, string msg = null, Exception exception = null)
         {
-            Match = match;
             IsSuccess = success;
             ErrorMessage = msg;
             Exception = exception;
+            Result = result;
         }
 
         /// <summary>
@@ -32,14 +32,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static SearchResult FromError(string errorMessage, Exception exception = null)
-            => new SearchResult(false, null, errorMessage, exception);
+        internal static ConstructionResult FromError(string errorMessage, Exception exception = null)
+            => new ConstructionResult(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static SearchResult FromSuccess(CommandInfo match)
-            => new SearchResult(true, match);
+        internal static ConstructionResult FromSuccess(ICommandBase value)
+            => new ConstructionResult(true, value);
     }
 }

@@ -8,7 +8,7 @@ namespace CSF
     /// <remarks>
     ///     Do not use this interface to build modules or new commandbases on. Use <see cref="CommandBase{T}"/> instead.
     /// </remarks>
-    public interface ICommandBase
+    internal interface ICommandBase
     {
         /// <summary>
         ///     Formats and sends an error response.
