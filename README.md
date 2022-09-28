@@ -18,6 +18,8 @@ Samples are available to learn how to implement CSF in your own programs.
 
 - [CSF.Samples.Console](https://github.com/Rozen4334/CSF.NET/tree/master/Samples/CSF.Samples.Console)
   - Shows how to implement CSF on a basic console application.
+- [CSF.Samples.TShock](https://github.com/Rozen4334/CSF.NET/tree/master/Samples/CSF.Samples.TShock)
+  - Shows how to implement CSF.NET.TShock into a plugin.
 
 ## Extensions
 
