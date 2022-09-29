@@ -10,6 +10,6 @@
         ///     <br/><br/>
         ///     Make sure to call <see cref="CommandStandardizationFramework.BuildModulesAsync(System.Reflection.Assembly)"/> post-initialization to guarantee successful replacement.
         /// </remarks>
-        public bool ReplaceAllExisting { get; set; }
+        public bool ReplaceAllExisting { get; set; } = false;
     }
 }

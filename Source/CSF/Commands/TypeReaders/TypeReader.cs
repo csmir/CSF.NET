@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -11,5 +13,18 @@ namespace CSF
     {
         /// <inheritdoc />
         public abstract Task<TypeReaderResult> ReadAsync(ICommandContext context, ParameterInfo info, string value, IServiceProvider provider);
+    }
+
+    internal static class TypeReader
+    {
+        internal static Dictionary<Type, ITypeReader> RegisterDefaultReaders()
+        {
+            var dictionary = BaseTypeReader.CreateBaseReaders();
+
+            dictionary.Add(typeof(TimeSpan), new TimeSpanTypeReader());
+            dictionary.Add(typeof(Color), new ColorTypeReader());
+
+            return dictionary;
+        }
     }
 }

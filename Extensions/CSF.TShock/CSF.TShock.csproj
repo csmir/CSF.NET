@@ -28,6 +28,8 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	<Copyright>Armano den Boef and CSF contributors.</Copyright>
+	  
+	<PackageIconUrl>https://rozen.one/files/csf.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>

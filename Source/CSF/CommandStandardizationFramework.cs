@@ -73,7 +73,7 @@ namespace CSF
         public CommandStandardizationFramework(CommandConfiguration config)
         {
             CommandMap = new List<CommandInfo>();
-            TypeReaders = BaseTypeReader.RegisterAll();
+            TypeReaders = TypeReader.RegisterDefaultReaders();
             Configuration = config;
 
             _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();

@@ -17,7 +17,7 @@ namespace CSF
                 if (parser(value, out var result))
                     return Task.FromResult(TypeReaderResult.FromSuccess(result));
             }
-            return Task.FromResult(TypeReaderResult.FromError($"Invalid input! Expected {typeof(T).FullName}, got {value}. At: '{info.Name}'"));
+            return Task.FromResult(TypeReaderResult.FromError($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{info.Name}'"));
         }
 
         private static bool TryGetParser(out Tpd<T> parser)
@@ -76,7 +76,7 @@ namespace CSF
 
     internal static class BaseTypeReader
     {
-        public static Dictionary<Type, ITypeReader> RegisterAll()
+        public static Dictionary<Type, ITypeReader> CreateBaseReaders()
         {
             var callback = new Dictionary<Type, ITypeReader>
             {
