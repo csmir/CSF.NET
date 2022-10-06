@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSF.NET" Version="0.1.0-beta" />
+    <PackageReference Include="CSF.NET" Version="1.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
   </ItemGroup>
 
