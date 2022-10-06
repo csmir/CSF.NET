@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
 
-	<AssemblyVersion>0.1.1</AssemblyVersion>
-	<PackageVersion>0.1.1-beta</PackageVersion>
-	<FileVersion>0.1.1.0</FileVersion>
-	<Version>0.1.1</Version>
+	<AssemblyVersion>1.0.1</AssemblyVersion>
+	<PackageVersion>1.0.1</PackageVersion>
+	<FileVersion>1.0.1.0</FileVersion>
+	<Version>1.0.1</Version>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 
@@ -14,7 +14,7 @@
 	<RepositoryUrl>https://github.com/Rozen4334/CSF.NET</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 
-	<PackageReleaseNotes>Early access version 0.1.1; Made for netstandard2.0.</PackageReleaseNotes>
+	<PackageReleaseNotes>Version 1.0.1; Made for netstandard2.0.</PackageReleaseNotes>
 	<PackageTags>Text, Console, Commands, Framework, TShock</PackageTags>
 
 	<Title>Command Standardization Framework Extension; TShock for Terraria</Title>
@@ -46,13 +46,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSF.NET" Version="0.1.0-beta" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TShockAPI">
-      <HintPath>Reference\TShockAPI.dll</HintPath>
-    </Reference>
+    <PackageReference Include="CSF.NET" Version="0.1.1-beta" />
+    <PackageReference Include="TShock" Version="5.0.0-beta" />
   </ItemGroup>
 
 </Project>

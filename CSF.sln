@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Spectre", "Extensions\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Samples.TShock", "Samples\CSF.Samples.TShock\CSF.Samples.TShock.csproj", "{30B695C5-3AFF-46DB-A514-9B81B3013DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Tests", "Source\CSF.Tests\CSF.Tests.csproj", "{A70E8C5D-0209-433B-9AB7-9C05C0DA04E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Tests", "Source\CSF.Tests\CSF.Tests.csproj", "{A70E8C5D-0209-433B-9AB7-9C05C0DA04E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

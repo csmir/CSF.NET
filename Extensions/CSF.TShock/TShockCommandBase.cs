@@ -1,6 +1,6 @@
-﻿using System.Drawing;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TShockAPI;
+using Microsoft.Xna.Framework;
 
 namespace CSF.TShock
 {
@@ -57,7 +57,7 @@ namespace CSF.TShock
         /// <param name="color">The color to send this message in.</param>
         public void Respond(string message, Color color)
         {
-            Context.Player.SendMessage(message, color.R, color.G, color.B);
+            Context.Player.SendMessage(message, color);
         }
 
         /// <summary>
@@ -77,9 +77,11 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
+#pragma warning disable CA1822 // Mark members as static
         public void Announce(string message, Color color)
+#pragma warning restore CA1822 // Mark members as static
         {
-            TSPlayer.Server.SendMessage(message, color.R, color.G, color.B);
+            TSPlayer.Server.SendMessage(message, color);
         }
 
         /// <summary>
