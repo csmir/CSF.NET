@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 
-	<AssemblyVersion>0.1.0</AssemblyVersion>
-	<PackageVersion>0.1.0-beta</PackageVersion>
-	<FileVersion>0.1.0.0</FileVersion>
-	<Version>0.1</Version>
+	<AssemblyVersion>0.1.1</AssemblyVersion>
+	<PackageVersion>0.1.1-beta</PackageVersion>
+	<FileVersion>0.1.1.0</FileVersion>
+	<Version>0.1.1</Version>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 
@@ -14,7 +14,7 @@
 	<RepositoryUrl>https://github.com/Rozen4334/CSF.NET</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 
-	<PackageReleaseNotes>Early access version 0.1; Made for netstandard2.0.</PackageReleaseNotes>
+	<PackageReleaseNotes>Early access version 0.1.1; Made for netstandard2.0.</PackageReleaseNotes>
 	<PackageTags>Text, Console, Commands, Framework, TShock</PackageTags>
 
 	<Title>Command Standardization Framework Extension; TShock for Terraria</Title>
@@ -28,9 +28,22 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	<Copyright>Armano den Boef and CSF contributors.</Copyright>
-	  
-	<PackageIconUrl>https://rozen.one/files/csf.png</PackageIconUrl>
+
+	<PackageIcon>csf_nogap.png</PackageIcon>
+
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+	<None Include="..\..\README.md">
+	  <Pack>True</Pack>
+	  <PackagePath>\</PackagePath>
+	</None>
+	<None Include="..\..\Style\csf_nogap.png">
+	  <Pack>True</Pack>
+	  <PackagePath>\</PackagePath>
+	</None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CSF.NET" Version="0.1.0-beta" />
