@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSF.NET.TShock" Version="1.0.1" />
+    <PackageReference Include="TShock" Version="5.0.0-beta" />
+  </ItemGroup>
+
+</Project>
