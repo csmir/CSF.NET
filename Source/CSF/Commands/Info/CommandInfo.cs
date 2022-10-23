@@ -50,7 +50,7 @@ namespace CSF
         /// </summary>
         /// <param name="constructor"></param>
         /// <param name="method"></param>
-        internal CommandInfo(IReadOnlyDictionary<Type, ITypeReader> typeReaders, ModuleInfo module, MethodInfo method, string[] aliases)
+        internal CommandInfo(CommandConfiguration config, ModuleInfo module, MethodInfo method, string[] aliases)
         {
             Name = aliases[0];
             Aliases = aliases;
@@ -60,7 +60,7 @@ namespace CSF
 
             Attributes = Module.Attributes.Concat(GetAttributes(Method)).ToList();
             Preconditions = module.Preconditions.Concat(GetPreconditions(Attributes)).ToList();
-            Parameters = GetParameters(typeReaders, Method).ToList();
+            Parameters = GetParameters(config, Method).ToList();
 
             var remainderParameters = Parameters.Where(x => x.IsRemainder);
             if (remainderParameters.Any())
@@ -73,7 +73,7 @@ namespace CSF
             }
         }
 
-        private IEnumerable<ParameterInfo> GetParameters(IReadOnlyDictionary<Type, ITypeReader> typeReaders, MethodInfo method)
+        private IEnumerable<ParameterInfo> GetParameters(CommandConfiguration config, MethodInfo method)
         {
             var parameters = method.GetParameters();
 
@@ -86,10 +86,12 @@ namespace CSF
                 if (isNullable)
                     paramType = nullableType;
 
-                if (paramType == typeof(string))
+                if (paramType == typeof(string) || paramType == typeof(object))
                     yield return new ParameterInfo(param, null, isNullable);
-                else if (typeReaders.TryGetValue(paramType, out var value))
+
+                else if (config.TypeReaders.TryGetValue(paramType, out var value))
                     yield return new ParameterInfo(param, value, isNullable);
+
                 else
                     throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {paramType}");
             }

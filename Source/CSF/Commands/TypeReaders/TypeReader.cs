@@ -17,7 +17,7 @@ namespace CSF
 
     internal static class TypeReader
     {
-        internal static Dictionary<Type, ITypeReader> RegisterDefaultReaders()
+        internal static Dictionary<Type, ITypeReader> CreateDefaultReaders()
         {
             var dictionary = BaseTypeReader.CreateBaseReaders();
 

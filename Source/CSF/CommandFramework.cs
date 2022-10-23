@@ -18,11 +18,6 @@ namespace CSF
         public List<CommandInfo> CommandMap { get; private set; }
 
         /// <summary>
-        ///     The range of registered typereaders.
-        /// </summary>
-        public Dictionary<Type, ITypeReader> TypeReaders { get; private set; }
-
-        /// <summary>
         ///     The configuration for this service.
         /// </summary>
         public CommandConfiguration Configuration { get; private set; }
@@ -72,8 +67,10 @@ namespace CSF
         /// <param name="config"></param>
         public CommandFramework(CommandConfiguration config)
         {
+            if (config.TypeReaders == null)
+                config.TypeReaders = new TypeReaderDictionary(TypeReader.CreateDefaultReaders());
+
             CommandMap = new List<CommandInfo>();
-            TypeReaders = TypeReader.RegisterDefaultReaders();
             Configuration = config;
 
             _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
@@ -147,7 +144,7 @@ namespace CSF
 
                 try
                 {
-                    var command = new CommandInfo(TypeReaders, module, method, aliases);
+                    var command = new CommandInfo(Configuration, module, method, aliases);
 
                     if (Configuration.InvokeOnlyNameRegistrations)
                     {
@@ -167,46 +164,6 @@ namespace CSF
 
             return BuildResult.FromSuccess();
         }
-
-        /// <summary>
-        ///     Adds an <see cref="ITypeReader"/> to the framework.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify registration steps.
-        /// </remarks>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="reader"></param>
-        /// <param name="replaceExisting"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public virtual bool RegisterTypeReader<T>(TypeReader<T> reader, bool replaceExisting = true)
-        {
-            var type = typeof(T);
-
-            if (TypeReaders.ContainsKey(type))
-            {
-                if (replaceExisting)
-                {
-                    TypeReaders[type] = reader;
-                    return true;
-                }
-                return false;
-            }
-
-            TypeReaders.Add(type, reader);
-            return true;
-        }
-
-        /// <summary>
-        ///     Removes a typereader from the list of existing type readers.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify removal steps.
-        /// </remarks>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public virtual bool RemoveTypeReader<T>()
-            => TypeReaders.Remove(typeof(T));
 
         /// <summary>
         ///     Tries to execute a command with provided <see cref="ICommandContext"/>.
