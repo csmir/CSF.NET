@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace CSF.TShock
     /// <summary>
     ///     Represents a <see cref="CommandStandardizationFramework"/> intended to be functional for TShock plugins.
     /// </summary>
-    public class TSCommandFramework : CommandStandardizationFramework
+    public class TSCommandFramework : CommandFramework
     {
         /// <summary>
         ///     Represents the configuration for the framework in its current state.
@@ -79,6 +80,22 @@ namespace CSF.TShock
 
             if (!result.IsSuccess)
                 args.Player.SendErrorMessage(result.ErrorMessage);
+        }
+
+        protected override SearchResult CommandNotFoundResult<T>(T context)
+        {
+            return SearchResult.FromError($"A command with name: '{context.Name}' was not found.");
+        }
+
+        protected override SearchResult NoApplicableOverloadResult<T>(T context)
+        {
+            return SearchResult.FromError($"No best override was found for command with name: '{context.Name}'.");
+        }
+
+        protected override ExecuteResult UnhandledExceptionResult<T>(T context, CommandInfo command, Exception ex)
+        {
+            TShockAPI.TShock.Log.ConsoleError(ex.ToString());
+            return ExecuteResult.FromError($"An unhandled exception has occurred. Please check logs for more details");
         }
     }
 }

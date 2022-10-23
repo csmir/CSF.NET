@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace CSF.Spectre
 {
-    public class SpectreCommandBase<T> : CommandBase<T>
+    public class SpectreCommandBase<T> : ModuleBase<T>
         where T : ICommandContext
     {
         public override void RespondError(string message)

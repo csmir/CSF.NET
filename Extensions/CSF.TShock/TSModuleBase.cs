@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace CSF.TShock
 {
-    public class TSModuleBase<T> : CommandBase<T> 
+    public class TSModuleBase<T> : ModuleBase<T> 
         where T : ITSCommandContext
     {
         public override void RespondError(string message)
