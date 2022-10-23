@@ -10,7 +10,7 @@ namespace CSF
     /// <summary>
     ///     Represents the handler for registered commands.
     /// </summary>
-    public class CommandStandardizationFramework
+    public class CommandFramework
     {
         /// <summary>
         ///     The range of registered commands.
@@ -58,19 +58,19 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Creates a new instance of <see cref="CommandStandardizationFramework"/> with default configuration.
+        ///     Creates a new instance of <see cref="CommandFramework"/> with default configuration.
         /// </summary>
-        public CommandStandardizationFramework()
+        public CommandFramework()
             : this(new CommandConfiguration())
         {
 
         }
 
         /// <summary>
-        ///     Creates a new instance of <see cref="CommandStandardizationFramework"/> with provided configuration.
+        ///     Creates a new instance of <see cref="CommandFramework"/> with provided configuration.
         /// </summary>
         /// <param name="config"></param>
-        public CommandStandardizationFramework(CommandConfiguration config)
+        public CommandFramework(CommandConfiguration config)
         {
             CommandMap = new List<CommandInfo>();
             TypeReaders = TypeReader.RegisterDefaultReaders();
@@ -113,7 +113,7 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the registration flow.
         /// </remarks>
-        /// <param name="type">The <see cref="CommandBase{T}"/> to register.</param>
+        /// <param name="type">The <see cref="ModuleBase{T}"/> to register.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual async Task<BuildResult> BuildModuleAsync(Type type)
         {
@@ -141,7 +141,7 @@ namespace CSF
                 }
 
                 if (string.IsNullOrEmpty(name))
-                    return BuildResult.FromSuccess();
+                    continue;
 
                 aliases = new[] { name }.Concat(aliases).ToArray();
 
@@ -280,7 +280,7 @@ namespace CSF
             if (!constructResult.IsSuccess)
                 return constructResult;
 
-            var commandBase = (CommandBase<T>)constructResult.Result;
+            var commandBase = (ModuleBase<T>)constructResult.Result;
 
             // read typereaders & populate command
             var readResult = await ParseAsync(context, command, provider);
@@ -452,7 +452,7 @@ namespace CSF
 
             var obj = command.Module.Constructor.Invoke(services.ToArray());
 
-            if (!(obj is CommandBase<T> commandBase))
+            if (!(obj is ModuleBase<T> commandBase))
                 return InvalidModuleTypeResult(context, command.Module);
 
             commandBase.SetContext(context);
@@ -491,7 +491,7 @@ namespace CSF
         protected virtual ConstructionResult InvalidModuleTypeResult<T>(T context, ModuleInfo module)
             where T : ICommandContext
         {
-            return ConstructionResult.FromError($"Failed to interpret module of type {module.ModuleType.FullName} with type of {nameof(CommandBase<T>)}");
+            return ConstructionResult.FromError($"Failed to interpret module of type {module.ModuleType.FullName} with type of {nameof(ModuleBase<T>)}");
         }
 
         /// <summary>
@@ -553,7 +553,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="parameters">The parsed parameters required to populate the command method.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ExecuteResult"/> of this executed command.</returns>
-        protected virtual async Task<IResult> ExecuteAsync<T>(T context, CommandBase<T> commandBase, CommandInfo command, object[] parameters)
+        protected virtual async Task<IResult> ExecuteAsync<T>(T context, ModuleBase<T> commandBase, CommandInfo command, object[] parameters)
             where T : ICommandContext
         {
             try

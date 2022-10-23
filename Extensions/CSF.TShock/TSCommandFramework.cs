@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using TerrariaApi.Server;
 using TShockAPI;
 
 namespace CSF.TShock
@@ -8,24 +10,31 @@ namespace CSF.TShock
     /// <summary>
     ///     Represents a <see cref="CommandStandardizationFramework"/> intended to be functional for TShock plugins.
     /// </summary>
-    public class TShockCSF : CommandStandardizationFramework
+    public class TSCommandFramework : CommandStandardizationFramework
     {
         /// <summary>
         ///     Represents the configuration for the framework in its current state.
         /// </summary>
-        public new TShockCommandConfiguration Configuration { get; }
+        public new TSCommandConfiguration Configuration { get; }
 
         /// <summary>
-        ///     Creates a new <see cref="TShockCSF"/> for processing modules inside the framework.
+        ///     Creates a new <see cref="TSCommandFramework"/> for processing modules inside the framework.
         /// </summary>
         /// <param name="config"></param>
-        public TShockCSF(TShockCommandConfiguration config)
+        public TSCommandFramework(TSCommandConfiguration config, TerrariaPlugin registrator)
             : base(config)
         {
             config.InvokeOnlyNameRegistrations = true;
 
             Configuration = config;
             base.CommandRegistered += CommandRegistered;
+
+            var assembly = registrator.GetType().Assembly;
+
+            var result = BuildModulesAsync(assembly).GetAwaiter().GetResult();
+
+            if (!result.IsSuccess)
+                TShockAPI.TShock.Log.ConsoleError(result.ErrorMessage);
         }
 
         private new Task CommandRegistered(CommandInfo arg)
@@ -56,11 +65,17 @@ namespace CSF.TShock
             return Task.CompletedTask;
         }
 
-        private async Task ExecuteCommandAsync(CommandArgs args)
+        public virtual async Task<ITSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
         {
-            var context = new TShockCommandContext(args, args.Message);
+            await Task.CompletedTask;
+            return new TSCommandContext(args, rawInput);
+        }
 
-            var result = await base.ExecuteCommandAsync(context);
+        public virtual async Task ExecuteCommandAsync(CommandArgs args)
+        {
+            var context = await CreateContextAsync(args, args.Message);
+
+            var result = await ExecuteCommandAsync(context);
 
             if (!result.IsSuccess)
                 args.Player.SendErrorMessage(result.ErrorMessage);

@@ -6,27 +6,27 @@ namespace CSF.TShock
     /// <summary>
     ///     A command context providing TShock command info.
     /// </summary>
-    public class TShockCommandContext : ICommandContext
+    public class TSCommandContext : ITSCommandContext
     {
+        /// <inheritdoc/>
         public string Name { get; }
 
+        /// <inheritdoc/>
         public string RawInput { get; }
 
+        /// <inheritdoc/>
         public List<string> Parameters { get; }
 
-        /// <summary>
-        ///     Determines if the command is silently executed or not.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsSilent { get; }
 
-        /// <summary>
-        ///     The player invoking this command.
-        /// </summary>
+        /// <inheritdoc/>
         public TSPlayer Player { get; }
 
-        /// <summary>
-        ///     The TShock arguments provided for this command.
-        /// </summary>
+        /// <inheritdoc/>
+        public ServerInfo Server { get; }
+
+        /// <inheritdoc/>
         public CommandArgs CommandArguments { get; }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="args"></param>
         /// <param name="rawInput"></param>
-        public TShockCommandContext(CommandArgs args, string rawInput)
+        public TSCommandContext(CommandArgs args, string rawInput)
         {
             CommandArguments = args;
             RawInput = rawInput;
@@ -43,7 +43,7 @@ namespace CSF.TShock
             IsSilent = args.Silent;
 
             // Skip prefix & get first occurence
-            Name = args.Message.Substring(1).Split(' ')[0];
+            Name = args.Message[1..].Split(' ')[0];
         }
     }
 }

@@ -32,7 +32,7 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        internal static ConstructionResult FromError(string errorMessage, Exception exception = null)
+        public static ConstructionResult FromError(string errorMessage, Exception exception = null)
             => new ConstructionResult(false, null, errorMessage, exception);
 
         /// <summary>

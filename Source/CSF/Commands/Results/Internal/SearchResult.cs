@@ -32,7 +32,7 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        internal static SearchResult FromError(string errorMessage, Exception exception = null)
+        public static SearchResult FromError(string errorMessage, Exception exception = null)
             => new SearchResult(false, null, errorMessage, exception);
 
         /// <summary>

@@ -4,7 +4,8 @@ using Microsoft.Xna.Framework;
 
 namespace CSF.TShock
 {
-    public class TShockCommandBase : CommandBase<TShockCommandContext>
+    public class TSModuleBase<T> : CommandBase<T> 
+        where T : ITSCommandContext
     {
         public override void RespondError(string message)
         {
@@ -77,11 +78,9 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
-#pragma warning disable CA1822 // Mark members as static
         public void Announce(string message, Color color)
-#pragma warning restore CA1822 // Mark members as static
         {
-            TSPlayer.Server.SendMessage(message, color);
+            TShockAPI.TShock.Utils.Broadcast(message, color);
         }
 
         /// <summary>

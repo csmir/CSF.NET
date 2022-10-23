@@ -3,10 +3,10 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents an interface used by <see cref="CommandBase{T}"/> without needing to internally provide the generic parameter.
+    ///     Represents an interface used by <see cref="ModuleBase{T}"/> without needing to internally provide the generic parameter.
     /// </summary>
     /// <remarks>
-    ///     Do not use this interface to build modules or new commandbases on. Use <see cref="CommandBase{T}"/> instead.
+    ///     Do not use this interface to build modules or new commandbases on. Use <see cref="ModuleBase{T}"/> instead.
     /// </remarks>
     internal interface ICommandBase
     {

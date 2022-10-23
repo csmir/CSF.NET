@@ -7,7 +7,7 @@ namespace CSF
     ///     Represents a generic command base to implement commands with.
     /// </summary>
     /// <typeparam name="T">The <see cref="ICommandContext"/> expected to use for this command.</typeparam>
-    public abstract class CommandBase<T> : ICommandBase where T : ICommandContext
+    public abstract class ModuleBase<T> : ICommandBase where T : ICommandContext
     {
         /// <summary>
         ///     Gets the command's context.
@@ -26,8 +26,8 @@ namespace CSF
         /// <summary>
         ///     The command service used to execute this command.
         /// </summary>
-        public CommandStandardizationFramework Framework { get; private set; }
-        internal void SetSource(CommandStandardizationFramework service)
+        public CommandFramework Framework { get; private set; }
+        internal void SetSource(CommandFramework service)
             => Framework = service;
 
         /// <summary>

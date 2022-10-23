@@ -1,6 +1,6 @@
 ﻿namespace CSF.TShock
 {
-    public class TShockCommandConfiguration : CommandConfiguration
+    public class TSCommandConfiguration : CommandConfiguration
     {
         /// <summary>
         ///     Defines if all existing commands should be replaced.

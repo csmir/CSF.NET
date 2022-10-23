@@ -32,7 +32,7 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        internal static ParseResult FromError(string errorMessage, Exception exception = null)
+        public static ParseResult FromError(string errorMessage, Exception exception = null)
             => new ParseResult(false, null, errorMessage, exception);
 
         /// <summary>
