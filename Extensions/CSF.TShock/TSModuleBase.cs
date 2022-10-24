@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using TShockAPI;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CSF.TShock
 {
-    public class TSModuleBase<T> : ModuleBase<T> 
+    public class TSModuleBase<T> : ModuleBase<T>
         where T : ITSCommandContext
     {
         public override void RespondError(string message)

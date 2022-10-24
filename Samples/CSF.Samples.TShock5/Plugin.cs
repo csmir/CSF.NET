@@ -1,6 +1,6 @@
 ﻿using CSF.TShock;
-using TerrariaApi.Server;
 using Terraria;
+using TerrariaApi.Server;
 
 namespace CSF.Samples.TShock5
 {

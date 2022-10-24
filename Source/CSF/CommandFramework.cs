@@ -22,6 +22,14 @@ namespace CSF
         /// </summary>
         public CommandConfiguration Configuration { get; private set; }
 
+        /// <summary>
+        ///     The logger passed throughout the build and execution process.
+        /// </summary>
+        /// <remarks>
+        ///     The resolver behind this logger is available for modification in <see cref="ConfigureLogger"/>.
+        /// </remarks>
+        public ILogger Logger { get; private set; }
+
         private readonly AsyncEvent<Func<ICommandContext, IResult, Task>> _commandExecuted;
         /// <summary>
         ///     Invoked when a command is executed.
@@ -67,11 +75,13 @@ namespace CSF
         /// <param name="config"></param>
         public CommandFramework(CommandConfiguration config)
         {
-            if (config.TypeReaders == null)
-                config.TypeReaders = new TypeReaderDictionary(TypeReader.CreateDefaultReaders());
-
             CommandMap = new List<CommandInfo>();
             Configuration = config;
+
+            Logger = ConfigureLogger();
+
+            if (config.TypeReaders is null)
+                config.TypeReaders = new TypeReaderDictionary(TypeReader.CreateDefaultReaders());
 
             _commandRegistered = new AsyncEvent<Func<CommandInfo, Task>>();
             _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
@@ -79,15 +89,27 @@ namespace CSF
             if (Configuration.AutoRegisterModules)
             {
                 if (Configuration.RegistrationAssembly is null)
-                    return; // log
+                {
+                    Logger.WriteWarning("Auto-registration is enabled but the default registration assembly is not.");
+                    return;
+                }
 
-                var result = BuildModulesAsync(Configuration.RegistrationAssembly)
+                BuildModulesAsync(Configuration.RegistrationAssembly)
                     .GetAwaiter()
                     .GetResult();
-
-                if (!result.IsSuccess)
-                    return; // TODO: logging
             }
+        }
+
+        /// <summary>
+        ///     Configures the application logger and exposes it within the pipeline.
+        /// </summary>
+        /// <remarks>
+        ///     This method can be overridden to modify what will be registered.
+        /// </remarks>
+        /// <returns></returns>
+        protected virtual ILogger ConfigureLogger()
+        {
+            return new DefaultLogger(Configuration.DefaultLogLevel);
         }
 
         /// <summary>
@@ -98,10 +120,13 @@ namespace CSF
         /// </remarks>
         /// <param name="assembly">The assembly to find all modules for.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual async Task<IResult> BuildModulesAsync(Assembly assembly)
+        public virtual async Task BuildModulesAsync(Assembly assembly)
         {
             if (assembly is null)
-                return BuildResult.FromError("Expected a not-null value.", new ArgumentNullException(nameof(assembly)));
+            {
+                Logger.WriteError("Expected a not-null value.", new ArgumentNullException(nameof(assembly)));
+                return;
+            }
 
             var types = assembly.GetTypes();
 
@@ -110,15 +135,8 @@ namespace CSF
             foreach (var type in types)
             {
                 if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
-                {
-                    var result = await BuildModuleAsync(type);
-
-                    if (!result.IsSuccess)
-                        return result;
-                }
+                    await BuildModuleAsync(type);
             }
-
-            return BuildResult.FromSuccess();
         }
 
         /// <summary>
@@ -129,10 +147,13 @@ namespace CSF
         /// </remarks>
         /// <param name="type">The <see cref="ModuleBase{T}"/> to register.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual async Task<BuildResult> BuildModuleAsync(Type type)
+        public virtual async Task BuildModuleAsync(Type type)
         {
             if (type is null)
-                return BuildResult.FromError("Expected a not-null value.", new ArgumentNullException(nameof(type)));
+            {
+                Logger.WriteError("Expected a not-null value.", new ArgumentNullException(nameof(type)));
+                return;
+            }
 
             var module = new ModuleInfo(type);
 
@@ -149,7 +170,10 @@ namespace CSF
                     if (attribute is CommandAttribute commandAttribute)
                     {
                         if (string.IsNullOrEmpty(commandAttribute.Name))
-                            return BuildResult.FromError($"Commands cannot have a null or empty name. Failed at method: '{method.Name}'");
+                        {
+                            Logger.WriteWarning("Expected a not-null and not-empty command name.", new ArgumentNullException(method.Name));
+                            continue;
+                        }
                         name = commandAttribute.Name;
                     }
 
@@ -178,11 +202,10 @@ namespace CSF
                 }
                 catch (Exception ex)
                 {
-                    return BuildResult.FromError(ex.Message, ex);
+                    Logger.WriteCritical(ex.Message, ex);
+                    return;
                 }
             }
-
-            return BuildResult.FromSuccess();
         }
 
         /// <summary>
@@ -192,8 +215,7 @@ namespace CSF
         ///     If <see cref="CommandConfiguration.DoAsynchronousExecution"/> is enabled, the <see cref="IResult"/> of this method will always return success.
         ///     Use the <see cref="CommandExecuted"/> event to do post-execution processing.
         ///     <br/><br/>
-        ///     This method can be overridden to modify the execution entry flow. 
-        ///     If you want to change the order of execution or add extra steps, override <see cref="RunPipelineAsync{T}(T, IServiceProvider)"/> instead.
+        ///     If you want to change the order of execution or add extra steps, override <see cref="RunPipelineAsync{T}(T, IServiceProvider)"/>.
         /// </remarks>
         /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
@@ -237,7 +259,6 @@ namespace CSF
         protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider)
             where T : ICommandContext
         {
-            // search input for command
             var searchResult = await SearchAsync(context);
 
             if (!searchResult.IsSuccess)
@@ -245,21 +266,16 @@ namespace CSF
 
             var command = searchResult.Match;
 
-            // check preconditions
             var preconResult = await CheckAsync(context, command, provider);
 
             if (!preconResult.IsSuccess)
                 return preconResult;
 
-            // create class object & inject services
             var constructResult = await ConstructAsync(context, command, provider);
 
             if (!constructResult.IsSuccess)
                 return constructResult;
 
-            var commandBase = (ModuleBase<T>)constructResult.Result;
-
-            // read typereaders & populate command
             var readResult = await ParseAsync(context, command, provider);
 
             if (!readResult.IsSuccess)
@@ -267,8 +283,7 @@ namespace CSF
 
             var parameters = ((ParseResult)readResult).Result;
 
-            // run command
-            return await ExecuteAsync(context, commandBase, command, parameters.ToArray());
+            return await ExecuteAsync(context, (ModuleBase<T>)constructResult.Result, command, parameters.ToArray());
         }
 
         /// <summary>
@@ -434,6 +449,8 @@ namespace CSF
 
             commandBase.SetContext(context);
             commandBase.SetInformation(command);
+
+            commandBase.SetLogger(Logger);
             commandBase.SetSource(this);
 
             return ConstructionResult.FromSuccess(commandBase);

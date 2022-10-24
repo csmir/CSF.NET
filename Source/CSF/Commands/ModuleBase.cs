@@ -31,6 +31,13 @@ namespace CSF
             => Framework = service;
 
         /// <summary>
+        ///     The logger of the framework being used.
+        /// </summary>
+        public ILogger Logger { get; private set; }
+        internal void SetLogger(ILogger logger)
+            => Logger = logger;
+
+        /// <summary>
         ///     Invoked right before a command is executed.
         /// </summary>
         /// <remarks>
