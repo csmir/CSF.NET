@@ -22,7 +22,7 @@ namespace CSF
         /// </summary>
         public CommandConfiguration Configuration { get; private set; }
 
-        private readonly AsyncEvent<Func<ICommandContext, IResult, Task>> _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
+        private readonly AsyncEvent<Func<ICommandContext, IResult, Task>> _commandExecuted;
         /// <summary>
         ///     Invoked when a command is executed.
         /// </summary>
@@ -37,7 +37,7 @@ namespace CSF
                 => _commandExecuted.Remove(value);
         }
 
-        private readonly AsyncEvent<Func<CommandInfo, Task>> _commandRegistered = new AsyncEvent<Func<CommandInfo, Task>>();
+        private readonly AsyncEvent<Func<CommandInfo, Task>> _commandRegistered;
         /// <summary>
         ///     Invoked when a command is registered.
         /// </summary>
@@ -73,7 +73,21 @@ namespace CSF
             CommandMap = new List<CommandInfo>();
             Configuration = config;
 
+            _commandRegistered = new AsyncEvent<Func<CommandInfo, Task>>();
             _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
+
+            if (Configuration.AutoRegisterModules)
+            {
+                if (Configuration.RegistrationAssembly is null)
+                    return; // log
+
+                var result = BuildModulesAsync(Configuration.RegistrationAssembly)
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (!result.IsSuccess)
+                    return; // TODO: logging
+            }
         }
 
         /// <summary>
@@ -86,6 +100,9 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual async Task<IResult> BuildModulesAsync(Assembly assembly)
         {
+            if (assembly is null)
+                return BuildResult.FromError("Expected a not-null value.", new ArgumentNullException(nameof(assembly)));
+
             var types = assembly.GetTypes();
 
             var baseType = typeof(ICommandBase);
@@ -114,6 +131,9 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual async Task<BuildResult> BuildModuleAsync(Type type)
         {
+            if (type is null)
+                return BuildResult.FromError("Expected a not-null value.", new ArgumentNullException(nameof(type)));
+
             var module = new ModuleInfo(type);
 
             var methods = type.GetMethods();

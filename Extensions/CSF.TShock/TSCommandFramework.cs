@@ -22,20 +22,13 @@ namespace CSF.TShock
         ///     Creates a new <see cref="TSCommandFramework"/> for processing modules inside the framework.
         /// </summary>
         /// <param name="config"></param>
-        public TSCommandFramework(TSCommandConfiguration config, TerrariaPlugin registrator)
+        public TSCommandFramework(TSCommandConfiguration config)
             : base(config)
         {
             config.InvokeOnlyNameRegistrations = true;
 
             Configuration = config;
             base.CommandRegistered += CommandRegistered;
-
-            var assembly = registrator.GetType().Assembly;
-
-            var result = BuildModulesAsync(assembly).GetAwaiter().GetResult();
-
-            if (!result.IsSuccess)
-                TShockAPI.TShock.Log.ConsoleError(result.ErrorMessage);
         }
 
         private new Task CommandRegistered(CommandInfo arg)

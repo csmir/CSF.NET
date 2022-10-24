@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace CSF
 {
@@ -40,5 +41,15 @@ namespace CSF
         ///     In these cases, it is best to disable this option and self-implement module registration through <see cref="CommandFramework.BuildModulesAsync(System.Reflection.Assembly)"/> to avoid failures or unexpected behavior.
         /// </remarks>
         public bool AutoRegisterModules { get; set; } = false;
+
+        /// <summary>
+        ///     If <see cref="AutoRegisterModules"/> is enabled, this value needs to be populated with the target assembly to register modules for.
+        /// </summary>
+        /// <remarks>
+        ///     If this value is not needed, do not populate it. It's default value is <see langword="null"/>.
+        ///     <br/>
+        ///     The <see cref="CommandFramework"/> will not automatically register modules if this value is <see langword="null"/>, even if <see cref="AutoRegisterModules"/> is <see langword="true"/>.
+        /// </remarks>
+        public Assembly RegistrationAssembly { get; set; } = null;
     }
 }
