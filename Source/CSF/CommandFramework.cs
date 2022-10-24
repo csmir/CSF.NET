@@ -540,9 +540,9 @@ namespace CSF
         /// </remarks>
         /// <param name="param"></param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
-        protected virtual async Task<TypeReaderResult> ResolveMissingValue(ParameterInfo param)
+        protected virtual Task<TypeReaderResult> ResolveMissingValue(ParameterInfo param)
         {
-            return TypeReaderResult.FromError("Unresolved.");
+            return Task.FromResult(TypeReaderResult.FromError("Unresolved."));
         }
 
         /// <summary>
