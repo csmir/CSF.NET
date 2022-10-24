@@ -22,20 +22,13 @@ namespace CSF.TShock
         ///     Creates a new <see cref="TSCommandFramework"/> for processing modules inside the framework.
         /// </summary>
         /// <param name="config"></param>
-        public TSCommandFramework(TSCommandConfiguration config, TerrariaPlugin registrator)
+        public TSCommandFramework(TSCommandConfiguration config)
             : base(config)
         {
             config.InvokeOnlyNameRegistrations = true;
 
             Configuration = config;
             base.CommandRegistered += CommandRegistered;
-
-            var assembly = registrator.GetType().Assembly;
-
-            var result = BuildModulesAsync(assembly).GetAwaiter().GetResult();
-
-            if (!result.IsSuccess)
-                TShockAPI.TShock.Log.ConsoleError(result.ErrorMessage);
         }
 
         private new Task CommandRegistered(CommandInfo arg)
@@ -55,7 +48,7 @@ namespace CSF.TShock
                     description = descriptionAttribute.Description;
             }
 
-            if (shouldReplace)
+            if (shouldReplace || Configuration.ReplaceAllExisting)
                 Commands.ChatCommands.RemoveAll(x => x.Names.Any(o => arg.Aliases.Any(n => o == n)));
 
             Commands.ChatCommands.Add(new Command(string.Join(".", permissions), async (x) => await ExecuteCommandAsync(x), arg.Aliases)
