@@ -497,9 +497,21 @@ namespace CSF
                 }
 
                 if (param.IsOptional && context.Parameters.Count <= index)
-                    break;
+                {
+                    var missingResult = await ResolveMissingValue(param);
 
-                if (param.ParameterType == typeof(string))
+                    if (!missingResult.IsSuccess)
+                        break;
+
+                    var resultType = missingResult.Result.GetType();
+                    if (resultType != param.ParameterType)
+                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{param.ParameterType.Name}'. Got: '{resultType.Name}'");
+
+                    else
+                        parameters.Add(missingResult.Result);
+                }
+
+                if (param.ParameterType == typeof(string) || param.ParameterType == typeof(object))
                 {
                     parameters.Add(context.Parameters[index]);
                     index++;
@@ -516,6 +528,21 @@ namespace CSF
             }
 
             return ParseResult.FromSuccess(parameters.ToArray());
+        }
+
+        /// <summary>
+        ///     Called when the first optional parameter has a lacking value.
+        /// </summary>
+        /// <remarks>
+        ///     This method can be overridden to add uses for <see cref="SelfIfNullAttribute"/>'s.
+        ///     <br/>
+        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="ParameterInfo.ParameterType"/>.
+        /// </remarks>
+        /// <param name="param"></param>
+        /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
+        protected virtual async Task<TypeReaderResult> ResolveMissingValue(ParameterInfo param)
+        {
+            return TypeReaderResult.FromError("Unresolved.");
         }
 
         /// <summary>
