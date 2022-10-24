@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TShockAPI;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace CSF.TShock
 {
@@ -15,6 +16,26 @@ namespace CSF.TShock
         public override Task RespondErrorAsync(string message)
         {
             RespondError(message);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Responds with a multi-match error.
+        /// </summary>
+        /// <param name="matches">The found matches.</param>
+        public void RespondError(IEnumerable<object> matches)
+        {
+            Context.Player.SendMultipleMatchError(matches);
+        }
+
+        /// <summary>
+        ///     Responds with a multi-match error.
+        /// </summary>
+        /// <param name="matches">The found matches.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        public Task RespondErrorAsync(IEnumerable<object> matches)
+        {
+            RespondError(matches);
             return Task.CompletedTask;
         }
 
