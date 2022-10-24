@@ -48,7 +48,7 @@ namespace CSF.TShock
                     description = descriptionAttribute.Description;
             }
 
-            if (shouldReplace)
+            if (shouldReplace || Configuration.ReplaceAllExisting)
                 Commands.ChatCommands.RemoveAll(x => x.Names.Any(o => arg.Aliases.Any(n => o == n)));
 
             Commands.ChatCommands.Add(new Command(string.Join(".", permissions), async (x) => await ExecuteCommandAsync(x), arg.Aliases)
