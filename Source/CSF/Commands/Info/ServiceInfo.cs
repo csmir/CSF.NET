@@ -22,11 +22,17 @@ namespace CSF
         /// </summary>
         public bool IsOptional { get; }
 
-        internal ServiceInfo(Type type, bool isOptional, bool isNullable)
+        /// <summary>
+        ///     Defines if the service is injectable.
+        /// </summary>
+        public bool IsInjectable { get; }
+
+        internal ServiceInfo(Type type, bool isOptional, bool isNullable, bool isInjectable)
         {
             ServiceType = type;
             IsNullable = isNullable;
             IsOptional = isOptional;
+            IsInjectable = isInjectable;
         }
     }
 }

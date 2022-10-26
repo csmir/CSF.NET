@@ -38,7 +38,7 @@ namespace CSF
         internal ModuleInfo(Type type)
         {
             ModuleType = type;
-            Constructor = type.GetConstructors()[0];
+            Constructor = GetConstructor(type);
             ServiceTypes = GetServiceTypes(Constructor).ToList();
             Attributes = GetAttributes(ModuleType).ToList();
             Preconditions = GetPreconditions(Attributes).ToList();
@@ -51,6 +51,32 @@ namespace CSF
                 if (attr is Attribute attribute)
                     yield return attribute;
             }
+        }
+
+        private ConstructorInfo GetConstructor(Type type)
+        {
+            var constructors = type.GetConstructors();
+
+            if (!constructors.Any())
+                throw new InvalidOperationException($"Found no constructor on provided module type: {type.Name}");
+
+            var constructor = constructors[0];
+
+            if (constructors.Length is 1)
+                return constructor;
+
+            for (int i = 0; i < constructors.Length; i++)
+            {
+                var attributes = constructors[i].GetCustomAttributes(true);
+
+                foreach (var attribute in attributes)
+                {
+                    if (attribute is InjectionConstructorAttribute)
+                        return constructors[i];
+                }
+            }
+
+            return constructor;
         }
 
         private IEnumerable<PreconditionAttribute> GetPreconditions(IReadOnlyCollection<Attribute> attributes)
@@ -73,7 +99,14 @@ namespace CSF
                 if (isNullable)
                     type = nullableType;
 
-                yield return new ServiceInfo(type, param.IsOptional, isNullable);
+                var isInjectable = true;
+                foreach (var attr in param.GetCustomAttributes(true))
+                {
+                    if (attr is DontInjectAttribute)
+                        isInjectable = false;
+                }
+
+                yield return new ServiceInfo(type, param.IsOptional, isNullable, isInjectable);
             }
         }
     }

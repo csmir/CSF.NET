@@ -3,7 +3,10 @@
 var framework = new CommandFramework(new()
 {
     AutoRegisterModules = true,
-    RegistrationAssembly = typeof(Program).Assembly
+    RegistrationAssembly = typeof(Program).Assembly,
+    DefaultLogLevel = LogLevel.Trace,
+    TypeReaders = new TypeReaderDictionary()
+        .Include<LogLevel>(new EnumTypeReader<LogLevel>())
 });
 
 while (true)

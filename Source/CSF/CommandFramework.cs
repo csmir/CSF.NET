@@ -1,6 +1,7 @@
 ﻿using CSF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -88,6 +89,7 @@ namespace CSF
 
             if (Configuration.AutoRegisterModules)
             {
+                Logger.WriteDebug("Auto-registration enabled. Starting build process:");
                 if (Configuration.RegistrationAssembly is null)
                 {
                     Logger.WriteWarning("Auto-registration is enabled but the default registration assembly is not.");
@@ -109,6 +111,10 @@ namespace CSF
         /// <returns></returns>
         protected virtual ILogger ConfigureLogger()
         {
+#if RELEASE
+            if (Configuration.DefaultLogLevel is LogLevel.Trace)
+                Configuration.DefaultLogLevel = LogLevel.Debug;
+#endif
             return new DefaultLogger(Configuration.DefaultLogLevel);
         }
 
@@ -135,7 +141,10 @@ namespace CSF
             foreach (var type in types)
             {
                 if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
+                {
+                    Logger.WriteTrace($"Found module by name: {type.Name}.");
                     await BuildModuleAsync(type);
+                }
             }
         }
 
@@ -175,6 +184,7 @@ namespace CSF
                             continue;
                         }
                         name = commandAttribute.Name;
+                        Logger.WriteTrace($"Found command by name: {name}");
                     }
 
                     if (attribute is AliasesAttribute aliasesAttribute)
@@ -185,6 +195,7 @@ namespace CSF
                     continue;
 
                 aliases = new[] { name }.Concat(aliases).ToArray();
+                Logger.WriteTrace($"Concatenated aliases for {name}: {string.Join(", ", aliases)}");
 
                 try
                 {
@@ -193,12 +204,19 @@ namespace CSF
                     if (Configuration.InvokeOnlyNameRegistrations)
                     {
                         if (!CommandMap.Any(x => x.Aliases.SequenceEqual(command.Aliases)))
+                        {
                             await _commandRegistered.InvokeAsync(command);
+                            Logger.WriteTrace($"Invoked registration event for {command.Name}");
+                        }
                     }
                     else
+                    {
                         await _commandRegistered.InvokeAsync(command);
+                        Logger.WriteTrace($"Invoked registration event for {command.Name}");
+                    }
 
                     CommandMap.Add(command);
+                    Logger.WriteDebug($"Registered command {command.Name}.");
                 }
                 catch (Exception ex)
                 {
@@ -259,31 +277,31 @@ namespace CSF
         protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider)
             where T : ICommandContext
         {
-            var searchResult = await SearchAsync(context);
+            Logger.WriteDebug($"Starting command pipeline for name: '{context.Name}'");
 
+            var searchResult = await SearchAsync(context);
             if (!searchResult.IsSuccess)
                 return searchResult;
 
             var command = searchResult.Match;
 
             var preconResult = await CheckAsync(context, command, provider);
-
             if (!preconResult.IsSuccess)
                 return preconResult;
 
             var constructResult = await ConstructAsync(context, command, provider);
-
             if (!constructResult.IsSuccess)
                 return constructResult;
 
             var readResult = await ParseAsync(context, command, provider);
-
             if (!readResult.IsSuccess)
                 return readResult;
 
-            var parameters = ((ParseResult)readResult).Result;
-
-            return await ExecuteAsync(context, (ModuleBase<T>)constructResult.Result, command, parameters.ToArray());
+            return await ExecuteAsync(
+                context: context,
+                command: command,
+                commandBase: (ModuleBase<T>)constructResult.Result, 
+                parameters: ((ParseResult)readResult).Result.ToArray());
         }
 
         /// <summary>
@@ -352,6 +370,8 @@ namespace CSF
             if (match is null)
                 return NoApplicableOverloadResult(context);
 
+            Logger.WriteTrace($"Found matching command for name: '{context.Name}': {match.Name}");
+
             return SearchResult.FromSuccess(match);
         }
 
@@ -407,6 +427,8 @@ namespace CSF
                     return result;
             }
 
+            Logger.WriteTrace($"Succesfully ran precondition checks for {command.Name}.");
+
             return PreconditionResult.FromSuccess();
         }
 
@@ -452,6 +474,8 @@ namespace CSF
 
             commandBase.SetLogger(Logger);
             commandBase.SetSource(this);
+
+            Logger.WriteTrace($"Succesfully constructed module for {command.Name}");
 
             return ConstructionResult.FromSuccess(commandBase);
         }
@@ -544,6 +568,8 @@ namespace CSF
                 index++;
             }
 
+            Logger.WriteTrace($"Succesfully populated parameters for {command.Name}");
+
             return ParseResult.FromSuccess(parameters.ToArray());
         }
 
@@ -574,11 +600,14 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="parameters">The parsed parameters required to populate the command method.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ExecuteResult"/> of this executed command.</returns>
-        protected virtual async Task<IResult> ExecuteAsync<T>(T context, ModuleBase<T> commandBase, CommandInfo command, object[] parameters)
+        protected virtual async Task<IResult> ExecuteAsync<T>(T context, CommandInfo command, ModuleBase<T> commandBase, object[] parameters)
             where T : ICommandContext
         {
             try
             {
+                Logger.WriteDebug($"Starting execution of {commandBase.CommandInfo.Name}.");
+                var sw = Stopwatch.StartNew();
+
                 await commandBase.BeforeExecuteAsync(command, context);
 
                 var result = command.Method.Invoke(commandBase, parameters.ToArray());
@@ -602,6 +631,9 @@ namespace CSF
                 }
 
                 await commandBase.AfterExecuteAsync(command, context);
+
+                sw.Stop();
+                Logger.WriteDebug($"Finished execution of {commandBase.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
 
                 return ExecuteResult.FromSuccess();
             }
