@@ -62,13 +62,13 @@ namespace CSF
             Preconditions = module.Preconditions.Concat(GetPreconditions(Attributes)).ToList();
             Parameters = GetParameters(config, Method).ToList();
 
-            var remainderParameters = Parameters.Where(x => x.IsRemainder);
+            var remainderParameters = Parameters.Where(x => x.Flags.HasFlag(ParameterFlags.IsRemainder));
             if (remainderParameters.Any())
             {
                 if (remainderParameters.Count() > 1)
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} cannot exist on multiple parameters at once.");
 
-                if (!Parameters.Last().IsRemainder)
+                if (!Parameters.Last().Flags.HasFlag(ParameterFlags.IsRemainder))
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
             }
         }

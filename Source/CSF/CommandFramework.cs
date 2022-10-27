@@ -342,7 +342,7 @@ namespace CSF
                 {
                     foreach (var parameter in command.Parameters)
                     {
-                        if (parameter.IsRemainder)
+                        if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
                             match = command;
                     }
                 }
@@ -359,7 +359,7 @@ namespace CSF
                             break;
                         }
 
-                        if (!parameter.IsOptional)
+                        if (!parameter.Flags.HasFlag(ParameterFlags.IsOptional))
                         {
                             requiredLength++;
                         }
@@ -457,7 +457,7 @@ namespace CSF
                 {
                     var t = provider.GetService(service.ServiceType);
 
-                    if (t is null && !service.IsNullable)
+                    if (t is null && !service.Flags.HasFlag(ParameterFlags.IsNullable))
                         return ServiceNotFoundResult(context, service);
 
                     services.Add(t);
@@ -531,13 +531,13 @@ namespace CSF
 
             foreach (var param in command.Parameters)
             {
-                if (param.IsRemainder)
+                if (param.Flags.HasFlag(ParameterFlags.IsRemainder))
                 {
                     parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
                     break;
                 }
 
-                if (param.IsOptional && context.Parameters.Count <= index)
+                if (param.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
                 {
                     var missingResult = await ResolveMissingValue(param);
 

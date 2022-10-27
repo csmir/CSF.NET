@@ -21,19 +21,9 @@ namespace CSF
         public string Name { get; }
 
         /// <summary>
-        ///     Defines if the parameter is optional.
+        ///     The flags of this parameter.
         /// </summary>
-        public bool IsOptional { get; }
-
-        /// <summary>
-        ///     Defines the parameter is nullable.
-        /// </summary>
-        public bool IsNullable { get; }
-
-        /// <summary>
-        ///     Defines if the parameter is the parameterized remainder of the command.
-        /// </summary>
-        public bool IsRemainder { get; }
+        public ParameterFlags Flags { get; }
 
         /// <summary>
         ///     The typereader for this parameter.
@@ -47,8 +37,9 @@ namespace CSF
 
         internal ParameterInfo(SystemParameter paramInfo, ITypeReader reader, bool isNullable)
         {
-            IsNullable = isNullable;
-            IsOptional = paramInfo.IsOptional;
+            Flags.WithNullable(isNullable);
+            Flags.WithOptional(paramInfo.IsOptional);
+
             ParameterType = paramInfo.ParameterType;
             Name = paramInfo.Name;
             Reader = reader;
@@ -59,10 +50,8 @@ namespace CSF
                 if (ParameterType != typeof(string))
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on string parameters.");
 
-                IsRemainder = true;
+                Flags.WithRemainder();
             }
-            else
-                IsRemainder = false;
         }
 
         private IEnumerable<Attribute> GetAttributes(SystemParameter paramInfo)

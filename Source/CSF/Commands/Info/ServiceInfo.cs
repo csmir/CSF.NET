@@ -13,26 +13,14 @@ namespace CSF
         public Type ServiceType { get; }
 
         /// <summary>
-        ///     Defines if the service is nullable.
+        ///     The parameter flags for this service.
         /// </summary>
-        public bool IsNullable { get; }
+        public ParameterFlags Flags { get; }
 
-        /// <summary>
-        ///     Defines if the service is optional.
-        /// </summary>
-        public bool IsOptional { get; }
-
-        /// <summary>
-        ///     Defines if the service is injectable.
-        /// </summary>
-        public bool IsInjectable { get; }
-
-        internal ServiceInfo(Type type, bool isOptional, bool isNullable, bool isInjectable)
+        internal ServiceInfo(Type type, ParameterFlags flags)
         {
             ServiceType = type;
-            IsNullable = isNullable;
-            IsOptional = isOptional;
-            IsInjectable = isInjectable;
+            Flags = flags;
         }
     }
 }

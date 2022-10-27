@@ -106,7 +106,12 @@ namespace CSF
                         isInjectable = false;
                 }
 
-                yield return new ServiceInfo(type, param.IsOptional, isNullable, isInjectable);
+                var flags = ParameterFlags.Default
+                    .WithNullable(isNullable)
+                    .WithOptional(param.IsOptional)
+                    .WithInjectable(isInjectable);
+
+                yield return new ServiceInfo(type, flags);
             }
         }
     }
