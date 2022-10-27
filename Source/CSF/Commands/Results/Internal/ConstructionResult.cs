@@ -7,8 +7,10 @@ namespace CSF
     /// </summary>
     public readonly struct ConstructionResult : IResult
     {
+        /// <inheritdoc/>
         public bool IsSuccess { get; }
 
+        /// <inheritdoc/>
         public string ErrorMessage { get; }
 
         /// <summary>
@@ -16,6 +18,7 @@ namespace CSF
         /// </summary>
         internal ICommandBase Result { get; }
 
+        /// <inheritdoc/>
         public Exception Exception { get; }
 
         private ConstructionResult(bool success, ICommandBase result = null, string msg = null, Exception exception = null)

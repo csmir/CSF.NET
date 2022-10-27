@@ -7,10 +7,13 @@ namespace CSF
     /// </summary>
     public readonly struct PreconditionResult : IResult
     {
+        /// <inheritdoc/>
         public bool IsSuccess { get; }
 
+        /// <inheritdoc/>
         public string ErrorMessage { get; }
 
+        /// <inheritdoc/>
         public Exception Exception { get; }
 
         private PreconditionResult(bool success, string msg = null, Exception exception = null)

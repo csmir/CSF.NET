@@ -2,6 +2,9 @@
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the description of a command.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = false)]
     public class DescriptionAttribute : Attribute
     {

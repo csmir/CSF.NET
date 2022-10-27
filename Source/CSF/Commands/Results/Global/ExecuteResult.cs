@@ -7,10 +7,13 @@ namespace CSF
     /// </summary>
     public readonly struct ExecuteResult : IResult
     {
+        /// <inheritdoc/>
         public bool IsSuccess { get; }
 
+        /// <inheritdoc/>
         public string ErrorMessage { get; }
 
+        /// <inheritdoc/>
         public Exception Exception { get; }
 
         private ExecuteResult(bool success, string errorMessage = null, Exception exception = null)

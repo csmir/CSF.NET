@@ -7,8 +7,10 @@ namespace CSF
     /// </summary>
     public readonly struct SearchResult : IResult
     {
+        /// <inheritdoc/>
         public bool IsSuccess { get; }
 
+        /// <inheritdoc/>
         public string ErrorMessage { get; }
 
         /// <summary>
@@ -16,6 +18,7 @@ namespace CSF
         /// </summary>
         internal Command Match { get; }
 
+        /// <inheritdoc/>
         public Exception Exception { get; }
 
         private SearchResult(bool success, Command match = null, string msg = null, Exception exception = null)

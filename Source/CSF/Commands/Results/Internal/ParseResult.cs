@@ -7,8 +7,10 @@ namespace CSF
     /// </summary>
     public readonly struct ParseResult : IResult
     {
+        /// <inheritdoc/>
         public bool IsSuccess { get; }
 
+        /// <inheritdoc/>
         public string ErrorMessage { get; }
 
         /// <summary>
@@ -16,6 +18,7 @@ namespace CSF
         /// </summary>
         internal object[] Result { get; }
 
+        /// <inheritdoc/>
         public Exception Exception { get; }
 
         private ParseResult(bool success, object[] result = null, string msg = null, Exception exception = null)
