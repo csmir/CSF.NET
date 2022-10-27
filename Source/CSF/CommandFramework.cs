@@ -31,14 +31,14 @@ namespace CSF
         /// </remarks>
         public ILogger Logger { get; private set; }
 
-        private readonly AsyncEvent<Func<ICommandContext, IResult, Task>> _commandExecuted;
+        private readonly AsyncEvent<Func<IContext, IResult, Task>> _commandExecuted;
         /// <summary>
         ///     Invoked when a command is executed.
         /// </summary>
         /// <remarks>
         ///     This is the only way to do post-execution processing when <see cref="CommandConfiguration.DoAsynchronousExecution"/> is set to <see cref="true"/>.
         /// </remarks>
-        public event Func<ICommandContext, IResult, Task> CommandExecuted
+        public event Func<IContext, IResult, Task> CommandExecuted
         {
             add
                 => _commandExecuted.Add(value);
@@ -85,7 +85,7 @@ namespace CSF
                 config.TypeReaders = new TypeReaderDictionary(TypeReader.CreateDefaultReaders());
 
             _commandRegistered = new AsyncEvent<Func<Command, Task>>();
-            _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
+            _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
 
             if (Configuration.AutoRegisterModules)
             {
@@ -227,7 +227,7 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Tries to execute a command with provided <see cref="ICommandContext"/>.
+        ///     Tries to execute a command with provided <see cref="IContext"/>.
         /// </summary>
         /// <remarks>
         ///     If <see cref="CommandConfiguration.DoAsynchronousExecution"/> is enabled, the <see cref="IResult"/> of this method will always return success.
@@ -235,12 +235,12 @@ namespace CSF
         ///     <br/><br/>
         ///     If you want to change the order of execution or add extra steps, override <see cref="RunPipelineAsync{T}(T, IServiceProvider)"/>.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
         public async Task<IResult> ExecuteCommandAsync<T>(T context, IServiceProvider provider = null)
-            where T : ICommandContext
+            where T : IContext
         {
             if (provider is null)
                 provider = EmptyServiceProvider.Instance;
@@ -270,12 +270,12 @@ namespace CSF
         ///     This method can be overridden to modify the pipeline order. 
         ///     Not providing all existing steps while overriding this method will cause unpredictable behavior.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
         protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider)
-            where T : ICommandContext
+            where T : IContext
         {
             Logger.WriteDebug($"Starting command pipeline for name: '{context.Name}'");
 
@@ -300,18 +300,18 @@ namespace CSF
             return await ExecuteAsync(
                 context: context,
                 command: command,
-                commandBase: (ModuleBase<T>)constructResult.Result, 
+                commandBase: (ModuleBase<T>)constructResult.Result,
                 parameters: ((ParseResult)readResult).Result.ToArray());
         }
 
         /// <summary>
         ///     Searches through the <see cref="CommandMap"/> for the best possible match.
         /// </summary>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns></returns>
         protected virtual async Task<SearchResult> SearchAsync<T>(T context)
-            where T : ICommandContext
+            where T : IContext
         {
             await Task.CompletedTask;
 
@@ -381,11 +381,11 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="SearchResult"/> holding the returned error.</returns>
         protected virtual SearchResult CommandNotFoundResult<T>(T context)
-            where T : ICommandContext
+            where T : IContext
         {
             return SearchResult.FromError($"Failed to find command with name: {context.Name}.");
         }
@@ -396,11 +396,11 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="SearchResult"/> holding the returned error.</returns>
         protected virtual SearchResult NoApplicableOverloadResult<T>(T context)
-            where T : ICommandContext
+            where T : IContext
         {
             return SearchResult.FromError($"Failed to find overload that best matches input: {context.RawInput}.");
         }
@@ -411,13 +411,13 @@ namespace CSF
         /// <remarks>
         ///     Can be overridden to modify how checks are done and what should be returned if certain checks fail.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="PreconditionResult"/> of the first failed check or success if all checks succeeded.</returns>
         protected virtual async Task<PreconditionResult> CheckAsync<T>(T context, Command command, IServiceProvider provider)
-            where T : ICommandContext
+            where T : IContext
         {
             foreach (var precon in command.Preconditions)
             {
@@ -438,13 +438,13 @@ namespace CSF
         /// <remarks>
         ///     Can be overridden to modify how the command module is injected and constructed.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ConstructionResult"/> of the built module.</returns>
         protected virtual async Task<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider)
-            where T : ICommandContext
+            where T : IContext
         {
             await Task.CompletedTask;
 
@@ -486,12 +486,12 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="dependency">Information about the service to inject.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
         protected virtual ConstructionResult ServiceNotFoundResult<T>(T context, Dependency dependency)
-            where T : ICommandContext
+            where T : IContext
         {
             return ConstructionResult.FromError($"The service of type {dependency.Type.FullName} does not exist in the current {nameof(IServiceProvider)}.");
         }
@@ -502,29 +502,29 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="module">The module that failed to cast to an <see cref="ICommandBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
         protected virtual ConstructionResult InvalidModuleTypeResult<T>(T context, Module module)
-            where T : ICommandContext
+            where T : IContext
         {
             return ConstructionResult.FromError($"Failed to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<T>)}");
         }
 
         /// <summary>
-        ///     Tries to parse all parameter inputs provided by the <see cref="ICommandContext"/> to its expected type.
+        ///     Tries to parse all parameter inputs provided by the <see cref="IContext"/> to its expected type.
         /// </summary>
         /// <remarks>
         ///     This method can be overridden to add extra steps to parameter parsing or catch certain attributes being present.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ParseResult"/> of the parsed parameters of this command.</returns>
         protected virtual async Task<IResult> ParseAsync<T>(T context, Command command, IServiceProvider provider)
-            where T : ICommandContext
+            where T : IContext
         {
             int index = 0;
             var parameters = new List<object>();
@@ -594,14 +594,14 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to add extra steps to the execution of the command with all prior steps completed.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="commandBase">The module needed to execute the command method.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="parameters">The parsed parameters required to populate the command method.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ExecuteResult"/> of this executed command.</returns>
         protected virtual async Task<IResult> ExecuteAsync<T>(T context, Command command, ModuleBase<T> commandBase, object[] parameters)
-            where T : ICommandContext
+            where T : IContext
         {
             try
             {
@@ -649,8 +649,8 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
-        /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
-        /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="ex">The exception that occurred while executing the command.</param>
         /// <returns>A <see cref="ExecuteResult"/> holding the returned error.</returns>

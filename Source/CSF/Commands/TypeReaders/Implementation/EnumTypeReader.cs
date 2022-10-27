@@ -13,7 +13,7 @@ namespace CSF
     public class EnumTypeReader<T> : TypeReader<T>
         where T : struct, Enum
     {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, Parameter info, string value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, string value, IServiceProvider provider)
         {
             if (Enum.TryParse<T>(value, out var result))
                 return Task.FromResult(TypeReaderResult.FromSuccess(result));

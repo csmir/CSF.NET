@@ -4,40 +4,22 @@ using System.Threading.Tasks;
 
 namespace CSF.Utils
 {
-    /// <summary>
-    ///     Represents an asynchronous event container.
-    /// </summary>
-    /// <typeparam name="T">The delegate to invoke.</typeparam>
-    internal class AsyncEvent<T>
+    internal sealed class AsyncEvent<T>
         where T : class
     {
         private readonly object _subLock = new object();
 
         private readonly List<T> _subscriptions;
 
-        /// <summary>
-        ///     Checks if the event has any subscribers.
-        /// </summary>
         public bool HasSubscribers
             => _subscriptions.Count != 0;
 
-        /// <summary>
-        ///     The subscriptions to this event.
-        /// </summary>
         public IReadOnlyList<T> Subscriptions
             => _subscriptions;
 
-        /// <summary>
-        ///     Creates a new <see cref="AsyncEvent{T}"/>.
-        /// </summary>
         public AsyncEvent()
             => _subscriptions = new List<T>();
 
-        /// <summary>
-        ///     Adds a subscriber to the event.
-        /// </summary>
-        /// <param name="subscriber"></param>
-        /// <exception cref="ArgumentNullException"></exception>
         public void Add(T subscriber)
         {
             if (subscriber is null)
@@ -46,11 +28,6 @@ namespace CSF.Utils
                 _subscriptions.Add(subscriber);
         }
 
-        /// <summary>
-        ///     Removes a subscriber from the event.
-        /// </summary>
-        /// <param name="subscriber"></param>
-        /// <exception cref="ArgumentNullException"></exception>
         public void Remove(T subscriber)
         {
             if (subscriber is null)

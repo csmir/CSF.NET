@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace CSF
 {
@@ -50,7 +49,7 @@ namespace CSF
         {
             var type = paramInfo.ParameterType;
             var isNullable = Nullable.GetUnderlyingType(type) != null;
-                
+
             var isInjectable = true;
 
             foreach (var attribute in Attributes)

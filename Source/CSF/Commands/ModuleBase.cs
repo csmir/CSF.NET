@@ -6,8 +6,8 @@ namespace CSF
     /// <summary>
     ///     Represents a generic command base to implement commands with.
     /// </summary>
-    /// <typeparam name="T">The <see cref="ICommandContext"/> expected to use for this command.</typeparam>
-    public abstract class ModuleBase<T> : ICommandBase where T : ICommandContext
+    /// <typeparam name="T">The <see cref="IContext"/> expected to use for this command.</typeparam>
+    public abstract class ModuleBase<T> : ICommandBase where T : IContext
     {
         /// <summary>
         ///     Gets the command's context.

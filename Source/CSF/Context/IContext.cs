@@ -3,9 +3,9 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents a default interface for the <see cref="CommandContext"/> class.
+    ///     Represents an interface that supports all implementations of command context classes.
     /// </summary>
-    public interface ICommandContext
+    public interface IContext
     {
         /// <summary>
         ///     The name of the command.
@@ -21,5 +21,10 @@ namespace CSF
         ///     The command parameters.
         /// </summary>
         List<string> Parameters { get; }
+
+        /// <summary>
+        ///     The source of this command execution.
+        /// </summary>
+        ISource Source { get; }
     }
 }

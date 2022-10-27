@@ -3,8 +3,11 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Defines a precondition 
+    /// </summary>
     public abstract class PreconditionAttribute : Attribute
     {
-        public abstract Task<PreconditionResult> CheckAsync(ICommandContext context, Command info, IServiceProvider provider);
+        public abstract Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider);
     }
 }
