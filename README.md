@@ -12,7 +12,7 @@ CSF is an attribute based framework that makes creating and processing text base
 [Command("handle")]
 public IResult Handle(int param1, DateTime param2)
 {
-    return ExecuteResult.FromSuccess();
+    return Respond("{0}, {1}", param1, param2);
 }
 ```
 > This will automatically parse `int` by using the default `int.TryParse` implementation, and will do the same for the `DateTime`.
@@ -28,7 +28,7 @@ Outside of this, implementing and adding your own `TypeReader`'s is also support
 public void Handle([Remainder] string path)
 {
     if (!Path.Exists(path))
-        RespondError("Failed to find specified path!");
+        Error("Failed to find specified path!");
 }
 ```
 
@@ -61,11 +61,11 @@ _csf.CommandExecuted += async (context, result) =>
 
 ### 🔗 Virtual base class to support freely overriding all results:
 
-Every single method inside the `CommandStandardizationFramework` is virtual and can be overwritten if desired to change results or rewrite certain steps inside the pipeline.
+Every single method inside the `CommandFramework` is virtual and can be overwritten if desired to change results or rewrite certain steps inside the pipeline.
 
 ### 💡 Support for overriding context, module & framework:
 
-`ICommandContext` can be implemented in your own way, as it by itself serves as just a parsing tool. You can add a number of application-unique properties that are populated at creation. Because of how context's are created, it is easy to implement your own constructors and populate values from your own codebase.
+`IContext` can be implemented in your own way, as it by itself serves as just a parsing tool. You can add a number of application-unique properties that are populated at creation. Because of how context's are created, it is easy to implement your own constructors and populate values from your own codebase.
 
 ### 💉 Dependency injection:
 
@@ -73,8 +73,6 @@ You can provide an `IServiceProvider` at execution to inject modules with depend
 
 ## 🗺️ Roadmap
 
-- [x] Support dependency injection on module properties.
-- [x] Implement a better and customizable parameter parser.
 - [x] Add support for flags.
 - [x] Add regex parameter support.
 - [x] Add complex parameters.
@@ -109,13 +107,13 @@ CSF.NET works by grabbing all available modules on the specified assembly, stori
 
 Building the command map is done in a number of steps to ensure the pipeline can run through it succesfully.
 
-- [x] Find all types in the provided assembly and check if they inherit `CommandBase<>`.
+- [x] Find all types in the provided assembly and check if they inherit `ModuleBase<>`.
 - [x] Find all methods signed with `CommandAttribute`, if any. 
-- [x] Create a new `ModuleInfo` from the found module, and create a new `CommandInfo` for each command within.
+- [x] Create a new `Module` from the found module, and create a new `Command` for each command within.
 - [x] Populate the information with all found `TypeReader`s, `PreconditionAttribute`s, attributes and aliases.
 - [x] Add all aliases for the command to the commandmap, sharing a reference to the same target command.
 
-> The entire build process resides [here](https://github.com/Rozen4334/CSF.NET/blob/master/Source/CSF/CommandStandardizationFramework.cs).
+> The entire build process resides [here](https://github.com/Rozen4334/CSF.NET/blob/master/Source/CSF/CommandFramework.cs).
 
 ### 🔗 Pipeline steps:
 
@@ -131,4 +129,4 @@ The pipeline runs through several steps, in order, to make sure your command can
 - [x] Run the `AfterExecuteAsync` method.
 - [x] Return a result to the caller.
 
-> The entire pipeline process resides [here](https://github.com/Rozen4334/CSF.NET/blob/master/Source/CSF/CommandStandardizationFramework.cs).
+> The entire pipeline process resides [here](https://github.com/Rozen4334/CSF.NET/blob/master/Source/CSF/CommandFramework.cs).
