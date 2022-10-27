@@ -610,9 +610,9 @@ namespace CSF
 
                 await commandBase.BeforeExecuteAsync(command, context);
 
-                var result = command.Method.Invoke(commandBase, parameters.ToArray());
+                var returnValue = command.Method.Invoke(commandBase, parameters.ToArray());
 
-                switch (result)
+                switch (returnValue)
                 {
                     case Task<IResult> execTask:
                         var asyncResult = await execTask;
@@ -627,6 +627,13 @@ namespace CSF
                             return syncResult;
                         break;
                     default:
+                        if (returnValue is null)
+                            break;
+
+                        var unhandledResult = ProcessUnhandledReturnType(returnValue);
+                        if (!unhandledResult.IsSuccess)
+                            return unhandledResult;
+
                         break;
                 }
 
@@ -641,6 +648,16 @@ namespace CSF
             {
                 return UnhandledExceptionResult(context, command, ex);
             }
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="returnValue">The value returned by the </param>
+        /// <returns></returns>
+        protected virtual IResult ProcessUnhandledReturnType(object returnValue)
+        {
+            return ExecuteResult.FromError($"Received an unhandled type from method execution: {returnValue.GetType().Name}. \n\rConsider overloading {nameof(ProcessUnhandledReturnType)} if this is intended.");
         }
 
         /// <summary>
