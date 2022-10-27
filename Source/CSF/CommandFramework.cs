@@ -622,7 +622,7 @@ namespace CSF
                     case Task task:
                         await task;
                         break;
-                    case ExecuteResult syncResult:
+                    case IResult syncResult:
                         if (!syncResult.IsSuccess)
                             return syncResult;
                         break;
