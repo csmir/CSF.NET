@@ -16,12 +16,12 @@ namespace CSF
         /// <summary>
         ///     The result object of this reader.
         /// </summary>
-        internal ICommandBase Result { get; }
+        internal IModuleBase Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private ConstructionResult(bool success, ICommandBase result = null, string msg = null, Exception exception = null)
+        private ConstructionResult(bool success, IModuleBase result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             ErrorMessage = msg;
@@ -42,7 +42,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static ConstructionResult FromSuccess(ICommandBase value)
+        internal static ConstructionResult FromSuccess(IModuleBase value)
             => new ConstructionResult(true, value);
     }
 }

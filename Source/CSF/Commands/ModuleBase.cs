@@ -7,7 +7,7 @@ namespace CSF
     ///     Represents a generic command base to implement commands with.
     /// </summary>
     /// <typeparam name="T">The <see cref="IContext"/> expected to use for this command.</typeparam>
-    public abstract class ModuleBase<T> : ICommandBase where T : IContext
+    public abstract class ModuleBase<T> : IModuleBase where T : IContext
     {
         /// <summary>
         ///     Gets the command's context.
@@ -37,6 +37,60 @@ namespace CSF
         internal void SetLogger(ILogger logger)
             => Logger = logger;
 
+        /// <inheritdoc/>
+        public virtual ExecuteResult Error(string message, params object[] values)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(string.Format(message, values));
+            Console.ResetColor();
+
+            return ExecuteResult.FromSuccess();
+        }
+
+        /// <inheritdoc/>
+        public virtual Task<ExecuteResult> ErrorAsync(string message, params object[] values)
+            => Task.FromResult(Error(message, values));
+
+        /// <inheritdoc/>
+        public virtual ExecuteResult Success(string message, params object[] values)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(string.Format(message, values));
+            Console.ResetColor();
+
+            return ExecuteResult.FromSuccess();
+        }
+
+        /// <inheritdoc/>
+        public virtual Task<ExecuteResult> SuccessAsync(string message, params object[] values)
+            => Task.FromResult(Success(message, values));
+
+        /// <inheritdoc/>
+        public virtual ExecuteResult Info(string message, params object[] values)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(string.Format(message, values));
+            Console.ResetColor();
+
+            return ExecuteResult.FromSuccess();
+        }
+
+        /// <inheritdoc/>
+        public virtual Task<ExecuteResult> InfoAsync(string message, params object[] values)
+            => Task.FromResult(Info(message, values));
+
+        /// <inheritdoc/>
+        public virtual ExecuteResult Respond(string message, params object[] values)
+        {
+            Console.WriteLine(string.Format(message, values));
+
+            return ExecuteResult.FromSuccess();
+        }
+
+        /// <inheritdoc/>
+        public virtual Task<ExecuteResult> RespondAsync(string message, params object[] values)
+            => Task.FromResult(Respond(message, values));
+
         /// <summary>
         ///     Invoked right before a command is executed.
         /// </summary>
@@ -62,56 +116,6 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual Task AfterExecuteAsync(Command info, T context)
         {
-            return Task.CompletedTask;
-        }
-
-        public virtual void RespondError(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        public virtual Task RespondErrorAsync(string message)
-        {
-            RespondError(message);
-            return Task.CompletedTask;
-        }
-
-        public virtual void RespondSuccess(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        public virtual Task RespondSuccessAsync(string message)
-        {
-            RespondSuccess(message);
-            return Task.CompletedTask;
-        }
-
-        public virtual void RespondInformation(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        public virtual Task RespondInformationAsync(string message)
-        {
-            RespondInformation(message);
-            return Task.CompletedTask;
-        }
-
-        public virtual void Respond(string message)
-        {
-            Console.WriteLine(message);
-        }
-
-        public virtual Task RespondAsync(string message)
-        {
-            Respond(message);
             return Task.CompletedTask;
         }
     }

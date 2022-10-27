@@ -136,7 +136,7 @@ namespace CSF
 
             var types = assembly.GetTypes();
 
-            var baseType = typeof(ICommandBase);
+            var baseType = typeof(IModuleBase);
 
             foreach (var type in types)
             {
@@ -497,14 +497,14 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Returns the error message when the module in question cannot be cast to an <see cref="ICommandBase"/>.
+        ///     Returns the error message when the module in question cannot be cast to an <see cref="IModuleBase"/>.
         /// </summary>
         /// <remarks>
         ///     This method can be overridden to modify the error response.
         /// </remarks>
         /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
-        /// <param name="module">The module that failed to cast to an <see cref="ICommandBase"/>.</param>
+        /// <param name="module">The module that failed to cast to an <see cref="IModuleBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
         protected virtual ConstructionResult InvalidModuleTypeResult<T>(T context, Module module)
             where T : IContext

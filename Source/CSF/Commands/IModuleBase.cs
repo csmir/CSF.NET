@@ -2,64 +2,58 @@
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents an interface used by <see cref="ModuleBase{T}"/> without needing to internally provide the generic parameter.
-    /// </summary>
-    /// <remarks>
-    ///     Do not use this interface to build modules or new commandbases on. Use <see cref="ModuleBase{T}"/> instead.
-    /// </remarks>
-    internal interface ICommandBase
+    internal interface IModuleBase
     {
         /// <summary>
         ///     Formats and sends an error response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        void RespondError(string message);
+        ExecuteResult Error(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends an error response.
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task RespondErrorAsync(string message);
+        Task<ExecuteResult> ErrorAsync(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends a successful response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        void RespondSuccess(string message);
+        ExecuteResult Success(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends a successful response.
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task RespondSuccessAsync(string message);
+        Task<ExecuteResult> SuccessAsync(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends an informational response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        void RespondInformation(string message);
+        ExecuteResult Info(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends an informational response.
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task RespondInformationAsync(string message);
+        Task<ExecuteResult> InfoAsync(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends a plain response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        void Respond(string message);
+        ExecuteResult Respond(string message, params object[] values);
 
         /// <summary>
         ///     Formats and sends a plain response.
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task RespondAsync(string message);
+        Task<ExecuteResult> RespondAsync(string message, params object[] values);
     }
 }

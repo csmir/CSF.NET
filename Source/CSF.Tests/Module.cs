@@ -5,21 +5,17 @@
         [Command("help")]
         public IResult Help()
         {
-            Console.WriteLine("Success");
-
             Logger.WriteDebug("Test message");
 
-            return ExecuteResult.FromSuccess();
+            return Success("Success");
         }
 
         [Command("loglevel")]
         public IResult LogLevel(LogLevel level)
         {
-            Console.WriteLine("Success");
-
             Logger.LogLevel = level;
 
-            return ExecuteResult.FromSuccess();
+            return Success("Success");
         }
     }
 }
