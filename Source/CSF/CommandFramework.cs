@@ -16,7 +16,7 @@ namespace CSF
         /// <summary>
         ///     The range of registered commands.
         /// </summary>
-        public List<CommandInfo> CommandMap { get; private set; }
+        public List<Command> CommandMap { get; private set; }
 
         /// <summary>
         ///     The configuration for this service.
@@ -46,14 +46,14 @@ namespace CSF
                 => _commandExecuted.Remove(value);
         }
 
-        private readonly AsyncEvent<Func<CommandInfo, Task>> _commandRegistered;
+        private readonly AsyncEvent<Func<Command, Task>> _commandRegistered;
         /// <summary>
         ///     Invoked when a command is registered.
         /// </summary>
         /// <remarks>
         ///     This event can be used to do additional registration steps for certain services.
         /// </remarks>
-        public event Func<CommandInfo, Task> CommandRegistered
+        public event Func<Command, Task> CommandRegistered
         {
             add
                 => _commandRegistered.Add(value);
@@ -76,7 +76,7 @@ namespace CSF
         /// <param name="config"></param>
         public CommandFramework(CommandConfiguration config)
         {
-            CommandMap = new List<CommandInfo>();
+            CommandMap = new List<Command>();
             Configuration = config;
 
             Logger = ConfigureLogger();
@@ -84,7 +84,7 @@ namespace CSF
             if (config.TypeReaders is null)
                 config.TypeReaders = new TypeReaderDictionary(TypeReader.CreateDefaultReaders());
 
-            _commandRegistered = new AsyncEvent<Func<CommandInfo, Task>>();
+            _commandRegistered = new AsyncEvent<Func<Command, Task>>();
             _commandExecuted = new AsyncEvent<Func<ICommandContext, IResult, Task>>();
 
             if (Configuration.AutoRegisterModules)
@@ -164,7 +164,7 @@ namespace CSF
                 return;
             }
 
-            var module = new ModuleInfo(type);
+            var module = new Module(type);
 
             var methods = type.GetMethods();
 
@@ -199,7 +199,7 @@ namespace CSF
 
                 try
                 {
-                    var command = new CommandInfo(Configuration, module, method, aliases);
+                    var command = new Command(Configuration, module, method, aliases);
 
                     if (Configuration.InvokeOnlyNameRegistrations)
                     {
@@ -323,7 +323,7 @@ namespace CSF
             if (commands.Count < 1)
                 return CommandNotFoundResult(context);
 
-            CommandInfo match = null;
+            Command match = null;
             foreach (var command in commands)
             {
                 var commandLength = command.Parameters.Count;
@@ -416,7 +416,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="PreconditionResult"/> of the first failed check or success if all checks succeeded.</returns>
-        protected virtual async Task<PreconditionResult> CheckAsync<T>(T context, CommandInfo command, IServiceProvider provider)
+        protected virtual async Task<PreconditionResult> CheckAsync<T>(T context, Command command, IServiceProvider provider)
             where T : ICommandContext
         {
             foreach (var precon in command.Preconditions)
@@ -443,28 +443,28 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ConstructionResult"/> of the built module.</returns>
-        protected virtual async Task<ConstructionResult> ConstructAsync<T>(T context, CommandInfo command, IServiceProvider provider)
+        protected virtual async Task<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider)
             where T : ICommandContext
         {
             await Task.CompletedTask;
 
             var services = new List<object>();
-            foreach (var service in command.Module.ServiceTypes)
+            foreach (var dependency in command.Module.Constructor.Dependencies)
             {
-                if (service.ServiceType is IServiceProvider)
+                if (dependency.Type is IServiceProvider)
                     services.Add(provider);
                 else
                 {
-                    var t = provider.GetService(service.ServiceType);
+                    var t = provider.GetService(dependency.Type);
 
-                    if (t is null && !service.Flags.HasFlag(ParameterFlags.IsNullable))
-                        return ServiceNotFoundResult(context, service);
+                    if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
+                        return ServiceNotFoundResult(context, dependency);
 
                     services.Add(t);
                 }
             }
 
-            var obj = command.Module.Constructor.Invoke(services.ToArray());
+            var obj = command.Module.Constructor.EntryPoint.Invoke(services.ToArray());
 
             if (!(obj is ModuleBase<T> commandBase))
                 return InvalidModuleTypeResult(context, command.Module);
@@ -488,12 +488,12 @@ namespace CSF
         /// </remarks>
         /// <typeparam name="T">The <see cref="ICommandContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
-        /// <param name="service">Information about the service to inject.</param>
+        /// <param name="dependency">Information about the service to inject.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        protected virtual ConstructionResult ServiceNotFoundResult<T>(T context, ServiceInfo service)
+        protected virtual ConstructionResult ServiceNotFoundResult<T>(T context, Dependency dependency)
             where T : ICommandContext
         {
-            return ConstructionResult.FromError($"The service of type {service.ServiceType.FullName} does not exist in the current {nameof(IServiceProvider)}.");
+            return ConstructionResult.FromError($"The service of type {dependency.Type.FullName} does not exist in the current {nameof(IServiceProvider)}.");
         }
 
         /// <summary>
@@ -506,10 +506,10 @@ namespace CSF
         /// <param name="context">The <see cref="ICommandContext"/> used to run the command.</param>
         /// <param name="module">The module that failed to cast to an <see cref="ICommandBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        protected virtual ConstructionResult InvalidModuleTypeResult<T>(T context, ModuleInfo module)
+        protected virtual ConstructionResult InvalidModuleTypeResult<T>(T context, Module module)
             where T : ICommandContext
         {
-            return ConstructionResult.FromError($"Failed to interpret module of type {module.ModuleType.FullName} with type of {nameof(ModuleBase<T>)}");
+            return ConstructionResult.FromError($"Failed to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<T>)}");
         }
 
         /// <summary>
@@ -523,7 +523,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ParseResult"/> of the parsed parameters of this command.</returns>
-        protected virtual async Task<IResult> ParseAsync<T>(T context, CommandInfo command, IServiceProvider provider)
+        protected virtual async Task<IResult> ParseAsync<T>(T context, Command command, IServiceProvider provider)
             where T : ICommandContext
         {
             int index = 0;
@@ -545,21 +545,21 @@ namespace CSF
                         break;
 
                     var resultType = missingResult.Result.GetType();
-                    if (resultType != param.ParameterType)
-                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{param.ParameterType.Name}'. Got: '{resultType.Name}'");
+                    if (resultType != param.Type)
+                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{param.Type.Name}'. Got: '{resultType.Name}'");
 
                     else
                         parameters.Add(missingResult.Result);
                 }
 
-                if (param.ParameterType == typeof(string) || param.ParameterType == typeof(object))
+                if (param.Type == typeof(string) || param.Type == typeof(object))
                 {
                     parameters.Add(context.Parameters[index]);
                     index++;
                     continue;
                 }
 
-                var result = await param.Reader.ReadAsync(context, param, context.Parameters[index], provider);
+                var result = await param.TypeReader.ReadAsync(context, param, context.Parameters[index], provider);
 
                 if (!result.IsSuccess)
                     return result;
@@ -579,11 +579,11 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to add uses for <see cref="SelfIfNullAttribute"/>'s.
         ///     <br/>
-        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="ParameterInfo.ParameterType"/>.
+        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="Parameter.Type"/>.
         /// </remarks>
         /// <param name="param"></param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
-        protected virtual Task<TypeReaderResult> ResolveMissingValue(ParameterInfo param)
+        protected virtual Task<TypeReaderResult> ResolveMissingValue(Parameter param)
         {
             return Task.FromResult(TypeReaderResult.FromError("Unresolved."));
         }
@@ -600,7 +600,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="parameters">The parsed parameters required to populate the command method.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="ExecuteResult"/> of this executed command.</returns>
-        protected virtual async Task<IResult> ExecuteAsync<T>(T context, CommandInfo command, ModuleBase<T> commandBase, object[] parameters)
+        protected virtual async Task<IResult> ExecuteAsync<T>(T context, Command command, ModuleBase<T> commandBase, object[] parameters)
             where T : ICommandContext
         {
             try
@@ -654,7 +654,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="ex">The exception that occurred while executing the command.</param>
         /// <returns>A <see cref="ExecuteResult"/> holding the returned error.</returns>
-        protected virtual ExecuteResult UnhandledExceptionResult<T>(T context, CommandInfo command, Exception ex)
+        protected virtual ExecuteResult UnhandledExceptionResult<T>(T context, Command command, Exception ex)
         {
             return ExecuteResult.FromError(ex.Message, ex);
         }

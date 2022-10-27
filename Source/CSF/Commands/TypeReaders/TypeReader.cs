@@ -12,12 +12,12 @@ namespace CSF
     public abstract class TypeReader<T> : ITypeReader
     {
         /// <inheritdoc />
-        public abstract Task<TypeReaderResult> ReadAsync(ICommandContext context, ParameterInfo info, string value, IServiceProvider provider);
+        public abstract Task<TypeReaderResult> ReadAsync(ICommandContext context, Parameter info, string value, IServiceProvider provider);
     }
 
     internal static class TypeReader
     {
-        internal static Dictionary<Type, ITypeReader> CreateDefaultReaders()
+        public static Dictionary<Type, ITypeReader> CreateDefaultReaders()
         {
             var dictionary = BaseTypeReader.CreateBaseReaders();
 

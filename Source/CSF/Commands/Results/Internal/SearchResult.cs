@@ -14,11 +14,11 @@ namespace CSF
         /// <summary>
         ///     The command that matched the search best, and will be used for continuing the pipeline.
         /// </summary>
-        internal CommandInfo Match { get; }
+        internal Command Match { get; }
 
         public Exception Exception { get; }
 
-        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
+        private SearchResult(bool success, Command match = null, string msg = null, Exception exception = null)
         {
             Match = match;
             IsSuccess = success;
@@ -39,7 +39,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static SearchResult FromSuccess(CommandInfo match)
+        internal static SearchResult FromSuccess(Command match)
             => new SearchResult(true, match);
     }
 }

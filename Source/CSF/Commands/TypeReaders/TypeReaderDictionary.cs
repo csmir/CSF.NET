@@ -99,6 +99,13 @@ namespace CSF
         public bool TryGetValue(Type type, out ITypeReader reader)
         {
             reader = null;
+
+            if (type == typeof(string))
+                return true;
+
+            if (type == typeof(object))
+                return true;
+
             if (_typeReaders.ContainsKey(type))
             {
                 reader = _typeReaders[type];

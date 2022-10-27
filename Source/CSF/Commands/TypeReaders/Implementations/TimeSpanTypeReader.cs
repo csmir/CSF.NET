@@ -36,7 +36,7 @@ namespace CSF
             };
         }
 
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, ParameterInfo info, string value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, Parameter info, string value, IServiceProvider provider)
         {
             if (!TimeSpan.TryParse(value, out TimeSpan span))
             {
