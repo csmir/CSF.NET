@@ -5,7 +5,7 @@ var framework = new CommandFramework(new()
     AutoRegisterModules = true,
     RegistrationAssembly = typeof(Program).Assembly,
     DefaultLogLevel = LogLevel.Trace,
-    TypeReaders = new TypeReaderDictionary()
+    TypeReaders = new TypReaderProvider()
         .Include<LogLevel>(new EnumTypeReader<LogLevel>())
 });
 

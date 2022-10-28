@@ -19,6 +19,6 @@ namespace CSF
         /// <param name="value">The string value that will populate this parameter.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used in the current scope.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> with provided error or successful parse.</returns>
-        Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, string value, IServiceProvider provider);
+        Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, object value, IServiceProvider provider);
     }
 }

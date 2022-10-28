@@ -56,8 +56,13 @@ namespace CSF
         ///     All <see cref="ITypeReader"/>'s accessible by the <see cref="CommandFramework"/> this configuration will be passed to.
         /// </summary>
         /// <remarks>
-        ///     Chain calls to <see cref="TypeReaderDictionary.Include(Type, ITypeReader)"/> an <see cref="TypeReaderDictionary.Include{T}(TypeReader{T})"/> to populate the dictionary with your own <see cref="ITypeReader"/>'s.
+        ///     Chain calls to <see cref="TypReaderProvider.Include(Type, ITypeReader)"/> an <see cref="TypReaderProvider.Include{T}(TypeReader{T})"/> to populate the dictionary with your own <see cref="ITypeReader"/>'s.
         /// </remarks>
-        public TypeReaderDictionary TypeReaders { get; set; }
+        public TypReaderProvider TypeReaders { get; set; }
+
+        /// <summary>
+        ///     All <see cref="IPrefix"/>'s accessible by the <see cref="CommandFramework"/> this configuration will be passed to.
+        /// </summary>
+        public PrefixProvider Prefixes { get; set; }
     }
 }

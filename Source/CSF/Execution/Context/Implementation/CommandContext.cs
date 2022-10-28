@@ -10,33 +10,38 @@ namespace CSF
         /// <inheritdoc/>
         public string Name { get; }
 
-        /// <inheritdoc/>
+        /// <remarks>
+        ///     The raw input of the command.
+        /// </remarks>
         public string RawInput { get; }
 
         /// <inheritdoc/>
-        public List<string> Parameters { get; }
+        public IReadOnlyList<object> Parameters { get; }
 
         /// <inheritdoc/>
         public ISource Source { get; }
 
         /// <summary>
+        ///     The prefix for the command.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if not set in <see cref="CommandContext(string, IPrefix)"/>.
+        /// </remarks>
+        public IPrefix Prefix { get; }
+
+        /// <summary>
         ///     Creates a new <see cref="CommandContext"/> from the provided raw input.
         /// </summary>
         /// <param name="rawInput"></param>
-        /// <param name="expectedPrefix"></param>
-        public CommandContext(string rawInput, string expectedPrefix = null)
+        public CommandContext(string rawInput, IPrefix prefix = null)
         {
-            if (!string.IsNullOrEmpty(expectedPrefix))
-                rawInput = rawInput.Substring(expectedPrefix.Length);
-
             RawInput = rawInput;
+            Prefix = prefix;
 
-            var parameters = GetParameters();
-
-            Name = parameters[0];
-            Parameters = parameters.GetRange(1, parameters.Count - 1);
-
+            Parameters = GetParameters();
             Source = GetSource();
+
+            Name = Parameters[0].ToString();
         }
 
         /// <summary>
@@ -52,7 +57,7 @@ namespace CSF
         ///     Populates the <see cref="Parameters"/> of this context.
         /// </summary>
         /// <returns></returns>
-        protected virtual List<string> GetParameters()
+        protected virtual IReadOnlyList<object> GetParameters()
         {
             return Parser.Parse(RawInput);
         }

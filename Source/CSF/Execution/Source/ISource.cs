@@ -1,7 +1,7 @@
 ﻿namespace CSF
 {
     /// <summary>
-    ///     The source of an executed command.
+    ///     Represents a command's source.
     /// </summary>
     public interface ISource
     {

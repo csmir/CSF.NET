@@ -6,24 +6,24 @@ namespace CSF
     /// <summary>
     ///     Represents a dictionary of type readers.
     /// </summary>
-    public sealed class TypeReaderDictionary
+    public sealed class TypReaderProvider
     {
         private readonly Dictionary<Type, ITypeReader> _typeReaders;
 
         /// <summary>
         ///     Creates a new typereader dictionary with all default readers.
         /// </summary>
-        public TypeReaderDictionary()
+        public TypReaderProvider()
             : this(TypeReader.CreateDefaultReaders())
         {
 
         }
 
         /// <summary>
-        ///     Creates a new <see cref="TypeReaderDictionary"/> with self-defined default readers.
+        ///     Creates a new <see cref="TypReaderProvider"/> with self-defined default readers.
         /// </summary>
         /// <param name="dictionary"></param>
-        public TypeReaderDictionary(Dictionary<Type, ITypeReader> dictionary)
+        public TypReaderProvider(Dictionary<Type, ITypeReader> dictionary)
         {
             _typeReaders = dictionary;
         }
@@ -42,40 +42,40 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Includes an <see cref="ITypeReader"/> in the <see cref="TypeReaderDictionary"/>.
+        ///     Includes an <see cref="ITypeReader"/> in the <see cref="TypReaderProvider"/>.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns>The same instance for chaining calls.</returns>
-        public TypeReaderDictionary Include<T>(TypeReader<T> reader)
+        public TypReaderProvider Include<T>(TypeReader<T> reader)
             => Include(typeof(T), reader);
 
         /// <summary>
-        ///     Includes an <see cref="ITypeReader"/> in the <see cref="TypeReaderDictionary"/>.
+        ///     Includes an <see cref="ITypeReader"/> in the <see cref="TypReaderProvider"/>.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="reader"></param>
         /// <returns>The same instance for chaining calls.</returns>
-        public TypeReaderDictionary Include(Type type, ITypeReader reader)
+        public TypReaderProvider Include(Type type, ITypeReader reader)
         {
             _typeReaders.Add(type, reader);
             return this;
         }
 
         /// <summary>
-        ///     Excludes an <see cref="ITypeReader"/> from the <see cref="TypeReaderDictionary"/>.
+        ///     Excludes an <see cref="ITypeReader"/> from the <see cref="TypReaderProvider"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> for which to remove the <see cref="ITypeReader"/>.</typeparam>
         /// <returns>The same instance for chaining calls.</returns>
-        public TypeReaderDictionary Exclude<T>()
+        public TypReaderProvider Exclude<T>()
             => Exclude(typeof(T));
 
         /// <summary>
-        ///     Excludes an <see cref="ITypeReader"/> from the <see cref="TypeReaderDictionary"/>.
+        ///     Excludes an <see cref="ITypeReader"/> from the <see cref="TypReaderProvider"/>.
         /// </summary>
         /// <param name="type">The <see cref="Type"/> for which to remove the <see cref="ITypeReader"/>.</param>
         /// <returns>The same instance for chaining calls.</returns>
-        public TypeReaderDictionary Exclude(Type type)
+        public TypReaderProvider Exclude(Type type)
         {
             _typeReaders.Remove(type);
             return this;
@@ -87,8 +87,8 @@ namespace CSF
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns>True if success. False if not.</returns>
-        public bool TryGetValue<T>(out ITypeReader reader)
-            => TryGetValue(typeof(T), out reader);
+        public bool TryGetReader<T>(out ITypeReader reader)
+            => TryGetReader(typeof(T), out reader);
 
         /// <summary>
         ///     Tries to get a <see cref="ITypeReader"/> from the underlying dictionary.
@@ -96,7 +96,7 @@ namespace CSF
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns>True if success. False if not.</returns>
-        public bool TryGetValue(Type type, out ITypeReader reader)
+        public bool TryGetReader(Type type, out ITypeReader reader)
         {
             reader = null;
 
@@ -118,7 +118,7 @@ namespace CSF
         ///     Copies all keys in the current dictionary to another, overwriting existing keys.
         /// </summary>
         /// <param name="targetDictionary">The target dictionary to copy to.</param>
-        public void CopyTo(TypeReaderDictionary targetDictionary)
+        public void CopyTo(TypReaderProvider targetDictionary)
         {
             foreach (var kvp in _typeReaders)
                 targetDictionary[kvp.Key] = kvp.Value;

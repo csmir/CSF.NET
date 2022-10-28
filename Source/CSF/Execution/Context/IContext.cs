@@ -8,19 +8,14 @@ namespace CSF
     public interface IContext
     {
         /// <summary>
-        ///     The name of the command.
+        ///     The command name.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     The raw input of the command.
-        /// </summary>
-        string RawInput { get; }
-
-        /// <summary>
         ///     The command parameters.
         /// </summary>
-        List<string> Parameters { get; }
+        IReadOnlyList<object> Parameters { get; }
 
         /// <summary>
         ///     The source of this command execution.

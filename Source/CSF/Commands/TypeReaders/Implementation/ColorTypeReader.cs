@@ -48,19 +48,20 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, string value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
         {
-            if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
+            var str = value.ToString();
+            if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return Task.FromResult(TypeReaderResult.FromSuccess(Color.FromArgb(hexNumber)));
 
-            var name = value;
+            var name = str;
 
             _spacedColors.TryGetValue(name, out name);
 
             if (_colors.TryGetValue(name, out var color))
                 return Task.FromResult(TypeReaderResult.FromSuccess(color));
 
-            return Task.FromResult(TypeReaderResult.FromError($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{value}'. At: '{info.Name}'"));
+            return Task.FromResult(TypeReaderResult.FromError($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{info.Name}'"));
         }
     }
 }

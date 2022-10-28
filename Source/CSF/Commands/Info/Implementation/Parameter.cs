@@ -27,7 +27,7 @@ namespace CSF
         /// </summary>
         public ITypeReader TypeReader { get; }
 
-        internal Parameter(ParameterInfo paramInfo, TypeReaderDictionary dictionary)
+        internal Parameter(ParameterInfo paramInfo, TypReaderProvider dictionary)
         {
             var type = paramInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
@@ -44,9 +44,9 @@ namespace CSF
             Name = paramInfo.Name;
         }
 
-        private ITypeReader GetTypeReader(TypeReaderDictionary dictionary)
+        private ITypeReader GetTypeReader(TypReaderProvider dictionary)
         {
-            if (dictionary.TryGetValue(Type, out var reader))
+            if (dictionary.TryGetReader(Type, out var reader))
                 return reader;
 
             else
