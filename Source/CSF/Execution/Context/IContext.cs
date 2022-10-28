@@ -16,10 +16,5 @@ namespace CSF
         ///     The command parameters.
         /// </summary>
         IReadOnlyList<object> Parameters { get; }
-
-        /// <summary>
-        ///     The source of this command execution.
-        /// </summary>
-        ISource Source { get; }
     }
 }

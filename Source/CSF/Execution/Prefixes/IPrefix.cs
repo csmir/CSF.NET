@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CSF
+﻿namespace CSF
 {
     /// <summary>
     ///     Represents a command prefix with provided generic type.

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CSF
 {
@@ -19,7 +17,7 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Creates a new <see cref="TypReaderProvider"/> with self-defined default readers.
+        ///     Creates a new <see cref="TypeReaderProvider"/> with self-defined default readers.
         /// </summary>
         /// <param name="dictionary"></param>
         public PrefixProvider(Dictionary<string, IPrefix> dictionary)
@@ -103,7 +101,7 @@ namespace CSF
                 {
                     prefix = value.Value;
                     return true;
-                }    
+                }
             }
             return false;
         }

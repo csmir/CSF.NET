@@ -2,10 +2,8 @@
 
 var framework = new CommandFramework(new()
 {
-    AutoRegisterModules = true,
-    RegistrationAssembly = typeof(Program).Assembly,
     DefaultLogLevel = LogLevel.Trace,
-    TypeReaders = new TypReaderProvider()
+    TypeReaders = new TypeReaderProvider()
         .Include<LogLevel>(new EnumTypeReader<LogLevel>())
 });
 
@@ -16,5 +14,5 @@ while (true)
     var result = await framework.ExecuteCommandAsync(context);
 
     if (!result.IsSuccess)
-        framework.Logger.Write(new Log(LogLevel.Information, result.ErrorMessage, result.Exception));
+        framework.Logger.Write(new Log(LogLevel.Error, result.ErrorMessage, result.Exception));
 }

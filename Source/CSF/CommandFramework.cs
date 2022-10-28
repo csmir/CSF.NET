@@ -82,7 +82,7 @@ namespace CSF
             Logger = ConfigureLogger();
 
             if (config.TypeReaders is null)
-                config.TypeReaders = new TypReaderProvider(TypeReader.CreateDefaultReaders());
+                config.TypeReaders = new TypeReaderProvider(TypeReader.CreateDefaultReaders());
 
             _commandRegistered = new AsyncEvent<Func<Command, Task>>();
             _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
@@ -92,8 +92,8 @@ namespace CSF
                 Logger.WriteDebug("Auto-registration enabled. Starting build process:");
                 if (Configuration.RegistrationAssembly is null)
                 {
-                    Logger.WriteWarning("Auto-registration is enabled but the default registration assembly is not.");
-                    return;
+                    Configuration.RegistrationAssembly = Assembly.GetEntryAssembly();
+                    Logger.WriteWarning("Auto-registration is enabled but the registration assembly is null. Fetched the entry assembly instead.");
                 }
 
                 BuildModulesAsync(Configuration.RegistrationAssembly)
@@ -296,7 +296,7 @@ namespace CSF
         protected virtual async Task<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider)
             where T : IContext
         {
-            Logger.WriteDebug($"Starting command pipeline for name: '{context.Parameters[0]}'");
+            Logger.WriteDebug($"Starting command pipeline for name: '{context.Name}'");
 
             var searchResult = await SearchAsync(context);
             if (!searchResult.IsSuccess)
@@ -335,7 +335,7 @@ namespace CSF
             await Task.CompletedTask;
 
             var commands = CommandMap
-                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Parameters[0].ToString(), StringComparison.OrdinalIgnoreCase)))
+                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
@@ -389,7 +389,7 @@ namespace CSF
             if (match is null)
                 return NoApplicableOverloadResult(context);
 
-            Logger.WriteTrace($"Found matching command for name: '{context.Parameters[0]}': {match.Name}");
+            Logger.WriteTrace($"Found matching command for name: '{context.Name}': {match.Name}");
 
             return SearchResult.FromSuccess(match);
         }
@@ -406,7 +406,7 @@ namespace CSF
         protected virtual SearchResult CommandNotFoundResult<T>(T context)
             where T : IContext
         {
-            return SearchResult.FromError($"Failed to find command with name: {context.Parameters[0]}.");
+            return SearchResult.FromError($"Failed to find command with name: {context.Name}.");
         }
 
         /// <summary>
@@ -421,7 +421,7 @@ namespace CSF
         protected virtual SearchResult NoApplicableOverloadResult<T>(T context)
             where T : IContext
         {
-            return SearchResult.FromError($"Failed to find overload that best matches input: {string.Join(" ", context.Parameters)}.");
+            return SearchResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CSF
@@ -16,7 +17,7 @@ namespace CSF
         /// </remarks>
         /// <param name="rawInput">The input to parse.</param>
         /// <returns></returns>
-        public static List<string> Parse(string rawInput)
+        public static Tuple<string, List<string>> Parse(string rawInput)
         {
             var range = rawInput.Split(' ');
 
@@ -58,9 +59,7 @@ namespace CSF
                 commandParams.Add(entry);
             }
 
-            commandParams.Insert(0, commandName);
-
-            return commandParams;
+            return new Tuple<string, List<string>>(commandName, commandParams);
         }
     }
 }

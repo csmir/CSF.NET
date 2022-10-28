@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CSF.Utils;
+using System.Collections.Generic;
 
 namespace CSF
 {
@@ -18,9 +19,6 @@ namespace CSF
         /// <inheritdoc/>
         public IReadOnlyList<object> Parameters { get; }
 
-        /// <inheritdoc/>
-        public ISource Source { get; }
-
         /// <summary>
         ///     The prefix for the command.
         /// </summary>
@@ -35,31 +33,13 @@ namespace CSF
         /// <param name="rawInput"></param>
         public CommandContext(string rawInput, IPrefix prefix = null)
         {
+            var param = Parser.Parse(rawInput);
+
             RawInput = rawInput;
             Prefix = prefix;
 
-            Parameters = GetParameters();
-            Source = GetSource();
-
-            Name = Parameters[0].ToString();
-        }
-
-        /// <summary>
-        ///     Populates the <see cref="Source"/> of this context.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual ISource GetSource()
-        {
-            return new ProcessSource();
-        }
-
-        /// <summary>
-        ///     Populates the <see cref="Parameters"/> of this context.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IReadOnlyList<object> GetParameters()
-        {
-            return Parser.Parse(RawInput);
+            Parameters = param.Item2;
+            Name = param.Item1;
         }
     }
 }
