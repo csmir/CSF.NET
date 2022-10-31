@@ -48,7 +48,7 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, object value, IServiceProvider provider)
         {
             var str = value.ToString();
             if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
@@ -61,7 +61,7 @@ namespace CSF
             if (_colors.TryGetValue(name, out var color))
                 return Task.FromResult(TypeReaderResult.FromSuccess(color));
 
-            return Task.FromResult(TypeReaderResult.FromError($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{info.Name}'"));
+            return Task.FromResult(TypeReaderResult.FromError($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{parameter.Name}'"));
         }
     }
 }

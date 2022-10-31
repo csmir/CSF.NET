@@ -548,37 +548,37 @@ namespace CSF
             int index = 0;
             var parameters = new List<object>();
 
-            foreach (var param in command.Parameters)
+            foreach (var parameter in command.Parameters)
             {
-                if (param.Flags.HasFlag(ParameterFlags.IsRemainder))
+                if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
                 {
                     parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
                     break;
                 }
 
-                if (param.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
+                if (parameter.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
                 {
-                    var missingResult = await ResolveMissingValue(param);
+                    var missingResult = await ResolveMissingValue(parameter);
 
                     if (!missingResult.IsSuccess)
                         break;
 
                     var resultType = missingResult.Result.GetType();
-                    if (resultType != param.Type)
-                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{param.Type.Name}'. Got: '{resultType.Name}'");
+                    if (resultType != parameter.Type)
+                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{parameter.Type.Name}'. Got: '{resultType.Name}'");
 
                     else
                         parameters.Add(missingResult.Result);
                 }
 
-                if (param.Type == typeof(string) || param.Type == typeof(object))
+                if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
                 {
                     parameters.Add(context.Parameters[index]);
                     index++;
                     continue;
                 }
 
-                var result = await param.TypeReader.ReadAsync(context, param, context.Parameters[index], provider);
+                var result = await parameter.TypeReader.ReadAsync(context, parameter, context.Parameters[index], provider);
 
                 if (!result.IsSuccess)
                     return result;

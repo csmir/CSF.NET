@@ -13,7 +13,7 @@ namespace CSF
             AllowedPrefixes = prefixes;
         }
 
-        public override Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider)
+        public override Task<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider)
         {
             foreach (var prefix in AllowedPrefixes)
             {

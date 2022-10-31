@@ -8,6 +8,6 @@ namespace CSF
     /// </summary>
     public abstract class PreconditionAttribute : Attribute
     {
-        public abstract Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider);
+        public abstract Task<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider);
     }
 }

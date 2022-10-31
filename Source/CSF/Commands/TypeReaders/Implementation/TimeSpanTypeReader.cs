@@ -36,7 +36,7 @@ namespace CSF
             };
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, object value, IServiceProvider provider)
         {
             var str = value.ToString();
             if (!TimeSpan.TryParse(str, out TimeSpan span))
@@ -50,7 +50,7 @@ namespace CSF
                             span += result(match.Groups[1].Value);
                 }
                 else
-                    return Task.FromResult(TypeReaderResult.FromError($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{info.Name}'"));
+                    return Task.FromResult(TypeReaderResult.FromError($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'"));
             }
 
             return Task.FromResult(TypeReaderResult.FromSuccess(span));

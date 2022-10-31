@@ -10,14 +10,14 @@ namespace CSF
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new Lazy<IReadOnlyDictionary<Type, Delegate>>(ValueGenerator);
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, object value, IServiceProvider provider)
         {
             if (TryGetParser(out var parser))
             {
                 if (parser(value.ToString(), out var result))
                     return Task.FromResult(TypeReaderResult.FromSuccess(result));
             }
-            return Task.FromResult(TypeReaderResult.FromError($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{info.Name}'"));
+            return Task.FromResult(TypeReaderResult.FromError($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'"));
         }
 
         private static bool TryGetParser(out Tpd<T> parser)

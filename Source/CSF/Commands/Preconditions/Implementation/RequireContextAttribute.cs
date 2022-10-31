@@ -22,7 +22,7 @@ namespace CSF
             ContextType = contextType;
         }
 
-        public override Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider)
+        public override Task<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider)
         {
             var providedType = context.GetType();
 

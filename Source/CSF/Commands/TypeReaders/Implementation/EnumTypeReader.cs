@@ -13,13 +13,13 @@ namespace CSF
     public class EnumTypeReader<T> : TypeReader<T>
         where T : struct, Enum
     {
-        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter parameter, object value, IServiceProvider provider)
         {
             if (Enum.TryParse<T>(value.ToString(), out var result))
                 return Task.FromResult(TypeReaderResult.FromSuccess(result));
 
             return Task.FromResult(TypeReaderResult.FromError(
-                errorMessage: $"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{info.Name}'"));
+                errorMessage: $"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{parameter.Name}'"));
         }
     }
 }
