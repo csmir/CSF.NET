@@ -3,7 +3,7 @@
     // Preconditions are allowed to exist on class & method level.
     // This precondition will return if the provided ICommandContext does not directly match CommandContext.
     [RequireContext(typeof(CommandContext))]
-    public sealed class ExampleModule : CommandBase<CommandContext>
+    public sealed class ExampleModule : ModuleBase<CommandContext>
     {
         // This is a simple command with 1 parameter.
         //
@@ -11,7 +11,7 @@
         [Command("example")]
         public async Task<ExecuteResult> HandleAsync(string input1)
         {
-            await RespondSuccessAsync($"Succesfully received your command! Input: {input1}");
+            await SuccessAsync($"Succesfully received your command! Input: {input1}");
 
             // You can return execute results to get error or success results out to the post-execution handler.
             return ExecuteResult.FromSuccess();
@@ -22,9 +22,9 @@
         // 'example "this is an example input" 14' will succeed.
         // 'example "this is an example input" hi' will fail.
         [Command("example")]
-        public async Task HandleAsync(string input1, int input2)
+        public async Task<ExecuteResult> HandleAsync(string input1, int input2)
         {
-            await RespondSuccessAsync($"Succesfully received your command! Input: {input1} && {input2}");
+            return await SuccessAsync($"Succesfully received your command! Input: {input1} && {input2}");
         }
 
         // This is a more advanced command with 4 parameters, 2 of which optional, and one the remainder.
@@ -37,7 +37,7 @@
         [Command("example")]
         public async Task HandleAsync(string input1, string input2, int input3 = 0, [Remainder] string remainder = "")
         {
-            await RespondSuccessAsync($"Succesfully received your command! Input: {input1} && {input2} && {input3} && {remainder}");
+            await SuccessAsync($"Succesfully received your command! Input: {input1} && {input2} && {input3} && {remainder}");
         }
 
         // This example will fail when the app is ran, because a command cannot be registered without a name.
@@ -55,7 +55,7 @@
         [RequireOperatingSystem(PlatformID.Unix)]
         public IResult UnixAsync()
         {
-            RespondSuccess("Success!");
+            Success("Success!");
 
             // Notice how this method is sync, for which is also full support, both returning void and result.
             return ExecuteResult.FromSuccess();

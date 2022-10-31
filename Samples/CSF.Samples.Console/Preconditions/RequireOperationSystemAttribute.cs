@@ -10,7 +10,7 @@
             Platform = platform;
         }
 
-        public override Task<PreconditionResult> CheckAsync(ICommandContext context, CommandInfo info, IServiceProvider provider)
+        public override Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider)
         {
             if (Environment.OSVersion.Platform != Platform)
                 return Task.FromResult(PreconditionResult.FromError("Current OS platform does not match the expected platform!"));

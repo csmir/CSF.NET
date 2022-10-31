@@ -2,16 +2,15 @@
 using CSF.Console;
 
 // Initialize the command framework.
-var framework = new CommandStandardizationFramework();
-
-// Register our custom-made guid type reader. A default typereader already exists for Guid, so we replace it. 
-framework.RegisterTypeReader(new GuidTypeReader(), true);
+var framework = new CommandFramework(new()
+{
+    // Here you can register type readers into the framework.
+    TypeReaders = new TypeReaderProvider()
+        .Include<Guid>(new GuidTypeReader())
+});
 
 // Build the modules found in the current assembly. This will look through the entire csproj the provided type resides in.
-var buildResult = await framework.BuildModulesAsync(typeof(Program).Assembly);
-
-if (!buildResult.IsSuccess)
-    throw new InvalidOperationException(buildResult.ErrorMessage, buildResult.Exception);
+await framework.BuildModulesAsync(typeof(Program).Assembly);
 
 // Start a loop to read out the console line and run a command.
 while (true)
@@ -28,9 +27,5 @@ while (true)
     var result = await framework.ExecuteCommandAsync(context);
 
     if (!result.IsSuccess)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(result.ErrorMessage);
-        Console.ResetColor();
-    }
+        framework.Logger.WriteError("Failed to handle command", result.Exception);
 }
