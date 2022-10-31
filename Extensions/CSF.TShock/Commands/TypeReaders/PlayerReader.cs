@@ -8,9 +8,9 @@ namespace CSF.TShock
 {
     internal class PlayerReader : TypeReader<Player>
     {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, ParameterInfo info, string value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
         {
-            var players = TSPlayer.FindByNameOrID(value);
+            var players = TSPlayer.FindByNameOrID(value.ToString());
 
             if (!players.Any())
                 return Task.FromResult(TypeReaderResult.FromError("No player found."));

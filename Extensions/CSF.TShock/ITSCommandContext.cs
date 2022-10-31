@@ -6,7 +6,7 @@ namespace CSF.TShock
     ///     Represents the context for TShock commands.
     /// </summary>
     /// <inheritdoc/>
-    public interface ITSCommandContext : ICommandContext
+    public interface ITSCommandContext : IContext
     {
         /// <summary>
         ///     Determines if the command is silently executed or not.

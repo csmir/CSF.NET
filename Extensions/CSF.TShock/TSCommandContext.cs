@@ -15,7 +15,7 @@ namespace CSF.TShock
         public string RawInput { get; }
 
         /// <inheritdoc/>
-        public List<string> Parameters { get; }
+        public IReadOnlyList<object> Parameters { get; }
 
         /// <inheritdoc/>
         public bool IsSilent { get; }

@@ -7,24 +7,25 @@ namespace CSF.TShock
     public class TSModuleBase<T> : ModuleBase<T>
         where T : ITSCommandContext
     {
-        public override void RespondError(string message)
+        public override ExecuteResult Error(string message, params object[] values)
         {
-            Context.Player.SendErrorMessage(message);
+            Context.Player.SendErrorMessage(message, values);
+            return ExecuteResult.FromSuccess();
         }
 
-        public override Task RespondErrorAsync(string message)
+        public override Task<ExecuteResult> ErrorAsync(string message, params object[] values)
         {
-            RespondError(message);
-            return Task.CompletedTask;
+            return Task.FromResult(Error(message, values));
         }
 
         /// <summary>
         ///     Responds with a multi-match error.
         /// </summary>
         /// <param name="matches">The found matches.</param>
-        public void RespondError(IEnumerable<object> matches)
+        public ExecuteResult Error(IEnumerable<object> matches)
         {
             Context.Player.SendMultipleMatchError(matches);
+            return ExecuteResult.FromSuccess();
         }
 
         /// <summary>
@@ -32,43 +33,41 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="matches">The found matches.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public Task RespondErrorAsync(IEnumerable<object> matches)
+        public Task<ExecuteResult> ErrorAsync(IEnumerable<object> matches)
         {
-            RespondError(matches);
-            return Task.CompletedTask;
+            return Task.FromResult(Error(matches));
         }
 
-        public override void RespondInformation(string message)
+        public override ExecuteResult Info(string message, params object[] values)
         {
-            Context.Player.SendInfoMessage(message);
+            Context.Player.SendInfoMessage(message, values);
+            return ExecuteResult.FromSuccess();
         }
 
-        public override Task RespondInformationAsync(string message)
+        public override Task<ExecuteResult> InfoAsync(string message, params object[] values)
         {
-            RespondInformation(message);
-            return Task.CompletedTask;
+            return Task.FromResult(Info(message, values));
         }
 
-        public override void RespondSuccess(string message)
+        public override ExecuteResult Success(string message, params object[] values)
         {
-            Context.Player.SendSuccessMessage(message);
+            Context.Player.SendSuccessMessage(message, values);
+            return ExecuteResult.FromSuccess();
         }
 
-        public override Task RespondSuccessAsync(string message)
+        public override Task<ExecuteResult> SuccessAsync(string message, params object[] values)
         {
-            RespondSuccess(message);
-            return Task.CompletedTask;
+            return Task.FromResult(Success(message, values));
         }
 
-        public override void Respond(string message)
+        public override ExecuteResult Respond(string message, params object[] values)
         {
-            Respond(message, Color.LightGray);
+            return Respond(string.Format(message, values), Color.LightGray);
         }
 
-        public override Task RespondAsync(string message)
+        public override Task<ExecuteResult> RespondAsync(string message, params object[] values)
         {
-            Respond(message, Color.LightGray);
-            return Task.CompletedTask;
+            return Task.FromResult(Respond(string.Format(message, values), Color.LightGray));
         }
 
         /// <summary>
@@ -76,9 +75,10 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
-        public void Respond(string message, Color color)
+        public ExecuteResult Respond(string message, Color color)
         {
             Context.Player.SendMessage(message, color);
+            return ExecuteResult.FromSuccess();
         }
 
         /// <summary>
@@ -87,10 +87,9 @@ namespace CSF.TShock
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public Task RespondAsync(string message, Color color)
+        public Task<ExecuteResult> RespondAsync(string message, Color color)
         {
-            Respond(message, color);
-            return Task.CompletedTask;
+            return Task.FromResult(Respond(message, color));
         }
 
         /// <summary>
@@ -98,9 +97,10 @@ namespace CSF.TShock
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
-        public void Announce(string message, Color color)
+        public ExecuteResult Announce(string message, Color color)
         {
             TShockAPI.TShock.Utils.Broadcast(message, color);
+            return ExecuteResult.FromSuccess();
         }
 
         /// <summary>
@@ -109,10 +109,9 @@ namespace CSF.TShock
         /// <param name="message">The message to send.</param>
         /// <param name="color">The color to send this message in.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public Task AnnounceAsync(string message, Color color)
+        public Task<ExecuteResult> AnnounceAsync(string message, Color color)
         {
-            Announce(message, color);
-            return Task.CompletedTask;
+            return Task.FromResult(Announce(message, color));
         }
     }
 }

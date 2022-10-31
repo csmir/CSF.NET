@@ -29,7 +29,7 @@ namespace CSF.TShock
             base.CommandRegistered += CommandRegistered;
         }
 
-        private new Task CommandRegistered(CommandInfo arg)
+        private new Task CommandRegistered(Command arg)
         {
             var permissions = new List<string>();
             bool shouldReplace = false;
@@ -49,7 +49,7 @@ namespace CSF.TShock
             if (shouldReplace || Configuration.ReplaceAllExisting)
                 Commands.ChatCommands.RemoveAll(x => x.Names.Any(o => arg.Aliases.Any(n => o == n)));
 
-            Commands.ChatCommands.Add(new Command(string.Join(".", permissions), async (x) => await ExecuteCommandAsync(x), arg.Aliases)
+            Commands.ChatCommands.Add(new TShockAPI.Command(string.Join(".", permissions), async (x) => await ExecuteCommandAsync(x), arg.Aliases)
             {
                 HelpText = description
             });
@@ -83,7 +83,7 @@ namespace CSF.TShock
             return SearchResult.FromError($"No best override was found for command with name: '{context.Name}'.");
         }
 
-        protected override ExecuteResult UnhandledExceptionResult<T>(T context, CommandInfo command, Exception ex)
+        protected override ExecuteResult UnhandledExceptionResult<T>(T context, Command command, Exception ex)
         {
             TShockAPI.TShock.Log.ConsoleError(ex.ToString());
             return ExecuteResult.FromError($"An unhandled exception has occurred. Please check logs for more details");
