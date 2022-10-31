@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 
-	<AssemblyVersion>1.1.0</AssemblyVersion>
-	<PackageVersion>1.1.0</PackageVersion>
-	<FileVersion>1.1.0.0</FileVersion>
-	<Version>1.1.0</Version>
+	<AssemblyVersion>1.2.0</AssemblyVersion>
+	<PackageVersion>1.2.0</PackageVersion>
+	<FileVersion>1.2.0.0</FileVersion>
+	<Version>1.2.0</Version>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 
@@ -14,7 +14,7 @@
 	<RepositoryUrl>https://github.com/Rozen4334/CSF.NET</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 
-	<PackageReleaseNotes>Version 1.1.0; Made for netstandard2.0.</PackageReleaseNotes>
+	<PackageReleaseNotes>Version 1.2.0; Made for netstandard2.0.</PackageReleaseNotes>
 	<PackageTags>Text, Console, Commands, Framework</PackageTags>
 	  
 	<Title>Command Standardization Framework</Title>
