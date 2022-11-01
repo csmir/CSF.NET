@@ -46,8 +46,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSF.NET" Version="1.2.0" />
     <PackageReference Include="TShock" Version="5.0.0-beta.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\CSF\CSF.csproj" />
   </ItemGroup>
 
 </Project>

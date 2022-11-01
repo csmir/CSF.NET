@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Terraria;
 using TShockAPI;
 
 namespace CSF.TShock
@@ -27,6 +28,10 @@ namespace CSF.TShock
 
             Configuration = config;
             base.CommandRegistered += CommandRegistered;
+
+            config.TypeReaders
+                .Include<TSPlayer>(new TSPlayerReader())
+                .Include<Player>(new PlayerReader());
         }
 
         private new Task CommandRegistered(Command arg)
