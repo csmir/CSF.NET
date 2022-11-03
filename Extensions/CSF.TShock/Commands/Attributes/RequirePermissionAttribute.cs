@@ -2,6 +2,9 @@
 
 namespace CSF.TShock
 {
+    /// <summary>
+    ///     Represents an attribute that defines the required permission node at the nesting level of the current step.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class RequirePermissionAttribute : Attribute
     {

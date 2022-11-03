@@ -5,7 +5,7 @@ using TShockAPI;
 
 namespace CSF.TShock
 {
-    internal class TSPlayerReader : TypeReader<TSPlayer>
+    internal sealed class TSPlayerReader : TypeReader<TSPlayer>
     {
         public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
         {

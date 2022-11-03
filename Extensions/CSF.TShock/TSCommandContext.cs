@@ -11,7 +11,9 @@ namespace CSF.TShock
         /// <inheritdoc/>
         public string Name { get; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        ///     Represents the raw command input.
+        /// </summary>
         public string RawInput { get; }
 
         /// <inheritdoc/>
