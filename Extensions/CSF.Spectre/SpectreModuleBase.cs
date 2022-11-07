@@ -4,48 +4,57 @@ using System.Threading.Tasks;
 
 namespace CSF.Spectre
 {
-    public class SpectreCommandBase<T> : ModuleBase<T>
+    /// <inheritdoc/>
+    public class SpectreModuleBase<T> : ModuleBase<T>
         where T : IContext
     {
+        /// <inheritdoc/>
         public override ExecuteResult Error(string message, params object[] values)
         {
             AnsiConsole.MarkupLineInterpolated($"[red]{string.Format(message, values)}[/]");
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> ErrorAsync(string message, params object[] values)
         {
             return Task.FromResult(Error(message, values));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Info(string message, params object[] values)
         {
             AnsiConsole.MarkupLineInterpolated($"[yellow]{string.Format(message, values)}[/]");
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> InfoAsync(string message, params object[] values)
         {
             return Task.FromResult(Info(message, values));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Success(string message, params object[] values)
         {
             AnsiConsole.MarkupLineInterpolated($"[green]{string.Format(message, values)}[/]");
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> SuccessAsync(string message, params object[] values)
         {
             return Task.FromResult(Success(message, values));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Respond(string message, params object[] values)
         {
             AnsiConsole.MarkupLine($"{string.Format(message, values)}");
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> RespondAsync(string message, params object[] values)
         {
             return Task.FromResult(Respond(message, values));

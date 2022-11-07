@@ -5,6 +5,7 @@ using Spectre.Console;
 
 namespace CSF.Spectre
 {
+    /// <inheritdoc/>
     public class SpectreCommandContext : CommandContext
     {
         /// <summary>
@@ -12,6 +13,7 @@ namespace CSF.Spectre
         /// </summary>
         public IAnsiConsole Console { get; }
 
+        /// <inheritdoc/>
         public SpectreCommandContext(string rawInput) : base(rawInput)
         {
             Console = AnsiConsole.Console;

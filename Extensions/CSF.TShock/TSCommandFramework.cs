@@ -62,10 +62,9 @@ namespace CSF.TShock
             return Task.CompletedTask;
         }
 
-        public virtual async Task<ITSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
+        public virtual Task<ITSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
         {
-            await Task.CompletedTask;
-            return new TSCommandContext(args, rawInput);
+            return Task.FromResult((ITSCommandContext)new TSCommandContext(args, rawInput));
         }
 
         public virtual async Task ExecuteCommandAsync(CommandArgs args)

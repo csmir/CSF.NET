@@ -4,15 +4,18 @@ using System.Threading.Tasks;
 
 namespace CSF.TShock
 {
+    /// <inheritdoc/>
     public class TSModuleBase<T> : ModuleBase<T>
         where T : ITSCommandContext
     {
+        /// <inheritdoc/>
         public override ExecuteResult Error(string message, params object[] values)
         {
             Context.Player.SendErrorMessage(message, values);
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> ErrorAsync(string message, params object[] values)
         {
             return Task.FromResult(Error(message, values));
@@ -38,33 +41,39 @@ namespace CSF.TShock
             return Task.FromResult(Error(matches));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Info(string message, params object[] values)
         {
             Context.Player.SendInfoMessage(message, values);
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> InfoAsync(string message, params object[] values)
         {
             return Task.FromResult(Info(message, values));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Success(string message, params object[] values)
         {
             Context.Player.SendSuccessMessage(message, values);
             return ExecuteResult.FromSuccess();
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> SuccessAsync(string message, params object[] values)
         {
             return Task.FromResult(Success(message, values));
         }
 
+        /// <inheritdoc/>
         public override ExecuteResult Respond(string message, params object[] values)
         {
             return Respond(string.Format(message, values), Color.LightGray);
         }
 
+        /// <inheritdoc/>
         public override Task<ExecuteResult> RespondAsync(string message, params object[] values)
         {
             return Task.FromResult(Respond(string.Format(message, values), Color.LightGray));
