@@ -1,6 +1,8 @@
-﻿using Spectre.Console;
+﻿using System;
+using Spectre.Console;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+    [assembly: CLSCompliant(true)]
 
 namespace CSF.Spectre
 {
@@ -85,6 +87,7 @@ namespace CSF.Spectre
         /// </summary>
         /// <param name="prompt">The prompt to request a value for.</param>
         /// <returns>The <see cref="Task"/> containing the string with selected value within.</returns>
+        [CLSCompliant(false)]
         public Task<string> PromptAsync(TextPrompt<string> prompt)
         {
             return Task.FromResult(Prompt(prompt));
@@ -95,6 +98,7 @@ namespace CSF.Spectre
         /// </summary>
         /// <param name="prompt">The prompt to request a value for.</param>
         /// <returns>The string with selected value within.</returns>
+        [CLSCompliant(false)]
         public string Prompt(TextPrompt<string> prompt)
         {
             return AnsiConsole.Prompt(prompt);
@@ -105,6 +109,7 @@ namespace CSF.Spectre
         /// </summary>
         /// <param name="selection">The selection to pick from.</param>
         /// <returns>The <see cref="Task"/> containing the string with selected value within.</returns>
+        [CLSCompliant(false)]
         public Task<string> SelectAsync(SelectionPrompt<string> selection)
         {
             return Task.FromResult(Select(selection));
@@ -115,6 +120,7 @@ namespace CSF.Spectre
         /// </summary>
         /// <param name="selection">The selection to pick from.</param>
         /// <returns>The string with selected value within.</returns>
+        [CLSCompliant(false)]
         public string Select(SelectionPrompt<string> selection)
         {
             return AnsiConsole.Prompt(selection);
