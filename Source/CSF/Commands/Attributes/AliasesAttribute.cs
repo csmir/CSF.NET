@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CSF
 {
@@ -16,10 +18,26 @@ namespace CSF
         /// <summary>
         ///     Creates a new instance of <see cref="AliasesAttribute"/>.
         /// </summary>
-        /// <param name="aliases"></param>
+        /// <param name="aliases">The aliases for this command.</param>
+        [CLSCompliant(false)]
         public AliasesAttribute(params string[] aliases)
         {
             Aliases = aliases;
+        }
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="AliasesAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        ///     This overload supports multiple prefixes only by splitting the string. Use '|' to declare new prefixes.
+        ///     <br/>
+        ///     If CLS compliancy is not of concern, use <see cref="AliasesAttribute(string[])"/> instead.
+        /// </remarks>
+        /// <param name="aliases">The aliases for this command.</param>
+        [CLSCompliant(true)]
+        public AliasesAttribute(string aliases)
+        {
+            Aliases = aliases.Split('|');
         }
     }
 }

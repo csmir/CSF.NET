@@ -11,6 +11,7 @@ namespace CSF.Spectre
         /// <summary>
         ///     The underlying console for this handler.
         /// </summary>
+        [CLSCompliant(false)]
         public IAnsiConsole Console { get; }
 
         /// <inheritdoc/>
