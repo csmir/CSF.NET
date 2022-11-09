@@ -1,4 +1,5 @@
 ﻿using CSF.TShock;
+using TShockAPI;
 
 namespace CSF.Samples.TShock
 {
@@ -18,6 +19,17 @@ namespace CSF.Samples.TShock
             var stringified = players.Select(x => $"{x.Name}{(getIndex ? $" (i: {x.Index})" : "")}");
 
             Info($"All online players ({players.Count()}/{Context.Server.Settings.MaxSlots}): \n{stringified}");
+        }
+
+        [Command("playerinfo")]
+        [Aliases("pi")]
+        [Description("Displays information about a player.")]
+        [RequirePermission("playerinfo")]
+        public IResult PlayerInfo(TSPlayer? player = null)
+        {
+            player ??= Context.Player;
+
+            return Info("Player account: {}", player.Account);
         }
     }
 }
