@@ -30,8 +30,12 @@ namespace CSF.TShock
             base.CommandRegistered += CommandRegistered;
 
             config.TypeReaders
-                .Include<TSPlayer>(new TSPlayerReader())
-                .Include<Player>(new PlayerReader());
+                .Include(new TSPlayerReader())
+                .Include(new PlayerReader());
+
+            config.Prefixes
+                .Include(new StringPrefix(TShockAPI.TShock.Config.Settings.CommandSpecifier))
+                .Include(new StringPrefix(TShockAPI.TShock.Config.Settings.CommandSilentSpecifier));
         }
 
         private new Task CommandRegistered(Command arg)
@@ -64,7 +68,10 @@ namespace CSF.TShock
 
         public virtual Task<ITSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
         {
-            return Task.FromResult((ITSCommandContext)new TSCommandContext(args, rawInput));
+            if (!TryParsePrefix(ref rawInput, out var prefix))
+                prefix = EmptyPrefix.Create();
+
+            return Task.FromResult((ITSCommandContext)new TSCommandContext(args, rawInput, prefix));
         }
 
         public virtual async Task ExecuteCommandAsync(CommandArgs args)

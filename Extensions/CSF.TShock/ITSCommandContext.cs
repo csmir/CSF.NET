@@ -27,5 +27,10 @@ namespace CSF.TShock
         ///     The TShock arguments provided for this command.
         /// </summary>
         CommandArgs CommandArguments { get; }
+
+        /// <summary>
+        ///     The prefix for the command.
+        /// </summary>
+        IPrefix Prefix { get; }
     }
 }

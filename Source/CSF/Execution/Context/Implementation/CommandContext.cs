@@ -33,6 +33,11 @@ namespace CSF
         /// <param name="rawInput"></param>
         public CommandContext(string rawInput, IPrefix prefix = null)
         {
+            if (prefix is null)
+                prefix = EmptyPrefix.Create();
+
+            Prefix = prefix;
+
             var param = Parser.Parse(rawInput);
 
             RawInput = rawInput;

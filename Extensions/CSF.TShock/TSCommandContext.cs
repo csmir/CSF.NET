@@ -31,21 +31,25 @@ namespace CSF.TShock
         /// <inheritdoc/>
         public CommandArgs CommandArguments { get; }
 
+        /// <inheritdoc/>
+        public IPrefix Prefix { get; }
+
         /// <summary>
         ///     Creates a new CommandContext from the provided 
         /// </summary>
         /// <param name="args"></param>
         /// <param name="rawInput"></param>
-        public TSCommandContext(CommandArgs args, string rawInput)
+        public TSCommandContext(CommandArgs args, string rawInput, IPrefix prefix)
         {
+            Prefix = prefix;
+
             CommandArguments = args;
             RawInput = rawInput;
             Parameters = args.Parameters;
             Player = args.Player;
             IsSilent = args.Silent;
 
-            // Skip prefix & get first occurence
-            Name = args.Message[1..].Split(' ')[0];
+            Name = rawInput.Split(' ')[0];
         }
     }
 }
