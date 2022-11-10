@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Spectre.Console;
+﻿using Spectre.Console;
+using System;
 
 namespace CSF.Spectre
 {

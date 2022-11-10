@@ -1,8 +1,7 @@
-﻿using System;
-using Spectre.Console;
-using System.Collections.Generic;
+﻿using Spectre.Console;
+using System;
 using System.Threading.Tasks;
-    [assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(true)]
 
 namespace CSF.Spectre
 {
