@@ -13,8 +13,8 @@ namespace CSF
         ///     Gets the command's context.
         /// </summary>
         public T Context { get; private set; }
-        internal void SetContext(T context)
-            => Context = context;
+        internal void SetContext(IContext context)
+            => Context = (T)context;
 
         /// <summary>
         ///     Displays all information about the command thats currently in scope.

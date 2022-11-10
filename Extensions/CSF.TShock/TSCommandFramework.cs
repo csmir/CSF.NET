@@ -34,8 +34,8 @@ namespace CSF.TShock
                 .Include(new PlayerReader());
 
             config.Prefixes
-                .Include(new StringPrefix(TShockAPI.TShock.Config.Settings.CommandSpecifier))
-                .Include(new StringPrefix(TShockAPI.TShock.Config.Settings.CommandSilentSpecifier));
+                .Include(new StringPrefix("/"))
+                .Include(new StringPrefix("."));
         }
 
         private new Task CommandRegistered(Command arg)
@@ -66,12 +66,12 @@ namespace CSF.TShock
             return Task.CompletedTask;
         }
 
-        public virtual Task<ITSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
+        public virtual Task<TSCommandContext> CreateContextAsync(CommandArgs args, string rawInput)
         {
             if (!TryParsePrefix(ref rawInput, out var prefix))
                 prefix = EmptyPrefix.Create();
 
-            return Task.FromResult((ITSCommandContext)new TSCommandContext(args, rawInput, prefix));
+            return Task.FromResult(new TSCommandContext(args, rawInput, prefix));
         }
 
         public virtual async Task ExecuteCommandAsync(CommandArgs args)

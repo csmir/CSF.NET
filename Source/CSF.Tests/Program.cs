@@ -2,6 +2,7 @@
 
 var framework = new CommandFramework(new()
 {
+    AutoRegisterModules = true,
     DefaultLogLevel = LogLevel.Trace,
     TypeReaders = new TypeReaderProvider()
         .Include<LogLevel>(new EnumTypeReader<LogLevel>())

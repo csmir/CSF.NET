@@ -83,7 +83,10 @@ namespace CSF
             Logger = ConfigureLogger();
 
             if (config.TypeReaders is null)
-                config.TypeReaders = new TypeReaderProvider(TypeReader.CreateDefaultReaders());
+                config.TypeReaders = new TypeReaderProvider();
+
+            if (config.Prefixes is null)
+                config.Prefixes = new PrefixProvider();
 
             _commandRegistered = new AsyncEvent<Func<Command, Task>>();
             _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
@@ -370,7 +373,7 @@ namespace CSF
                 // If context length is lower than command length, return the command with least optionals.
                 if (commandLength > contextLength)
                 {
-                    int requiredLength = 1;
+                    int requiredLength = 0;
                     foreach (var parameter in command.Parameters)
                     {
                         if (contextLength >= requiredLength)
@@ -565,11 +568,14 @@ namespace CSF
                         break;
 
                     var resultType = missingResult.Result.GetType();
-                    if (resultType != parameter.Type)
-                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{parameter.Type.Name}'. Got: '{resultType.Name}'");
 
-                    else
+                    if (resultType == parameter.Type || missingResult.Result == Type.Missing)
+                    {
                         parameters.Add(missingResult.Result);
+                        continue;
+                    }
+                    else
+                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{parameter.Type.Name}'. Got: '{resultType.Name}'");
                 }
 
                 if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
@@ -588,7 +594,7 @@ namespace CSF
                 index++;
             }
 
-            Logger.WriteTrace($"Succesfully populated parameters for {command.Name}");
+            Logger.WriteTrace($"Succesfully populated parameters for {command.Name}. Count: {parameters.Count}");
 
             return ParseResult.FromSuccess(parameters.ToArray());
         }
@@ -605,7 +611,7 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
         protected virtual Task<TypeReaderResult> ResolveMissingValue(Parameter param)
         {
-            return Task.FromResult(TypeReaderResult.FromError("Unresolved."));
+            return Task.FromResult(TypeReaderResult.FromSuccess(Type.Missing));
         }
 
         /// <summary>
@@ -630,7 +636,7 @@ namespace CSF
 
                 await commandBase.BeforeExecuteAsync(command, context);
 
-                var returnValue = command.Method.Invoke(commandBase, parameters.ToArray());
+                var returnValue = command.Method.Invoke(commandBase, parameters);
 
                 switch (returnValue)
                 {

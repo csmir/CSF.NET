@@ -32,7 +32,7 @@ namespace CSF
         ///     <br/>
         ///     In these cases, it is best to disable this option and self-implement module registration through <see cref="CommandFramework.BuildModulesAsync(System.Reflection.Assembly)"/> to avoid failures or unexpected behavior.
         /// </remarks>
-        public bool AutoRegisterModules { get; set; } = true;
+        public bool AutoRegisterModules { get; set; } = false;
 
         /// <summary>
         ///     If <see cref="AutoRegisterModules"/> is enabled, this value needs to be populated with the target assembly to register modules for.
@@ -58,11 +58,11 @@ namespace CSF
         /// <remarks>
         ///     Chain calls to <see cref="TypeReaderProvider.Include(Type, ITypeReader)"/> an <see cref="TypeReaderProvider.Include{T}(TypeReader{T})"/> to populate the dictionary with your own <see cref="ITypeReader"/>'s.
         /// </remarks>
-        public TypeReaderProvider TypeReaders { get; set; }
+        public TypeReaderProvider TypeReaders { get; set; } 
 
         /// <summary>
         ///     All <see cref="IPrefix"/>'s accessible by the <see cref="CommandFramework"/> this configuration will be passed to.
         /// </summary>
-        public PrefixProvider Prefixes { get; set; }
+        public PrefixProvider Prefixes { get; set; } 
     }
 }

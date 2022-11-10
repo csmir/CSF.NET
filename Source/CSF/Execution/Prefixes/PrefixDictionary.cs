@@ -45,7 +45,7 @@ namespace CSF
         /// <param name="prefix"></param>
         /// <returns>The same instance for chaining calls.</returns>
         public PrefixProvider Include<T>(IPrefix<T> prefix)
-            => Include(prefix);
+            => Include((IPrefix)prefix);
 
         /// <summary>
         ///     Includes an <see cref="IPrefix"/> in the <see cref="PrefixProvider"/>.
