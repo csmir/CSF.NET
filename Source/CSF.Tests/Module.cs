@@ -19,7 +19,7 @@
         }
 
         [Command("test")]
-        public IResult Test(string test = "")
+        public IResult Test(string test = "", string test2 = "", int test3 = 3)
         {
             return Success("Success");
         }

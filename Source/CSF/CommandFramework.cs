@@ -562,10 +562,10 @@ namespace CSF
 
                 if (parameter.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
                 {
-                    var missingResult = await ResolveMissingValue(parameter);
+                    var missingResult = await ResolveMissingValue(context, parameter);
 
                     if (!missingResult.IsSuccess)
-                        break;
+                        return OptionalValueNotPopulated(context);
 
                     var resultType = missingResult.Result.GetType();
 
@@ -575,7 +575,7 @@ namespace CSF
                         continue;
                     }
                     else
-                        return ParseResult.FromError($"Returned type does not match expected result. Expected: '{parameter.Type.Name}'. Got: '{resultType.Name}'");
+                        return MissingOptionalFailedMatch(context, parameter.Type, resultType);
                 }
 
                 if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
@@ -600,18 +600,53 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Called when the first optional parameter has a lacking value.
+        ///     Called when an optional parameter has a lacking value.
         /// </summary>
         /// <remarks>
         ///     This method can be overridden to add uses for <see cref="SelfIfNullAttribute"/>'s.
         ///     <br/>
-        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="Parameter.Type"/>.
+        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="Parameter.Type"/> or <see cref="Type.Missing"/>.
         /// </remarks>
+        /// <param name="context"></param>
         /// <param name="param"></param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
-        protected virtual Task<TypeReaderResult> ResolveMissingValue(Parameter param)
+        protected virtual Task<TypeReaderResult> ResolveMissingValue<T>(T context, Parameter param)
+            where T : IContext
         {
             return Task.FromResult(TypeReaderResult.FromSuccess(Type.Missing));
+        }
+
+        /// <summary>
+        ///     Returns the error when <see cref="ResolveMissingValue{T}(T, Parameter)"/> returned a type that did not match the expected type.
+        /// </summary>
+        /// <remarks>
+        ///     This method can be overridden to modify the error response.
+        /// </remarks>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="expectedType">The type that was expected to return.</param>
+        /// <param name="returnedType">The returned type.</param>
+        /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
+        protected virtual ParseResult MissingOptionalFailedMatch<T>(T context, Type expectedType, Type returnedType)
+            where T : IContext
+        {
+            return ParseResult.FromError($"Returned type does not match expected result. Expected: '{expectedType.Name}'. Got: '{returnedType.Name}'");
+        }
+
+        /// <summary>
+        ///     Returns the error when <see cref="ResolveMissingValue{T}(T, Parameter)"/> failed to return a valid result. 
+        ///     This method has to return <see cref="Type.Missing"/> if no self-implemented value has been returned.
+        /// </summary>
+        /// <remarks>
+        ///     This method can be overridden to modify the error response.
+        /// </remarks>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
+        protected virtual ParseResult OptionalValueNotPopulated<T>(T context)
+            where T : IContext
+        {
+            return ParseResult.FromError($"Optional parameter did not get {nameof(Type.Missing)} or self-populated value.");
         }
 
         /// <summary>
@@ -656,7 +691,7 @@ namespace CSF
                         if (returnValue is null)
                             break;
 
-                        var unhandledResult = ProcessUnhandledReturnType(returnValue);
+                        var unhandledResult = ProcessUnhandledReturnType(context, returnValue);
                         if (!unhandledResult.IsSuccess)
                             return unhandledResult;
 
@@ -677,11 +712,17 @@ namespace CSF
         }
 
         /// <summary>
-        ///     
+        ///     Returns the error message when an unhandled return type has been returned from the command method.
         /// </summary>
-        /// <param name="returnValue">The value returned by the </param>
-        /// <returns></returns>
-        protected virtual IResult ProcessUnhandledReturnType(object returnValue)
+        /// <remarks>
+        ///     This method can be overridden to modify the error response.
+        /// </remarks>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="returnValue">The returned value of the method.</param>
+        /// <returns>An <see cref="ExecuteResult"/> holding the returned error.</returns>
+        protected virtual ExecuteResult ProcessUnhandledReturnType<T>(T context, object returnValue)
+            where T : IContext
         {
             return ExecuteResult.FromError($"Received an unhandled type from method execution: {returnValue.GetType().Name}. \n\rConsider overloading {nameof(ProcessUnhandledReturnType)} if this is intended.");
         }
@@ -696,8 +737,9 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="ex">The exception that occurred while executing the command.</param>
-        /// <returns>A <see cref="ExecuteResult"/> holding the returned error.</returns>
+        /// <returns>An <see cref="ExecuteResult"/> holding the returned error.</returns>
         protected virtual ExecuteResult UnhandledExceptionResult<T>(T context, Command command, Exception ex)
+            where T : IContext
         {
             return ExecuteResult.FromError(ex.Message, ex);
         }
