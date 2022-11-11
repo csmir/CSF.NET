@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using TShockAPI;
@@ -55,7 +56,15 @@ namespace CSF.TShock
             }
 
             if (shouldReplace || Configuration.ReplaceAllExisting)
+            {
                 Commands.ChatCommands.RemoveAll(x => x.Names.Any(o => arg.Aliases.Any(n => o == n)));
+
+                // A hacky resolver for replacing TShock commands. Consider making this optional.
+                var range = Commands.TShockCommands.Where(x => x.Names.Any(o => arg.Aliases.Any(n => o == n))).ToList();
+
+                if (Commands.TShockCommands.Count != range.Count)
+                    Commands.TShockCommands = new(range);
+            }
 
             Commands.ChatCommands.Add(new TShockAPI.Command(string.Join(".", permissions), async (x) => await ExecuteCommandAsync(x), arg.Aliases)
             {
