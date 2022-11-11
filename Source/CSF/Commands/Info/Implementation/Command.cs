@@ -44,8 +44,8 @@ namespace CSF
             Method = method;
             Module = module;
 
-            Attributes = GetAttributes().ToList();
-            Preconditions = GetPreconditions().ToList();
+            Attributes = GetAttributes().Concat(module.Attributes).ToList();
+            Preconditions = GetPreconditions().Concat(module.Preconditions).ToList();
 
             Parameters = GetParameters(config).ToList();
 
