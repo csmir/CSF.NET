@@ -10,7 +10,7 @@
         ///     Gets the prefix as the provided <typeparamref name="T"/>.
         /// </summary>
         /// <returns></returns>
-        T GetAs();
+        T GetValueAs();
     }
 
     /// <summary>

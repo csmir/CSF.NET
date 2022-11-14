@@ -15,7 +15,7 @@ namespace CSF
             => Value = prefix;
 
         /// <inheritdoc/>
-        public string GetAs()
+        public string GetValueAs()
         {
             return Value;
         }

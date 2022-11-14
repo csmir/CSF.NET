@@ -16,7 +16,7 @@ namespace CSF
             => Value = $"{prefix}";
 
         /// <inheritdoc/>
-        public char GetAs()
+        public char GetValueAs()
         {
             return Value.ToCharArray()[0];
         }
