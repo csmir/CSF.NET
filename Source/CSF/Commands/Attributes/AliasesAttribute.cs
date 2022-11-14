@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Xml.Linq;
 
 namespace CSF
 {
     /// <summary>
     ///     An attribute that represents multiple command aliases for quick execution.
     /// </summary>
-    [Obsolete("This item will be removed in the next major update.")]
+    [Obsolete("This item will be removed in the next major update. Use CommandAttribute instead.")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class AliasesAttribute : Attribute
     {

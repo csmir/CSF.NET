@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 
 namespace CSF.Utils
 {
@@ -23,7 +24,7 @@ namespace CSF.Utils
             return range.ToList();
         }
 
-        public static IEnumerable<TOut> SelectWhere<TIn, TOut>(this IEnumerable<TIn> input, Func<TOut, bool> predicate = null)
+        public static IEnumerable<TOut> SelectWhere<TOut>(this IEnumerable input, Func<TOut, bool> predicate = null)
         {
             foreach (var @in in input)
             {
@@ -32,20 +33,6 @@ namespace CSF.Utils
                     if (predicate != null)
                         if (predicate.Invoke(@out))
                             yield return @out;
-                    else
-                        yield return @out;
-                }
-            }
-        }
-
-        public static IEnumerable<TOut> SelectWhere<TOut>(this IEnumerable input, Func<TOut, bool> predicate = null)
-        {
-            foreach (var @in in input)
-            {
-                if (@in is TOut @out)
-                {
-                    if (predicate != null && predicate.Invoke(@out))
-                        yield return @out;
                     else
                         yield return @out;
                 }

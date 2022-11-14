@@ -1,13 +1,10 @@
 ﻿using CSF.Utils;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 
 [assembly: CLSCompliant(true)]
 
@@ -342,7 +339,7 @@ namespace CSF
 
             if (commands.Any())
                 return await SearchCommandsAsync(context, commands);
-            
+
             return CommandNotFoundResult(context);
         }
 
