@@ -6,6 +6,7 @@ namespace CSF
     /// <summary>
     ///     An attribute that represents multiple command aliases for quick execution.
     /// </summary>
+    [Obsolete("This item will be removed in the next major update.")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class AliasesAttribute : Attribute
     {
@@ -22,7 +23,7 @@ namespace CSF
         public AliasesAttribute(params string[] aliases)
         {
             foreach (var alias in aliases)
-                if (string.IsNullOrEmpty(alias))
+                if (string.IsNullOrWhiteSpace(alias))
                     throw new ArgumentNullException(nameof(alias), "Alias cannot be null or empty.");
 
             Aliases = aliases;
@@ -40,7 +41,7 @@ namespace CSF
         [CLSCompliant(true)]
         public AliasesAttribute(string aliases)
         {
-            if (string.IsNullOrEmpty(aliases))
+            if (string.IsNullOrWhiteSpace(aliases))
                 throw new ArgumentNullException(nameof(aliases), "Aliases cannot be null or empty.");
 
             Aliases = aliases.Split('|');

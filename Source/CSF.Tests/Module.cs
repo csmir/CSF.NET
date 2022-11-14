@@ -36,7 +36,7 @@
 
         }
 
-        [Group("group")]
+        [Group("group", "gr")]
         public class InnerModule : ModuleBase<CommandContext>
         {
             [Command("subcommand")]

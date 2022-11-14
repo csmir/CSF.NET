@@ -65,27 +65,17 @@ namespace CSF
             {
                 var attributes = method.GetCustomAttributes(true);
 
-                string name = null;
                 string[] aliases = Array.Empty<string>();
                 foreach (var attribute in attributes)
                 {
                     if (attribute is CommandAttribute commandAttribute)
                     {
-                        if (string.IsNullOrEmpty(commandAttribute.Name))
-                        {
-                            continue;
-                        }
-                        name = commandAttribute.Name;
+                        aliases = commandAttribute.Aliases;
                     }
-
-                    if (attribute is AliasesAttribute aliasesAttribute)
-                        aliases = aliasesAttribute.Aliases;
                 }
 
-                if (string.IsNullOrEmpty(name))
+                if (!aliases.Any())
                     continue;
-
-                aliases = new[] { name }.Concat(aliases).ToArray();
 
                 yield return new Command(configuration, this, method, aliases);
             }
