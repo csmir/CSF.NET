@@ -8,7 +8,7 @@ namespace CSF
     public class CommandContext : ICommandContext
     {
         /// <inheritdoc/>
-        public string Name { get; }
+        public string Name { get; set; }
 
         /// <inheritdoc/>
         public IReadOnlyList<object> Parameters { get; set; }

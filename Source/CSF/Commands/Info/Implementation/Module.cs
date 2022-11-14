@@ -13,10 +13,18 @@ namespace CSF
         public string Name { get; }
 
         /// <inheritdoc/>
+        public string[] Aliases { get; }
+
+        /// <inheritdoc/>
         public IReadOnlyCollection<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
+
+        /// <summary>
+        ///     The components of this module.
+        /// </summary>
+        public IReadOnlyCollection<IConditionalComponent> Components { get; }
 
         /// <summary>
         ///     The type of this module.
@@ -28,15 +36,67 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
-        internal Module(Type type)
+        /// <summary>
+        ///     The root module. <see langword="null"/> if not available.
+        /// </summary>
+        public Module Root { get; }
+
+        internal Module(CommandConfiguration configuration, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
+            if (rootModule != null)
+                Root = rootModule;
+
             Type = type;
             Constructor = new Constructor(type);
 
-            Attributes = GetAttributes().ToList();
-            Preconditions = GetPreconditions().ToList();
+            Attributes = (Root?.Attributes.Concat(GetAttributes()) ?? GetAttributes()).ToList();
+            Preconditions = (Root?.Preconditions.Concat(GetPreconditions()) ?? GetPreconditions()).ToList();
 
-            Name = type.Name;
+            Name = expectedName ?? type.Name;
+            Aliases = aliases ?? new string[] { Name };
+
+            Components = GetComponents(configuration).ToList();
+        }
+
+        private IEnumerable<IConditionalComponent> GetComponents(CommandConfiguration configuration)
+        {
+            foreach (var method in Type.GetMethods())
+            {
+                var attributes = method.GetCustomAttributes(true);
+
+                string name = null;
+                string[] aliases = Array.Empty<string>();
+                foreach (var attribute in attributes)
+                {
+                    if (attribute is CommandAttribute commandAttribute)
+                    {
+                        if (string.IsNullOrEmpty(commandAttribute.Name))
+                        {
+                            continue;
+                        }
+                        name = commandAttribute.Name;
+                    }
+
+                    if (attribute is AliasesAttribute aliasesAttribute)
+                        aliases = aliasesAttribute.Aliases;
+                }
+
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                aliases = new[] { name }.Concat(aliases).ToArray();
+
+                yield return new Command(configuration, this, method, aliases);
+            }
+
+            foreach (var group in Type.GetNestedTypes())
+            {
+                foreach (var attribute in group.GetCustomAttributes(true))
+                {
+                    if (attribute is GroupAttribute gattribute)
+                        yield return new Module(configuration, group, Root, gattribute.Name, gattribute.Aliases);
+                }
+            }
         }
 
         private IEnumerable<Attribute> GetAttributes()

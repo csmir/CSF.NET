@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CSF.Utils
@@ -7,18 +9,47 @@ namespace CSF.Utils
     {
         public static IReadOnlyList<T> GetRange<T>(this IReadOnlyList<T> input, int startIndex, int? count = null)
         {
-            IEnumerable<T> Iterate()
+            IEnumerable<T> InnerGetRange()
             {
                 if (count is null)
-                    count = input.Count - startIndex - 1;
+                    count = input.Count - startIndex;
 
-                for (int i = startIndex; i < count; i++)
-                {
+                for (int i = startIndex; i <= count; i++)
                     yield return input[i];
-                }
             }
 
-            return Iterate().ToList();
+            var range = InnerGetRange();
+
+            return range.ToList();
+        }
+
+        public static IEnumerable<TOut> SelectWhere<TIn, TOut>(this IEnumerable<TIn> input, Func<TOut, bool> predicate = null)
+        {
+            foreach (var @in in input)
+            {
+                if (@in is TOut @out)
+                {
+                    if (predicate != null)
+                        if (predicate.Invoke(@out))
+                            yield return @out;
+                    else
+                        yield return @out;
+                }
+            }
+        }
+
+        public static IEnumerable<TOut> SelectWhere<TOut>(this IEnumerable input, Func<TOut, bool> predicate = null)
+        {
+            foreach (var @in in input)
+            {
+                if (@in is TOut @out)
+                {
+                    if (predicate != null && predicate.Invoke(@out))
+                        yield return @out;
+                    else
+                        yield return @out;
+                }
+            }
         }
     }
 }

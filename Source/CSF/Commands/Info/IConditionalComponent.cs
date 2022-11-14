@@ -8,6 +8,11 @@ namespace CSF
     public interface IConditionalComponent : IComponent
     {
         /// <summary>
+        ///     The aliases of this component.
+        /// </summary>
+        string[] Aliases { get; }
+
+        /// <summary>
         ///     The preconditions of this component.
         /// </summary>
         IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
