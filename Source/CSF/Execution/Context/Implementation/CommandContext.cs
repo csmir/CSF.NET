@@ -5,25 +5,21 @@ namespace CSF
     /// <summary>
     ///     Represents a class that's used to describe data from the command.
     /// </summary>
-    public class CommandContext : IContext
+    public class CommandContext : ICommandContext
     {
         /// <inheritdoc/>
         public string Name { get; }
 
-        /// <remarks>
-        ///     The raw input of the command.
-        /// </remarks>
-        public string RawInput { get; }
+        /// <inheritdoc/>
+        public IReadOnlyList<object> Parameters { get; set; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<object> Parameters { get; }
+        public IReadOnlyDictionary<string, object> Flags { get; }
 
-        /// <summary>
-        ///     The prefix for the command.
-        /// </summary>
-        /// <remarks>
-        ///     <see langword="null"/> if not set in <see cref="CommandContext(string, IPrefix)"/>.
-        /// </remarks>
+        /// <inheritdoc/>
+        public string RawInput { get; set; }
+
+        /// <inheritdoc/>
         public IPrefix Prefix { get; }
 
         /// <summary>
@@ -42,8 +38,9 @@ namespace CSF
             RawInput = rawInput;
             Prefix = prefix;
 
-            Parameters = param.Item2;
-            Name = param.Item1;
+            Parameters = param.Parameters;
+            Flags = param.Flags;
+            Name = param.Name;
         }
     }
 }

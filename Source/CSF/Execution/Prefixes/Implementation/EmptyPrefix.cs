@@ -46,6 +46,10 @@ namespace CSF
             return 290341713 + EqualityComparer<string>.Default.GetHashCode(Value);
         }
 
+        /// <summary>
+        ///     Creates a new empty prefix. Thanks to .netstandard2.0 not allowing empty struct constructors, it is not possible to do this by simply calling new.
+        /// </summary>
+        /// <returns></returns>
         public static EmptyPrefix Create()
         {
             return new EmptyPrefix("");

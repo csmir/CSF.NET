@@ -2,14 +2,6 @@
 {
     internal class Module : ModuleBase<CommandContext>
     {
-        [Command("help")]
-        public IResult Help()
-        {
-            Logger.WriteDebug("Test message");
-
-            return Success("Success");
-        }
-
         [Command("loglevel")]
         public IResult LogLevel(LogLevel level)
         {
@@ -18,10 +10,22 @@
             return Success("Success");
         }
 
-        [Command("test")]
-        public IResult Test(string test = "", string test2 = "", int test3 = 3)
+        [Group("group")]
+        public class InnerModule : ModuleBase<CommandContext>
         {
-            return Success("Success");
+            [Group("group")]
+            public class InnerInnerModule : ModuleBase<CommandContext>
+            { 
+                [Group("group")]
+                public class InnerInnerInnerModule : ModuleBase<CommandContext>
+                {
+                    [Command("subcommand")]
+                    public IResult MostInnerTest()
+                    {
+                        return Success("Success");
+                    }
+                }
+            }
         }
     }
 }
