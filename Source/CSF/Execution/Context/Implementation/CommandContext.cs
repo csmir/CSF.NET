@@ -14,13 +14,13 @@ namespace CSF
         public IReadOnlyList<object> Parameters { get; set; }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<string, object> Flags { get; }
-
-        /// <inheritdoc/>
         public string RawInput { get; set; }
 
         /// <inheritdoc/>
         public IPrefix Prefix { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<string, object> Flags { get; }
 
         /// <summary>
         ///     Creates a new <see cref="CommandContext"/> from the provided raw input.
