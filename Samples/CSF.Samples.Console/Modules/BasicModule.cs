@@ -1,6 +1,6 @@
 ﻿namespace CSF.Console
 {
-    public sealed class ExampleModule : ModuleBase<CommandContext>
+    public sealed class BasicModule : ModuleBase<CommandContext>
     {
         // 'example "this is an example input"'
         [Command("example")]
