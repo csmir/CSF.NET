@@ -11,13 +11,13 @@
         }
 
         [Command("test")]
-        public IResult Test([Remainder] string help)
+        public IResult Test(int help)
         {
-            return Success(help);
+            return Success(help.ToString());
         }
 
         [Command("test")]
-        public IResult Test(string test = "", string test2 = "", int test3 = 3)
+        public IResult Test(long helping, long helping2)
         {
             return Success("Success");
         }
@@ -27,6 +27,13 @@
         public IResult Test()
         {
             return Success("Success");
+        }
+
+        [Command("group")]
+        [ErrorOverload]
+        public void Group()
+        {
+
         }
 
         [Group("group")]

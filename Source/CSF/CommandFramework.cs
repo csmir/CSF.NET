@@ -312,29 +312,38 @@ namespace CSF
             var matches = CommandMap
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
 
+            var groups = matches.SelectWhere<Module>()
+                .OrderBy(x => x.Components.Count)
+                .ToList();
+
             var commands = matches.SelectWhere<Command>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
-            if (commands.Count < 1)
+            if (groups.Any())
             {
-                var groups = matches.SelectWhere<Module>()
-                    .OrderBy(x => x.Components.Count)
-                    .ToList();
-
-                if (groups.Any())
+                if (context.Parameters.Count > 0)
                 {
+                    var oldName = context.Name;
+                    var oldParam = context.Parameters;
+
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    return await SearchModuleAsync(context, groups[0]);
-                }
+                    var result = await SearchModuleAsync(context, groups[0]);
 
-                else
-                    return CommandNotFoundResult(context);
+                    if (result.IsSuccess)
+                        return result;
+
+                    context.Name = oldName;
+                    context.Parameters = oldParam;
+                }
             }
 
-            return await SearchCommandsAsync(context, commands);
+            if (commands.Any())
+                return await SearchCommandsAsync(context, commands);
+            
+            return CommandNotFoundResult(context);
         }
 
         /// <summary>
