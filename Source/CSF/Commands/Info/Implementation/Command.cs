@@ -39,6 +39,11 @@ namespace CSF
         /// </summary>
         public MethodInfo Method { get; }
 
+        /// <summary>
+        ///     Represents if the command is an error overload.
+        /// </summary>
+        public bool IsErrorOverload { get; }
+
         internal Command(CommandConfiguration config, Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
@@ -57,6 +62,14 @@ namespace CSF
 
                 if (!Parameters.Last().Flags.HasFlag(ParameterFlags.IsRemainder))
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
+            }
+
+            if (Attributes.Any(x => x is ErrorOverloadAttribute))
+            {
+                if (Parameters.Any())
+                    throw new InvalidOperationException($"{nameof(ErrorOverloadAttribute)} cannot exist on a method with parameters.");
+
+                IsErrorOverload = true;
             }
 
             Name = aliases[0];

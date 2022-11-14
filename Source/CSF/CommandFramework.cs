@@ -363,7 +363,6 @@ namespace CSF
                     .OrderBy(x => x.Components.Count)
                     .ToList();
 
-                // prioritize groups.
                 if (groups.Any())
                 {
                     context.Name = context.Parameters[0].ToString();
@@ -395,8 +394,12 @@ namespace CSF
             await Task.CompletedTask;
 
             Command match = null;
+            Command errormatch = null;
             foreach (var command in commands)
             {
+                if (errormatch is null && command.IsErrorOverload)
+                    errormatch = command;
+
                 var commandLength = command.Parameters.Count;
                 var contextLength = context.Parameters.Count;
 
@@ -442,7 +445,12 @@ namespace CSF
             }
 
             if (match is null)
-                return NoApplicableOverloadResult(context);
+            {
+                if (errormatch is null)
+                    return NoApplicableOverloadResult(context);
+                else
+                    return SearchResult.FromSuccess(errormatch);
+            }
 
             Logger.WriteTrace($"Found matching command for name: '{context.Name}': {match.Name}");
 

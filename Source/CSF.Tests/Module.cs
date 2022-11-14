@@ -22,6 +22,13 @@
             return Success("Success");
         }
 
+        [Command("test")]
+        [ErrorOverload]
+        public IResult Test()
+        {
+            return Success("Success");
+        }
+
         [Group("group")]
         public class InnerModule : ModuleBase<CommandContext>
         {
