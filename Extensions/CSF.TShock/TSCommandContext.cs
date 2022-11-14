@@ -9,15 +9,15 @@ namespace CSF.TShock
     public class TSCommandContext : ITSCommandContext
     {
         /// <inheritdoc/>
-        public string Name { get; }
+        public string Name { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<object> Parameters { get; set; }
 
         /// <summary>
         ///     Represents the raw command input.
         /// </summary>
-        public string RawInput { get; }
-
-        /// <inheritdoc/>
-        public IReadOnlyList<object> Parameters { get; }
+        public string RawInput { get; set; }
 
         /// <inheritdoc/>
         public bool IsSilent { get; }

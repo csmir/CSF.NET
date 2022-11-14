@@ -74,7 +74,7 @@ namespace CSF
                 if (Type != typeof(string))
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on string parameters.");
 
-                flags.WithRemainder();
+                flags = flags.WithRemainder();
             }
 
             return flags;

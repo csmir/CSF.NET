@@ -12,13 +12,15 @@ namespace CSF.Utils
             IEnumerable<T> InnerGetRange()
             {
                 if (count is null)
-                    count = input.Count - startIndex - 1;
+                    count = input.Count - startIndex;
 
-                for (int i = startIndex; i < count; i++)
+                for (int i = startIndex; i <= count; i++)
                     yield return input[i];
             }
 
-            return InnerGetRange().ToList();
+            var range = InnerGetRange();
+
+            return range.ToList();
         }
 
         public static IEnumerable<TOut> SelectWhere<TIn, TOut>(this IEnumerable<TIn> input, Func<TOut, bool> predicate = null)

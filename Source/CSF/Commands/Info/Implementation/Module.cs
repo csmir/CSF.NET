@@ -94,7 +94,7 @@ namespace CSF
                 foreach (var attribute in group.GetCustomAttributes(true))
                 {
                     if (attribute is GroupAttribute gattribute)
-                        yield return new Module(configuration, Type, Root, gattribute.Name, gattribute.Aliases);
+                        yield return new Module(configuration, group, Root, gattribute.Name, gattribute.Aliases);
                 }
             }
         }

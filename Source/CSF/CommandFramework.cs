@@ -359,7 +359,9 @@ namespace CSF
 
             if (commands.Count < 1)
             {
-                var groups = matches.SelectWhere<Module>();
+                var groups = matches.SelectWhere<Module>()
+                    .OrderBy(x => x.Components.Count)
+                    .ToList();
 
                 // prioritize groups.
                 if (groups.Any())
@@ -367,7 +369,7 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    return await SearchModuleAsync(context, groups.First());
+                    return await SearchModuleAsync(context, groups[0]);
                 }
 
                 else
@@ -407,12 +409,15 @@ namespace CSF
 
                 // If command length is lower than context length, look for a remainder attribute.
                 // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
-                if (commandLength < contextLength)
+                if (commandLength <= contextLength)
                 {
                     foreach (var parameter in command.Parameters)
                     {
                         if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
+                        {
                             match = command;
+                            break;
+                        }
                     }
                 }
 
