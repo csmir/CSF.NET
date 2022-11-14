@@ -38,7 +38,7 @@ namespace CSF.TShock
                 .Include(new StringPrefix("."));
         }
 
-        private new Task CommandRegistered(Command arg)
+        private new Task CommandRegistered(IConditionalComponent arg)
         {
             var permissions = new List<string>();
             bool shouldReplace = false;

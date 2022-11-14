@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 
 namespace CSF
 {
@@ -20,6 +21,10 @@ namespace CSF
         [CLSCompliant(false)]
         public AliasesAttribute(params string[] aliases)
         {
+            foreach (var alias in aliases)
+                if (string.IsNullOrEmpty(alias))
+                    throw new ArgumentNullException(nameof(alias), "Alias cannot be null or empty.");
+
             Aliases = aliases;
         }
 
@@ -35,6 +40,9 @@ namespace CSF
         [CLSCompliant(true)]
         public AliasesAttribute(string aliases)
         {
+            if (string.IsNullOrEmpty(aliases))
+                throw new ArgumentNullException(nameof(aliases), "Aliases cannot be null or empty.");
+
             Aliases = aliases.Split('|');
         }
     }

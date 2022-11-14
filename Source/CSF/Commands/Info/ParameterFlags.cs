@@ -11,27 +11,27 @@ namespace CSF
         /// <summary>
         ///     Defines a default value.
         /// </summary>
-        Default = 0,
+        Default = 1,
 
         /// <summary>
         ///     Defines if a parameter is nullable.
         /// </summary>
-        IsNullable = 1,
+        IsNullable = 2,
 
         /// <summary>
         ///     Defines if a parameter is optional.
         /// </summary>
-        IsOptional = 2,
+        IsOptional = 4,
 
         /// <summary>
         ///     Defines if a parameter is remainder.
         /// </summary>
-        IsRemainder = 3,
+        IsRemainder = 8,
 
         /// <summary>
         ///     Defines if a parameter is injectable.
         /// </summary>
-        IsInjectable = 4,
+        IsInjectable = 16,
     }
 
     internal static class ParameterFlagsExtensions

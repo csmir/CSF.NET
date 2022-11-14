@@ -8,15 +8,15 @@ namespace CSF
     public class CommandContext : IContext
     {
         /// <inheritdoc/>
-        public string Name { get; }
+        public string Name { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<object> Parameters { get; set; }
 
         /// <remarks>
         ///     The raw input of the command.
         /// </remarks>
-        public string RawInput { get; }
-
-        /// <inheritdoc/>
-        public IReadOnlyList<object> Parameters { get; }
+        public string RawInput { get; set; }
 
         /// <summary>
         ///     The prefix for the command.
