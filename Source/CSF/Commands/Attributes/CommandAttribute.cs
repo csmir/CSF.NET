@@ -20,6 +20,9 @@ namespace CSF
         /// <param name="description"></param>
         public CommandAttribute(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name), "Name cannot be null or empty.");
+
             Name = name;
         }
     }

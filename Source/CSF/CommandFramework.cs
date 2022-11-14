@@ -1,10 +1,14 @@
 ﻿using CSF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Schema;
+
 [assembly: CLSCompliant(true)]
 
 namespace CSF
@@ -17,7 +21,7 @@ namespace CSF
         /// <summary>
         ///     The range of registered commands.
         /// </summary>
-        public List<Command> CommandMap { get; private set; }
+        public List<IConditionalComponent> CommandMap { get; private set; }
 
         /// <summary>
         ///     The configuration for this service.
@@ -47,14 +51,14 @@ namespace CSF
                 => _commandExecuted.Remove(value);
         }
 
-        private readonly AsyncEvent<Func<Command, Task>> _commandRegistered;
+        private readonly AsyncEvent<Func<IConditionalComponent, Task>> _commandRegistered;
         /// <summary>
         ///     Invoked when a command is registered.
         /// </summary>
         /// <remarks>
         ///     This event can be used to do additional registration steps for certain services.
         /// </remarks>
-        public event Func<Command, Task> CommandRegistered
+        public event Func<IConditionalComponent, Task> CommandRegistered
         {
             add
                 => _commandRegistered.Add(value);
@@ -77,7 +81,7 @@ namespace CSF
         /// <param name="config"></param>
         public CommandFramework(CommandConfiguration config)
         {
-            CommandMap = new List<Command>();
+            CommandMap = new List<IConditionalComponent>();
             Configuration = config;
 
             Logger = ConfigureLogger();
@@ -88,7 +92,7 @@ namespace CSF
             if (config.Prefixes is null)
                 config.Prefixes = new PrefixProvider();
 
-            _commandRegistered = new AsyncEvent<Func<Command, Task>>();
+            _commandRegistered = new AsyncEvent<Func<IConditionalComponent, Task>>();
             _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
 
             if (Configuration.AutoRegisterModules)
@@ -144,7 +148,7 @@ namespace CSF
 
             foreach (var type in types)
             {
-                if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
+                if (baseType.IsAssignableFrom(type) && !type.IsAbstract && !type.IsNested)
                 {
                     Logger.WriteTrace($"Found module by name: {type.Name}.");
                     await BuildModuleAsync(type);
@@ -162,71 +166,35 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         public virtual async Task BuildModuleAsync(Type type)
         {
-            if (type is null)
+            var module = new Module(Configuration, type);
+
+            foreach (var component in module.Components)
             {
-                Logger.WriteError("Expected a not-null value.", new ArgumentNullException(nameof(type)));
-                return;
-            }
-
-            var module = new Module(type);
-
-            var methods = type.GetMethods();
-
-            foreach (var method in methods)
-            {
-                var attributes = method.GetCustomAttributes(true);
-
-                string name = null;
-                string[] aliases = Array.Empty<string>();
-                foreach (var attribute in attributes)
-                {
-                    if (attribute is CommandAttribute commandAttribute)
-                    {
-                        if (string.IsNullOrEmpty(commandAttribute.Name))
-                        {
-                            Logger.WriteWarning("Expected a not-null and not-empty command name.", new ArgumentNullException(method.Name));
-                            continue;
-                        }
-                        name = commandAttribute.Name;
-                        Logger.WriteTrace($"Found command by name: {name}");
-                    }
-
-                    if (attribute is AliasesAttribute aliasesAttribute)
-                        aliases = aliasesAttribute.Aliases;
-                }
-
-                if (string.IsNullOrEmpty(name))
-                    continue;
-
-                aliases = new[] { name }.Concat(aliases).ToArray();
-                Logger.WriteTrace($"Concatenated aliases for {name}: {string.Join(", ", aliases)}");
-
                 try
                 {
-                    var command = new Command(Configuration, module, method, aliases);
-
                     if (Configuration.InvokeOnlyNameRegistrations)
                     {
-                        if (!CommandMap.Any(x => x.Aliases.SequenceEqual(command.Aliases)))
+                        if (!CommandMap.Any(x => x.Aliases.SequenceEqual(component.Aliases)))
                         {
-                            await _commandRegistered.InvokeAsync(command);
-                            Logger.WriteTrace($"Invoked registration event for {command.Name}");
+                            await _commandRegistered.InvokeAsync(component);
+                            Logger.WriteTrace($"Invoked registration event for {component.Name}");
                         }
                     }
                     else
                     {
-                        await _commandRegistered.InvokeAsync(command);
-                        Logger.WriteTrace($"Invoked registration event for {command.Name}");
+                        await _commandRegistered.InvokeAsync(component);
+                        Logger.WriteTrace($"Invoked registration event for {component.Name}");
                     }
 
-                    CommandMap.Add(command);
-                    Logger.WriteDebug($"Registered command {command.Name}.");
+                    CommandMap.Add(component);
+                    Logger.WriteDebug($"Registered command {component.Name}.");
                 }
                 catch (Exception ex)
                 {
                     Logger.WriteCritical(ex.Message, ex);
                     return;
                 }
+                CommandMap.Add(component);
             }
         }
 
@@ -330,21 +298,99 @@ namespace CSF
         /// <summary>
         ///     Searches through the <see cref="CommandMap"/> for the best possible match.
         /// </summary>
+        /// <remarks>
+        ///     Can be overridden to change the search flow.
+        /// </remarks>
         /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
-        /// <returns></returns>
+        /// <returns>An asynchronous <see cref="Task"/> holding a <see cref="SearchResult"/> with the returned result.</returns>
         protected virtual async Task<SearchResult> SearchAsync<T>(T context)
             where T : IContext
         {
             await Task.CompletedTask;
 
-            var commands = CommandMap
-                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)))
+            var matches = CommandMap
+                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
+
+            var commands = matches.SelectWhere<Command>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
             if (commands.Count < 1)
-                return CommandNotFoundResult(context);
+            {
+                var groups = matches.SelectWhere<Module>()
+                    .OrderBy(x => x.Components.Count)
+                    .ToList();
+
+                if (groups.Any())
+                {
+                    context.Name = context.Parameters[0].ToString();
+                    context.Parameters = context.Parameters.GetRange(1);
+
+                    return await SearchModuleAsync(context, groups[0]);
+                }
+
+                else
+                    return CommandNotFoundResult(context);
+            }
+
+            return await SearchCommandsAsync(context, commands);
+        }
+
+        /// <summary>
+        ///     Searches a module for the best fitting command.
+        /// </summary>
+        /// <remarks>
+        ///     Can be overridden to change the search flow.
+        /// </remarks>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="module">The module to search in.</param>
+        /// <returns>An asynchronous <see cref="Task"/> holding a <see cref="SearchResult"/> with the returned result.</returns>
+        protected virtual async Task<SearchResult> SearchModuleAsync<T>(T context, Module module)
+            where T : IContext
+        {
+            var matches = module.Components
+                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
+
+            var commands = matches.SelectWhere<Command>()
+                .OrderBy(x => x.Parameters.Count)
+                .ToList();
+
+            if (commands.Count < 1)
+            {
+                var groups = matches.SelectWhere<Module>();
+
+                // prioritize groups.
+                if (groups.Any())
+                {
+                    context.Name = context.Parameters[0].ToString();
+                    context.Parameters = context.Parameters.GetRange(1);
+
+                    return await SearchModuleAsync(context, groups.First());
+                }
+
+                else
+                    return CommandNotFoundResult(context);
+            }
+
+            return await SearchCommandsAsync(context, commands);
+        }
+
+        /// <summary>
+        ///     Searches a range of commands in the provided group for the best match.
+        /// </summary>
+        /// <remarks>
+        ///     Can be overridden to change the search flow.
+        /// </remarks>
+        /// <typeparam name="T">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="commands">The commands to seek through.</param>
+        /// <returns>An asynchronous <see cref="Task"/> holding a <see cref="SearchResult"/> with the returned result.</returns>
+        protected virtual async Task<SearchResult> SearchCommandsAsync<T>(T context, IEnumerable<Command> commands)
+            where T : IContext
+        {
+            await Task.CompletedTask;
 
             Command match = null;
             foreach (var command in commands)
