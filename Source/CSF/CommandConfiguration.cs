@@ -32,6 +32,7 @@ namespace CSF
         ///     <br/>
         ///     In these cases, it is best to disable this option and self-implement module registration through <see cref="CommandFramework.BuildModulesAsync(System.Reflection.Assembly)"/> to avoid failures or unexpected behavior.
         /// </remarks>
+        [Obsolete("This feature is no longer available due to instabilities. This property will be removed in the next major update.")]
         public bool AutoRegisterModules { get; set; } = false;
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace CSF
         ///     <br/>
         ///     The <see cref="CommandFramework"/> will not automatically register modules if this value is <see langword="null"/>, even if <see cref="AutoRegisterModules"/> is <see langword="true"/>.
         /// </remarks>
+        [Obsolete("This feature is no longer available due to instabilities. This property will be removed in the next major update.")]
         public Assembly RegistrationAssembly { get; set; } = null;
 
         /// <summary>

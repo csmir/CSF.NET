@@ -18,20 +18,29 @@ namespace CSF
         /// <summary>
         ///     The range of registered commands.
         /// </summary>
-        public List<IConditionalComponent> CommandMap { get; private set; }
+        public List<IConditionalComponent> CommandMap { get; }
 
         /// <summary>
         ///     The configuration for this service.
         /// </summary>
-        public CommandConfiguration Configuration { get; private set; }
+        public CommandConfiguration Configuration { get; }
 
+        private ILogger _logger;
         /// <summary>
         ///     The logger passed throughout the build and execution process.
         /// </summary>
         /// <remarks>
         ///     The resolver behind this logger is available for modification in <see cref="ConfigureLogger"/>.
         /// </remarks>
-        public ILogger Logger { get; private set; }
+        public ILogger Logger
+        {
+            get
+            {
+                if (_logger is null)
+                    _logger = ConfigureLogger();
+                return _logger;
+            }
+        }
 
         private readonly AsyncEvent<Func<IContext, IResult, Task>> _commandExecuted;
         /// <summary>
@@ -79,9 +88,6 @@ namespace CSF
         public CommandFramework(CommandConfiguration config)
         {
             CommandMap = new List<IConditionalComponent>();
-            Configuration = config;
-
-            Logger = ConfigureLogger();
 
             if (config.TypeReaders is null)
                 config.TypeReaders = new TypeReaderProvider();
@@ -89,22 +95,10 @@ namespace CSF
             if (config.Prefixes is null)
                 config.Prefixes = new PrefixProvider();
 
+            Configuration = config;
+
             _commandRegistered = new AsyncEvent<Func<IConditionalComponent, Task>>();
             _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
-
-            if (Configuration.AutoRegisterModules)
-            {
-                Logger.WriteDebug("Auto-registration enabled. Starting build process:");
-                if (Configuration.RegistrationAssembly is null)
-                {
-                    Configuration.RegistrationAssembly = Assembly.GetEntryAssembly();
-                    Logger.WriteWarning("Auto-registration is enabled but the registration assembly is null. Fetched the entry assembly instead.");
-                }
-
-                BuildModulesAsync(Configuration.RegistrationAssembly)
-                    .GetAwaiter()
-                    .GetResult();
-            }
         }
 
         /// <summary>
@@ -116,10 +110,6 @@ namespace CSF
         /// <returns></returns>
         protected virtual ILogger ConfigureLogger()
         {
-#if RELEASE
-            if (Configuration.DefaultLogLevel is LogLevel.Trace)
-                Configuration.DefaultLogLevel = LogLevel.Debug;
-#endif
             return new DefaultLogger(Configuration.DefaultLogLevel);
         }
 
@@ -184,7 +174,7 @@ namespace CSF
                     }
 
                     CommandMap.Add(component);
-                    Logger.WriteDebug($"Registered command {component.Name}.");
+                    Logger.WriteDebug($"Registered item: {component.GetQualifiedNames()}.");
                 }
                 catch (Exception ex)
                 {

@@ -1,4 +1,4 @@
-﻿namespace CSF.Tests
+﻿namespace CSF.Tests.Modules
 {
     public class Module : ModuleBase<CommandContext>
     {
@@ -39,9 +39,29 @@
         [Group("group", "gr")]
         public class InnerModule : ModuleBase<CommandContext>
         {
+            [Command("test")]
+            public void Test()
+                => Respond("");
+
+            [Command("test")]
+            public void Test1()
+                => Respond("");
+
+            [Command("test")]
+            public void Test2()
+                => Respond("");
+
+            [Command("test")]
+            public void Test3()
+                => Respond("");
+
             [Group("group")]
             public class InnerInnerModule : ModuleBase<CommandContext>
-            { 
+            {
+                [Command("test")]
+                public void Test()
+                    => Respond("");
+
                 [Group("group")]
                 public class InnerInnerInnerModule : ModuleBase<CommandContext>
                 {

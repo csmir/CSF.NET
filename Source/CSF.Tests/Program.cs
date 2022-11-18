@@ -2,11 +2,12 @@
 
 var framework = new CommandFramework(new()
 {
-    AutoRegisterModules = true,
     DefaultLogLevel = LogLevel.Trace,
     TypeReaders = new TypeReaderProvider()
         .Include<LogLevel>(new EnumTypeReader<LogLevel>())
 });
+
+await framework.BuildModulesAsync(typeof(Program).Assembly);
 
 while (true)
 {

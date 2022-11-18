@@ -31,8 +31,10 @@ namespace CSF.Utils
                 if (@in is TOut @out)
                 {
                     if (predicate != null)
+                    {
                         if (predicate.Invoke(@out))
                             yield return @out;
+                    }
                     else
                         yield return @out;
                 }

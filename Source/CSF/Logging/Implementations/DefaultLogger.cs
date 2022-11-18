@@ -53,12 +53,7 @@ namespace CSF
 
             if (log.LogLevel <= LogLevel)
             {
-                var message = $"{string.Format("{0:HH:mm:ss}", DateTime.UtcNow)} [{log.LogLevel}]: {log.Value}";
-
-                if (log.Exception != null)
-                    message += $"\n -> {log.Exception.ToString().Replace("\n\r", "\n\r -> ")}";
-
-                Resolver.Send(message);
+                Resolver.Send(log);
             }
 
             if (log.LogLevel is LogLevel.Critical)
