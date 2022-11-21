@@ -35,13 +35,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<None Include="..\..\README.md">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
+	<None Include="..\..\..\README.md">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
 	</None>
-	<None Include="..\..\Style\csf_nogap.png">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
+	<None Include="..\..\..\style\csf_nogap.png">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
 	</None>
   </ItemGroup>
 
@@ -50,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\..\Source\CSF\CSF.csproj" />
+	<ProjectReference Include="..\..\..\src\Core\CSF\CSF.csproj" />
   </ItemGroup>
 
 </Project>

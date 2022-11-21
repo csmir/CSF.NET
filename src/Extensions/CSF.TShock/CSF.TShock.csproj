@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
 
 	<AssemblyVersion>1.2.2.1</AssemblyVersion>
 	<PackageVersion>1.2.2.1</PackageVersion>
@@ -15,15 +15,15 @@
 	<RepositoryType>git</RepositoryType>
 
 	<PackageReleaseNotes>Version 1.2.2.1; Made for netstandard2.0.</PackageReleaseNotes>
-	<PackageTags>Text, Console, Commands, Framework</PackageTags>
-	  
-	<Title>Command Standardization Framework</Title>
-	<Description>The Command Standardization Framework (CSF) has been designed to give the developer a streamlined experience when implementing commands into projects.</Description>
-	
+	<PackageTags>Text, Console, Commands, Framework, TShock</PackageTags>
+
+	<Title>Command Standardization Framework Extension; TShock for Terraria</Title>
+	<Description>An extension for CSF that adds support for TShock for Terraria.</Description>
+
 	<NeutralLanguage>en-US</NeutralLanguage>
 
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageId>CSF.NET</PackageId>
+	<PackageId>CSF.NET.TShock</PackageId>
 
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -35,14 +35,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-	<None Include="..\..\Style\csf_nogap.png">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
+	<None Include="..\..\..\README.md">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
 	</None>
+	<None Include="..\..\..\style\csf_nogap.png">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
+	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TShock" Version="5.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\..\src\Core\CSF\CSF.csproj" />
   </ItemGroup>
 
 </Project>
