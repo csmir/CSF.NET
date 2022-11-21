@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.TShock", "src\Extension
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Spectre", "src\Extensions\CSF.Spectre\CSF.Spectre.csproj", "{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Hosting", "src\Core\CSF.Hosting\CSF.Hosting.csproj", "{63FE2C23-4BBB-412B-80B1-132523066762}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{C0CBE20E-B609-4098-B98A-F2F2E3C1914E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{B5A87F72-046D-43A4-802B-C57BBD50A261}"
@@ -57,10 +55,6 @@ Global
 		{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{924925E1-0AE5-4B5A-B736-EB09EF5BDB60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63FE2C23-4BBB-412B-80B1-132523066762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63FE2C23-4BBB-412B-80B1-132523066762}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63FE2C23-4BBB-412B-80B1-132523066762}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63FE2C23-4BBB-412B-80B1-132523066762}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
