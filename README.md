@@ -76,8 +76,6 @@ You can provide an `IServiceProvider` at execution to inject modules with depend
 
 ## 🗺️ Roadmap
 
-- [x] Add support for flags.
-- [x] Add regex parameter support.
 - [x] Add complex parameters.
 - [x] Wrap around other potential frameworks.
 - [x] Implement extensions for `IHost` and `WebHost`.
