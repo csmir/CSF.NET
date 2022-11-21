@@ -21,8 +21,8 @@ namespace CSF.Samples.TShock
             Info($"All online players ({players.Count()}/{Context.Server.Settings.MaxSlots}): \n{stringified}");
         }
 
-        [Command("playerinfo")]
-        [Aliases("pi")]
+        [Command("playerinfo", "pi")]
+        [Aliases("pi")] // ---- /\
         [Description("Displays information about a player.")]
         [RequirePermission("playerinfo")]
         public IResult PlayerInfo(TSPlayer? player = null)

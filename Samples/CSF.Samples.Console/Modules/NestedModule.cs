@@ -11,9 +11,24 @@ namespace CSF.Samples.Console.Modules
     [RequireContext(typeof(CommandContext))]
     public sealed class NestedModule : ModuleBase<CommandContext>
     {
+        [Command("nested")]
+        // Erroroverload will be the default resolver if the other matches could not be found thanks to an invalid parameter length.
+        [ErrorOverload]
+        public IResult Command()
+        {
+            return Success("Success!");
+        }
+
+        // A subcommand group
+        [Group("nested")]
         public sealed class InnerNestedModule : ModuleBase<CommandContext>
         {
-
+            [Command("inner")]
+            [ErrorOverload]
+            public IResult Command()
+            {
+                return Success("Success!");
+            }
         }
     }
 }
