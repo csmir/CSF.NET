@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace CSF.Hosting
+﻿namespace CSF.Hosting
 {
     /// <summary>
     ///     Represents an interface that is internally used to resolve the startup assembly. This interface is not intended to be used by developers.
@@ -8,8 +6,8 @@ namespace CSF.Hosting
     public interface ICommandHostingContext
     {
         /// <summary>
-        ///     The assembly used to register modules in the project.
+        ///     The configuration used to configure the <see cref="CommandFramework"/>.
         /// </summary>
-        public Assembly RegistrationAssembly { get; set; }
+        public CommandConfiguration Configuration { get; set; }
     }
 }

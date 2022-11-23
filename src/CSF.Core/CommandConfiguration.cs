@@ -6,7 +6,7 @@ namespace CSF
     /// <summary>
     ///     Base configuration for the <see cref="CommandFramework"/>.
     /// </summary>
-    public class CommandConfiguration
+    public sealed class CommandConfiguration
     {
         /// <summary>
         ///     If enabled, this ensures that <see cref="CommandFramework.CommandRegistered"/> 

@@ -8,20 +8,14 @@ namespace CSF.TShock
     public class TSCommandFramework : CommandFramework
     {
         /// <summary>
-        ///     Represents the configuration for the framework in its current state.
-        /// </summary>
-        public new TSCommandConfiguration Configuration { get; }
-
-        /// <summary>
         ///     Creates a new <see cref="TSCommandFramework"/> for processing modules inside the framework.
         /// </summary>
         /// <param name="config"></param>
-        public TSCommandFramework(TSCommandConfiguration config)
+        public TSCommandFramework(CommandConfiguration config)
             : base(config)
         {
             config.InvokeOnlyNameRegistrations = true;
 
-            Configuration = config;
             base.CommandRegistered += CommandRegistered;
 
             config.TypeReaders
@@ -50,7 +44,7 @@ namespace CSF.TShock
                     description = descriptionAttribute.Description;
             }
 
-            if (shouldReplace || Configuration.ReplaceAllExisting)
+            if (shouldReplace)
             {
                 Commands.ChatCommands.RemoveAll(x => x.Names.Any(o => arg.Aliases.Any(n => o == n)));
 

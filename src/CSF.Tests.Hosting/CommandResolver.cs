@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CSF.Tests.Hosting
 {
-    internal class MyStreamListener : CommandStreamListener<CommandFramework, CommandContext>
+    internal class CommandResolver : HostedCommandResolver<CommandFramework, CommandContext>
     {
-        public MyStreamListener(CommandFramework framework, IServiceProvider collection, ILogger<CommandFramework> logger)
+        public CommandResolver(CommandFramework framework, IServiceProvider collection, ILogger<CommandFramework> logger)
             : base(framework, collection, logger)
         {
 
@@ -13,12 +13,17 @@ namespace CSF.Tests.Hosting
 
         protected override Task<CommandContext> GenerateContextAsync(string input, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var ctx = new CommandContext(input);
+
+            return Task.FromResult(ctx);
         }
 
         protected override Task<string> GetInputStreamAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            while (true)
+            {
+                return Task.FromResult(Console.ReadLine()!);
+            }
         }
     }
 }

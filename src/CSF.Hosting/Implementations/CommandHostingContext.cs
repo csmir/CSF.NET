@@ -1,12 +1,14 @@
-﻿using System.Reflection;
-
-namespace CSF.Hosting
+﻿namespace CSF.Hosting
 {
-    public class CommandHostingContext<T> : ICommandHostingContext
-        where T : CommandConfiguration
+    /// <summary>
+    ///     Represents the context required to configure an <see cref="CommandFramework"/>.
+    /// </summary>
+    public class CommandHostingContext : ICommandHostingContext
     {
-        public T Configuration { get; set; } = default!;
+        /// <inheritdoc/>
+        public CommandConfiguration Configuration { get; set; } = default!;
 
-        public Assembly RegistrationAssembly { get; set; } = Assembly.GetEntryAssembly()!;
+        /// <inheritdoc/>
+        public CancellationTokenSource CancellationTokenSource { get; set; }
     }
 }

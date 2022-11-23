@@ -297,7 +297,7 @@ namespace CSF
             var services = new List<object>();
             foreach (var dependency in command.Module.Constructor.Dependencies)
             {
-                if (dependency.Type is IServiceProvider)
+                if (dependency.Type == typeof(IServiceProvider))
                     services.Add(provider);
                 else
                 {
