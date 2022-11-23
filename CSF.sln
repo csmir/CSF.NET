@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF", "src\Core\CSF\CSF.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Tests", "src\Tests\CSF.Tests\CSF.Tests.csproj", "{A70E8C5D-0209-433B-9AB7-9C05C0DA04E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Samples.TShock4", "samples\CSF.Samples.TShock4\CSF.Samples.TShock4.csproj", "{30B695C5-3AFF-46DB-A514-9B81B3013DE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Samples.TShock4", "examples\CSF.Samples.TShock4\CSF.Samples.TShock4.csproj", "{30B695C5-3AFF-46DB-A514-9B81B3013DE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Samples.TShock5", "samples\CSF.Samples.TShock5\CSF.Samples.TShock5.csproj", "{B868198E-67C3-4AFB-8D19-48034E1156FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Samples.TShock5", "examples\CSF.Samples.TShock5\CSF.Samples.TShock5.csproj", "{B868198E-67C3-4AFB-8D19-48034E1156FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Samples.Console", "samples\CSF.Samples.Console\CSF.Samples.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Samples.Console", "examples\CSF.Samples.Console\CSF.Samples.Console.csproj", "{19F7A07B-7349-4AA5-A9CC-58F1002DFED6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.TShock", "src\Extensions\CSF.TShock\CSF.TShock.csproj", "{CA734A9C-2E3A-4E61-8CD0-0476AD88F94C}"
 EndProject
