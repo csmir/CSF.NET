@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CSF.TShock
+﻿namespace CSF.TShock
 {
     /// <summary>
     ///     Represents an attribute that marks if another command with matching name should be replaced on registration.

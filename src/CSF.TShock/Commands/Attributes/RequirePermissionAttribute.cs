@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CSF.TShock
+﻿namespace CSF.TShock
 {
     /// <summary>
     ///     Represents an attribute that defines the required permission node at the nesting level of the current step.

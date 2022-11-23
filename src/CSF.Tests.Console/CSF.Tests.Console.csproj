@@ -12,7 +12,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\src\Core\CSF\CSF.csproj" />
+		<ProjectReference Include="..\..\src\CSF.Core\CSF.Core.csproj" />
 	</ItemGroup>
 
 </Project>

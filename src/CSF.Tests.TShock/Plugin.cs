@@ -10,7 +10,7 @@ namespace CSF.Tests.TShock
         private readonly TSCommandFramework _framework;
 
         public Plugin(Main game)
-            : base(game) 
+            : base(game)
         {
             _framework = new(new());
         }
