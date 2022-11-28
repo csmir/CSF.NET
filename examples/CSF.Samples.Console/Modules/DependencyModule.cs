@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CSF.Samples.Console.Modules
+﻿namespace CSF.Samples.Console.Modules
 {
     public sealed class DependencyModule : ModuleBase<CommandContext>
     {

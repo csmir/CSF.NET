@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSF.NET" Version="1.4.0" />
+    <ProjectReference Include="..\CSF.Hosting\CSF.Hosting.csproj" />
   </ItemGroup>
 
 </Project>

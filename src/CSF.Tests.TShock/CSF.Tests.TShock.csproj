@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CSF.TShock\CSF.TShock.csproj" />
+  </ItemGroup>
+
 </Project>

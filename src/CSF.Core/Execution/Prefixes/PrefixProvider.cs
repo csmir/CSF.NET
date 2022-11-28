@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a provider for prefixes, which can be used to define <see cref="RequirePrefixAttribute"/> and to define limitations in <see cref="CommandFramework.TryParsePrefix(ref string, out IPrefix)"/>
+    /// </summary>
     public sealed class PrefixProvider
     {
         private readonly Dictionary<string, IPrefix> _prefixes;

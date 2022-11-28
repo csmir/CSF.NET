@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using TShockAPI;
+﻿using TShockAPI;
 
 namespace CSF.TShock
 {

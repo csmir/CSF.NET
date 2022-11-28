@@ -51,7 +51,7 @@ namespace CSF
             if (LogLevel is LogLevel.None)
                 return;
 
-            if (log.LogLevel <= LogLevel)
+            if (log.LogLevel >= LogLevel)
             {
                 Resolver.Send(log);
             }
