@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Hosting", "src\CSF.Host
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSF.Tests.Hosting", "src\CSF.Tests.Hosting\CSF.Tests.Hosting.csproj", "{DC2807A7-F45F-422F-A9CB-75E1CC0A9978}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Samples.Hosting", "src\CSF.Samples.Hosting\CSF.Samples.Hosting.csproj", "{D99DCD40-8A42-42F5-8385-88EDF87057CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSF.Samples.Hosting", "examples\CSF.Samples.Hosting\CSF.Samples.Hosting.csproj", "{D99DCD40-8A42-42F5-8385-88EDF87057CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
