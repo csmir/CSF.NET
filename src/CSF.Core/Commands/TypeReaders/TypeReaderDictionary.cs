@@ -91,6 +91,14 @@ namespace CSF
             => TryGetReader(typeof(T), out reader);
 
         /// <summary>
+        ///     Checks if the underlying dictionary contains the provided type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>True if success. False if not.</returns>
+        public bool ContainsType(Type type)
+            => _typeReaders.ContainsKey(type);
+
+        /// <summary>
         ///     Tries to get a <see cref="ITypeReader"/> from the underlying dictionary.
         /// </summary>
         /// <typeparam name="T"></typeparam>

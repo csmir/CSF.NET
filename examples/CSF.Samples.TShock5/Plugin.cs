@@ -13,10 +13,9 @@ namespace CSF.Samples.TShock5
             : base(game)
         {
             // Define the command standardization framework made for TShock.
-            _fx = new(new TSCommandConfiguration()
+            _fx = new(new CommandConfiguration()
             {
-                DoAsynchronousExecution = false,
-                ReplaceAllExisting = true
+                DoAsynchronousExecution = false
             });
         }
 

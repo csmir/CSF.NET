@@ -1,6 +1,7 @@
 ﻿using CSF.Utils;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -72,6 +73,23 @@ namespace CSF
                 => _commandRegistered.Remove(value);
         }
 
+        private readonly AsyncEvent<Func<Type, ITypeReader, Task>> _typeReaderRegistered;
+        /// <summary>
+        ///     Invoked when a typereader is registered.
+        /// </summary>
+        /// <remarks>
+        ///     This event can be sed to do additional registration steps for certain services.
+        ///     <br/>
+        ///     This event is only ever used when types are registered through <see cref="BuildAssemblyAsync(Assembly)"/>.
+        /// </remarks>
+        public event Func<Type, ITypeReader, Task> TypeReaderRegistered
+        {
+            add
+                => _typeReaderRegistered.Add(value);
+            remove
+                => _typeReaderRegistered.Remove(value);
+        }
+
         /// <summary>
         ///     Creates a new instance of <see cref="CommandFramework"/> with default configuration.
         /// </summary>
@@ -113,6 +131,35 @@ namespace CSF
             return new DefaultLogger(Configuration.DefaultLogLevel);
         }
 
+        public virtual async Task BuildAssemblyAsync(Assembly assembly)
+        {
+            if (assembly is null)
+            {
+                Logger.WriteError("Expected a not-null value.", new ArgumentNullException(nameof(assembly)));
+                return;
+            }
+
+            var types = assembly.GetTypes();
+
+            var mt = typeof(IModuleBase);
+            var tt = typeof(ITypeReader);
+
+            foreach (var type in types)
+            {
+                if (mt.IsAssignableFrom(type) && !type.IsAbstract && !type.IsNested)
+                {
+                    Logger.WriteTrace($"Found module by name: {type.Name}.");
+                    await BuildModuleAsync(type);
+                }
+
+                if (tt.IsAssignableFrom(type) && !type.IsAbstract && !type.IsNested)
+                {
+                    Logger.WriteTrace($"Found typereader by name: {type.Name}.");
+                    await BuildTypeReaderAsync(type);
+                }
+            }
+        }
+
         /// <summary>
         ///     Registers all command modules in the provided assembly to the <see cref="CommandMap"/>.
         /// </summary>
@@ -131,15 +178,74 @@ namespace CSF
 
             var types = assembly.GetTypes();
 
-            var baseType = typeof(IModuleBase);
+            var mt = typeof(IModuleBase);
 
             foreach (var type in types)
             {
-                if (baseType.IsAssignableFrom(type) && !type.IsAbstract && !type.IsNested)
+                if (mt.IsAssignableFrom(type) && !type.IsAbstract && !type.IsNested)
                 {
                     Logger.WriteTrace($"Found module by name: {type.Name}.");
                     await BuildModuleAsync(type);
                 }
+            }
+        }
+
+        /// <summary>
+        ///     Registers a single typereader to the <see cref="CommandConfiguration.TypeReaders"/>.
+        /// </summary>
+        /// <param name="type">The type that represents the <see cref="ITypeReader"/> to be registered.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        public virtual async Task BuildTypeReaderAsync(Type type)
+        {
+            if (type.ContainsGenericParameters)
+            {
+                Logger.WriteError($"Typereader cannot be resolved as unbound generic type.");
+                return;
+            }
+
+            try
+            {
+                var tobj = Activator.CreateInstance(type);
+
+                if (tobj is ITypeReader reader)
+                {
+                    if (type.BaseType is null)
+                    {
+                        Logger.WriteTrace($"Could not fetch base type for {type.Name}.");
+                        return;
+                    }
+
+                    if (!type.BaseType.IsGenericType)
+                    {
+                        Logger.WriteDebug($"The type {type.Name} inherits from is not of expected generic type {nameof(TypeReader<Type>)}.");
+                        return;
+                    }
+
+                    var btype = type.BaseType.GetGenericArguments()[0];
+
+                    if (Configuration.TypeReaders.ContainsType(btype))
+                    {
+                        Logger.WriteDebug($"The typereader provider already has a definition for {btype.Name}.");
+                        return;
+                    }
+
+                    await _typeReaderRegistered.InvokeAsync(btype, reader);
+                    Logger.WriteTrace($"Invoked registration event for typereader: {btype.Name} as {type.Name}");
+
+                    Configuration.TypeReaders.Include(btype, reader);
+                    Logger.WriteDebug($"Registered typereader: {btype.Name} as {type.Name}.");
+                }
+                else
+                {
+                    Logger.WriteTrace($"Could not cast type {type.Name} to {nameof(ITypeReader)}.");
+                    return;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteCritical(ex.Message, ex);
+                return;
             }
         }
 
@@ -164,7 +270,7 @@ namespace CSF
                         if (!CommandMap.Any(x => x.Aliases.SequenceEqual(component.Aliases)))
                         {
                             await _commandRegistered.InvokeAsync(component);
-                            Logger.WriteTrace($"Invoked registration event for {component.Name}");
+                            Logger.WriteTrace($"Invoked registration event for command: {component.Name}");
                         }
                     }
                     else
