@@ -77,27 +77,29 @@ You can provide an `IServiceProvider` at execution to inject modules with depend
 ## 🗺️ Roadmap
 
 - [x] Add complex parameters.
-- [x] Wrap around other potential frameworks.
-- [x] Implement extensions for `IHost` and `WebHost`.
 
 ## 🤖 Samples
 
 Samples are available to learn how to implement CSF in your own programs.
 
-- [CSF.Samples.Console](https://github.com/Rozen4334/CSF.NET/tree/master/Samples/CSF.Samples.Console)
+- [CSF.Samples.Hosting](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.Hosting)
+  - Shows how to implement CSF in an IHost design console application.
+- [CSF.Samples.Console](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.Console)
   - Shows how to implement CSF on a basic console application.
-- [CSF.Samples.TShock4](https://github.com/Rozen4334/CSF.NET/tree/master/Samples/CSF.Samples4.TShock)
+- [CSF.Samples.TShock4](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.TShock4)
   - Shows how to implement CSF.NET.TShock into an OTAPI2 TShock plugin.
-- [CSF.Samples.TShock5](https://github.com/Rozen4334/CSF.NET/tree/master/Samples/CSF.Samples5.TShock)
+- [CSF.Samples.TShock5](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.TShock5)
   - Shows how to implement CSF.NET.TShock into an OTAPI3 TShock plugin.
 
 ## 📰 Extensions
 
 CSF introduces a number of extensions for external libraries.
 
-- [CSF.Spectre](https://github.com/Rozen4334/CSF.NET/tree/master/Extensions/CSF.Spectre)
+- [CSF.Hosting](https://github.com/Rozen4334/CSF.NET/tree/master/src/CSF.Hosting)
+  - A package that wraps around [Microsoft.Extensions.Hosting](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host).
+- [CSF.Spectre](https://github.com/Rozen4334/CSF.NET/tree/master/src/CSF.Spectre)
   - A package that wraps around [Spectre.Console](https://github.com/spectreconsole/spectre.console).
-- [CSF.TShock](https://github.com/Rozen4334/CSF.NET/tree/master/Extensions/CSF.TShock)
+- [CSF.TShock](https://github.com/Rozen4334/CSF.NET/tree/master/src/CSF.TShock)
   - A package that wraps around [TShock for Terraria](https://github.com/Pryaxis/TShock).
 
 ## ❓ Explaining the internals:
