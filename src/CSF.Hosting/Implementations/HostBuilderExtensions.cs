@@ -18,7 +18,7 @@ namespace CSF.Hosting
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommandFramework<T, TListener>(this IHostBuilder hostBuilder, Action<HostBuilderContext, CommandHostingContext> action)
-            where T : ICommandFramework where TListener : class, IHostedCommandResolver
+            where T : ImplementationFactory where TListener : class, IHostedCommandResolver
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -41,7 +41,7 @@ namespace CSF.Hosting
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommandFramework<T, TListener>(this IHostBuilder hostBuilder, Action<HostBuilderContext> action)
-            where T : ICommandFramework where TListener : class, IHostedCommandResolver
+            where T : ImplementationFactory where TListener : class, IHostedCommandResolver
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -61,7 +61,7 @@ namespace CSF.Hosting
         /// <param name="hostBuilder"></param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommandFramework<T, TListener>(this IHostBuilder hostBuilder)
-            where T : ICommandFramework where TListener : class, IHostedCommandResolver
+            where T : ImplementationFactory where TListener : class, IHostedCommandResolver
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -73,14 +73,15 @@ namespace CSF.Hosting
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IServiceCollection ConfigureCommandFramework<T, TListener>(this IServiceCollection services, CommandHostingContext cmdContext)
-            where T : ICommandFramework where TListener : class, IHostedCommandResolver
+            where T : ImplementationFactory where TListener : class, IHostedCommandResolver
         {
             services.AddSingleton(cmdContext);
 
             cmdContext.Configuration ??= new();
 
             services.AddSingleton(cmdContext.Configuration);
-            services.AddSingleton(typeof(ICommandFramework), typeof(T));
+            services.AddSingleton<T>();
+            services.AddSingleton<CommandFramework<T>>();
 
             services.AddHostedService<TListener>();
 

@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    public abstract class ImplementationFactory
+    public class ImplementationFactory
     {
         public IServiceProvider Provider { get; }
 
         public CommandConfiguration Configuration { get; }
 
-        public ImplementationFactory(IServiceProvider provider, CommandConfiguration configuration)
+        public ImplementationFactory(CommandConfiguration configuration, IServiceProvider provider = null)
         {
-            Provider = provider;
+            Provider = provider ?? EmptyServiceProvider.Instance;
             Configuration = configuration;
         }
 
