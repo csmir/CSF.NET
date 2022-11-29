@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6</TargetFramework>
 	<ImplicitUsings>enable</ImplicitUsings>
+
+	<NoWarn>MSB3270</NoWarn>
 	  
 	<AssemblyVersion>1.3</AssemblyVersion>
 	<PackageVersion>1.3</PackageVersion>

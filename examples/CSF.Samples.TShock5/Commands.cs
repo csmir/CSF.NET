@@ -22,7 +22,7 @@ namespace CSF.Samples.TShock
         }
 
         [Command("playerinfo", "pi")]
-        [Aliases("pi")] // ---- /\
+        //[Aliases("pi")] // -- /\
         [Description("Displays information about a player.")]
         [RequirePermission("playerinfo")]
         public IResult PlayerInfo(TSPlayer? player = null)

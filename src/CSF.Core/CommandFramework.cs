@@ -114,6 +114,7 @@ namespace CSF
 
             Configuration = config;
 
+            _typeReaderRegistered = new AsyncEvent<Func<Type, ITypeReader, Task>>();
             _commandRegistered = new AsyncEvent<Func<IConditionalComponent, Task>>();
             _commandExecuted = new AsyncEvent<Func<IContext, IResult, Task>>();
         }
