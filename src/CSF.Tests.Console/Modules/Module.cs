@@ -2,13 +2,13 @@
 {
     public class Module : ModuleBase<CommandContext>
     {
-        [Command("loglevel")]
-        public IResult LogLevel(LogLevel level)
-        {
-            Logger.LogLevel = level;
+        //[Command("loglevel")]
+        //public IResult LogLevel(LogLevel level)
+        //{
+        //    Logger.LogLevel = level;
 
-            return Success("Success");
-        }
+        //    return Success("Success");
+        //}
 
         [Command("test")]
         public IResult Test(int help)

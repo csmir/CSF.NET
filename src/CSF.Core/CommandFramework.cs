@@ -16,7 +16,7 @@ namespace CSF
     ///     Represents the handler for registered commands.
     /// </summary>
     public sealed class CommandFramework<T> : ICommandFramework
-        where T : ImplementationFactory
+        where T : ImplementationFactory, new()
     {
         /// <summary>
         ///     The configurator that handles command creation.
@@ -71,13 +71,26 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Creates a new instance of <see cref="CommandFramework"/> with provided configuration.
+        ///     Creates a new instance of <see cref="CommandFramework{T}"/> with provided configuration.
+        /// </summary>
+        /// <param name="config"></param>
+        public CommandFramework()
+            : this(new())
+        {
+
+        }
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="CommandFramework{T}"/> with provided configuration.
         /// </summary>
         /// <param name="config"></param>
         public CommandFramework(T implementationFactory)
         {
             Configurator = implementationFactory;
             Commands = new List<IConditionalComponent>();
+
+            if (Configurator.Configuration.AutoRegisterAssemblies)
+                BuildModuleAssemblies();
         }
 
         public void BuildModuleAssemblies()

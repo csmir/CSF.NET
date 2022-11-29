@@ -9,12 +9,6 @@ namespace CSF
     public sealed class CommandConfiguration
     {
         /// <summary>
-        ///     If enabled, this ensures that <see cref="CommandFramework.CommandRegistered"/> 
-        ///     will only be invoked when a command that does not match the same aliases or name is added to the command map.
-        /// </summary>
-        public bool InvokeOnlyNameRegistrations { get; set; } = false;
-
-        /// <summary>
         ///     If enabled, commands will execute asynchronously, ensuring that sync handlers will not wait out the execution before returning to the source method.
         /// </summary>
         /// <remarks>
@@ -35,6 +29,11 @@ namespace CSF
         /// <summary>
         ///     The assemblies that should be used for registering commands, typereaders and event resolvers.
         /// </summary>
-        public Assembly[] RegistrationAssemblies { get; set; }
+        public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };
+
+        /// <summary>
+        ///     If assemblies registered in <see cref="RegistrationAssemblies"/> should auto-register.
+        /// </summary>
+        public bool AutoRegisterAssemblies { get; set; } = true;
     }
 }

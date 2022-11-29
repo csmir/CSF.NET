@@ -11,9 +11,21 @@ namespace CSF
 
         public CommandConfiguration Configuration { get; }
 
-        public ImplementationFactory(CommandConfiguration configuration, IServiceProvider provider = null)
+        public ImplementationFactory()
+            : this(new())
         {
-            Provider = provider ?? EmptyServiceProvider.Instance;
+
+        }
+
+        public ImplementationFactory(CommandConfiguration configuration)
+            : this(configuration, EmptyServiceProvider.Instance)
+        {
+
+        }
+
+        public ImplementationFactory(CommandConfiguration configuration, IServiceProvider provider)
+        {
+            Provider = provider;
             Configuration = configuration;
         }
 

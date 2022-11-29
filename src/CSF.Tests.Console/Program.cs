@@ -1,11 +1,6 @@
 ﻿using CSF;
 
-var framework = new CommandFramework<ImplementationFactory>(new(new()
-{
-    DefaultLogLevel = LogLevel.Debug
-}));
-
-framework.BuildModuleAssembly(typeof(Program).Assembly);
+var framework = new CommandFramework<ImplementationFactory>();
 
 while (true)
 {
