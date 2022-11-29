@@ -34,7 +34,7 @@ namespace CSF.Hosting
         {
             Framework = framework;
 
-            Framework.Logger.Resolver = new LogResolver(async (x) => await LogAsync(x));
+            Framework.Logger.Resolver = new LoggingProvider(async (x) => await LogAsync(x));
             Framework.CommandExecuted += CommandExecutedAsync;
             Framework.CommandRegistered += CommandRegisteredAsync;
 

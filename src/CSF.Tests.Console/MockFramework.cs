@@ -2,9 +2,9 @@
 {
     public sealed class MockFramework : CommandFramework
     {
-        private readonly LogResolver _resolver;
+        private readonly LoggingProvider _resolver;
 
-        public MockFramework(LogResolver resolver, CommandConfiguration config)
+        public MockFramework(LoggingProvider resolver, CommandConfiguration config)
             : base(config)
         {
             _resolver = resolver;
