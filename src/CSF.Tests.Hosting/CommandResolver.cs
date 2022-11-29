@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CSF.Tests.Hosting
 {
-    internal class CommandResolver : HostedCommandResolver<CommandFramework, CommandContext>
+    internal class CommandResolver : HostedCommandResolver<ICommandFramework, CommandContext>
     {
-        public CommandResolver(CommandFramework framework, IServiceProvider collection, ILogger<CommandFramework> logger)
+        public CommandResolver(ICommandFramework framework, IServiceProvider collection, ILogger<ICommandFramework> logger)
             : base(framework, collection, logger)
         {
 

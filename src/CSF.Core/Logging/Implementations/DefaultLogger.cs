@@ -15,14 +15,14 @@ namespace CSF
         /// <summary>
         ///     The default resolver inherited from 
         /// </summary>
-        public LoggingProvider Resolver { get; set; }
+        public LogResolver Resolver { get; set; }
 
-        public DefaultLogger(LogLevel level, LoggingProvider resolver = null)
+        public DefaultLogger(LogLevel level, LogResolver resolver = null)
         {
             LogLevel = level;
 
             if (resolver is null)
-                resolver = LoggingProvider.CreateLocalProvider();
+                resolver = LogResolver.CreateLocalProvider();
 
             Resolver = resolver;
         }

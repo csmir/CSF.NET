@@ -15,7 +15,7 @@ namespace CSF
         /// <summary>
         ///     The resolver that pushes log messages to the target 
         /// </summary>
-        LoggingProvider Resolver { get; set; }
+        LogResolver Resolver { get; set; }
 
         /// <summary>
         ///     Writes a trace log.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace CSF
             };
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value)
         {
             var str = value.ToString();
             if (!TimeSpan.TryParse(str, out TimeSpan span))
@@ -45,7 +46,7 @@ namespace CSF
                 MatchCollection matches = _regex.Matches(str);
                 if (matches.Count != 0)
                 {
-                    foreach (Match match in matches)
+                    foreach (Match match in matches.Cast<Match>())
                         if (_callback.TryGetValue(match.Groups[2].Value, out var result))
                             span += result(match.Groups[1].Value);
                 }

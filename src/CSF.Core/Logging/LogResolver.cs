@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     Represents the log resolver used to send messages to the target handler.
     /// </summary>
-    public class LoggingProvider
+    public class LogResolver
     {
         private readonly object _lock;
 
@@ -18,7 +18,7 @@ namespace CSF
         ///     Creates a new default logging resolver with the provided sending action.
         /// </summary>
         /// <param name="sendAction"></param>
-        public LoggingProvider(Action<ILog> sendAction)
+        public LogResolver(Action<ILog> sendAction)
         {
             _lock = new object();
             SendAction = sendAction;
@@ -34,8 +34,8 @@ namespace CSF
                 SendAction(message);
         }
 
-        internal static LoggingProvider CreateLocalProvider()
-            => new LoggingProvider((x) =>
+        internal static LogResolver CreateLocalProvider()
+            => new((x) =>
             {
                 var message = $"{string.Format("{0:HH:mm:ss}", DateTime.UtcNow)} [{x.LogLevel}]: {x.Value}";
 

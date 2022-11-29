@@ -48,7 +48,7 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value)
         {
             var str = value.ToString();
             if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))

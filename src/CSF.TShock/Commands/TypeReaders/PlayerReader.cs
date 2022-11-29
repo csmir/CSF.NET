@@ -5,7 +5,7 @@ namespace CSF.TShock
 {
     public sealed class PlayerReader : TypeReader<Player>
     {
-        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo info, object value, IServiceProvider provider)
+        public override Task<TypeReaderResult> ReadAsync(IContext context, Parameter info, object value, IServiceProvider provider)
         {
             var players = TSPlayer.FindByNameOrID(value.ToString());
 
