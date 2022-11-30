@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -16,12 +15,12 @@ namespace CSF
     ///     Represents the handler for registered commands.
     /// </summary>
     public sealed class CommandFramework<T> : ICommandFramework
-        where T : ImplementationFactory, new()
+        where T : PipelineProvider, new()
     {
         /// <summary>
-        ///     The configurator that handles command creation.
+        ///     The pipeline provider that handles command creation, handling & result control.
         /// </summary>
-        public T Configurator { get; }
+        public T PipelineProvider { get; }
 
         /// <inheritdoc/>
         public IList<IConditionalComponent> Commands { get; }
@@ -32,7 +31,7 @@ namespace CSF
         {
             get
             {
-                _typeReaders ??= Configurator.ConfigureTypeReaders();
+                _typeReaders ??= PipelineProvider.ConfigureTypeReaders();
                 return _typeReaders;
             }
         }
@@ -43,7 +42,7 @@ namespace CSF
         {
             get
             {
-                _prefixes ??= Configurator.ConfigurePrefixes();
+                _prefixes ??= PipelineProvider.ConfigurePrefixes();
                 return _prefixes;
             }
         }
@@ -54,7 +53,7 @@ namespace CSF
         {
             get
             {
-                _resultHandlers ??= Configurator.ConfigureResultHandlers();
+                _resultHandlers ??= PipelineProvider.ConfigureResultHandlers();
                 return _resultHandlers;
             }
         }
@@ -65,7 +64,7 @@ namespace CSF
         {
             get
             {
-                _logger ??= Configurator.ConfigureLogger();
+                _logger ??= PipelineProvider.ConfigureLogger();
                 return _logger;
             }
         }
@@ -86,16 +85,16 @@ namespace CSF
         /// <param name="config"></param>
         public CommandFramework(T implementationFactory)
         {
-            Configurator = implementationFactory;
+            PipelineProvider = implementationFactory;
             Commands = new List<IConditionalComponent>();
 
-            if (Configurator.Configuration.AutoRegisterAssemblies)
+            if (PipelineProvider.Configuration.AutoRegisterAssemblies)
                 BuildModuleAssemblies();
         }
 
         public void BuildModuleAssemblies()
         {
-            foreach (var assembly in Configurator.Configuration.RegistrationAssemblies)
+            foreach (var assembly in PipelineProvider.Configuration.RegistrationAssemblies)
             {
                 BuildModuleAssembly(assembly);
             }
@@ -161,10 +160,10 @@ namespace CSF
         public async Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider provider = null)
             where TContext : IContext
         {
-            provider ??= Configurator.Provider
+            provider ??= PipelineProvider.Provider
                 ?? EmptyServiceProvider.Instance;
 
-            if (Configurator.Configuration.DoAsynchronousExecution)
+            if (PipelineProvider.Configuration.DoAsynchronousExecution)
             {
                 _ = Task.Run(async () =>
                 {
@@ -252,7 +251,7 @@ namespace CSF
             if (commands.Any())
                 return SearchCommands(context, commands);
 
-            return Configurator.CommandNotFoundResult(context);
+            return PipelineProvider.CommandNotFoundResult(context);
         }
 
         private SearchResult SearchModule<TContext>(TContext context, ModuleInfo module)
@@ -280,7 +279,7 @@ namespace CSF
                 }
 
                 else
-                    return Configurator.CommandNotFoundResult(context);
+                    return PipelineProvider.CommandNotFoundResult(context);
             }
 
             return SearchCommands(context, commands);
@@ -343,7 +342,7 @@ namespace CSF
             if (match is null)
             {
                 if (errormatch is null)
-                    return Configurator.NoApplicableOverloadResult(context);
+                    return PipelineProvider.NoApplicableOverloadResult(context);
                 else
                     return SearchResult.FromSuccess(errormatch);
             }
@@ -382,7 +381,7 @@ namespace CSF
                     var t = provider.GetService(dependency.Type);
 
                     if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
-                        return Configurator.ServiceNotFoundResult(context, dependency);
+                        return PipelineProvider.ServiceNotFoundResult(context, dependency);
 
                     services.Add(t);
                 }
@@ -391,7 +390,7 @@ namespace CSF
             var obj = command.Module.Constructor.EntryPoint.Invoke(services.ToArray());
 
             if (obj is not ModuleBase<TContext> commandBase)
-                return Configurator.InvalidModuleTypeResult(context, command.Module);
+                return PipelineProvider.InvalidModuleTypeResult(context, command.Module);
 
             commandBase.SetContext(context);
             commandBase.SetInformation(command);
@@ -419,10 +418,10 @@ namespace CSF
 
                 if (parameter.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
                 {
-                    var missingResult = Configurator.ResolveMissingValue(context, parameter);
+                    var missingResult = PipelineProvider.ResolveMissingValue(context, parameter);
 
                     if (!missingResult.IsSuccess)
-                        return Configurator.OptionalValueNotPopulated(context);
+                        return PipelineProvider.OptionalValueNotPopulated(context);
 
                     var resultType = missingResult.Result.GetType();
 
@@ -432,7 +431,7 @@ namespace CSF
                         continue;
                     }
                     else
-                        return Configurator.MissingOptionalFailedMatch(context, parameter.Type, resultType);
+                        return PipelineProvider.MissingOptionalFailedMatch(context, parameter.Type, resultType);
                 }
 
                 if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
@@ -486,7 +485,7 @@ namespace CSF
                         if (returnValue is null)
                             break;
 
-                        var unhandledResult = Configurator.ProcessUnhandledReturnType(context, returnValue);
+                        var unhandledResult = PipelineProvider.ProcessUnhandledReturnType(context, returnValue);
                         if (!unhandledResult.IsSuccess)
                             return unhandledResult;
 
@@ -502,7 +501,7 @@ namespace CSF
             }
             catch (Exception ex)
             {
-                return Configurator.UnhandledExceptionResult(context, command, ex);
+                return PipelineProvider.UnhandledExceptionResult(context, command, ex);
             }
         }
     }

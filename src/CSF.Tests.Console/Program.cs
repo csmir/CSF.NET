@@ -1,6 +1,6 @@
 ﻿using CSF;
 
-var framework = new CommandFramework<ImplementationFactory>();
+var framework = new CommandFramework<PipelineProvider>();
 
 while (true)
 {
