@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -16,41 +17,106 @@ namespace CSF
         /// <summary>
         ///     The range of registered commands.
         /// </summary>
-        public IList<IConditionalComponent> Commands { get; }
+        IList<IConditionalComponent> Commands { get; }
 
         /// <summary>
-        ///     The range of registered typereaders.
+        ///     The configuration used to configure the command framework.
         /// </summary>
-        public TypeReaderProvider TypeReaders { get; }
+        CommandConfiguration Configuration { get; }
 
         /// <summary>
-        ///     The range of registered prefixes.
+        ///     The service provider used to build and run commands.
         /// </summary>
-        public PrefixProvider Prefixes { get; }
-
-        /// <summary>
-        ///     The range of registered result handlers.
-        /// </summary>
-        public ResultHandlerProvider ResultHandlers { get; }
+        IServiceProvider Services { get; }
 
         /// <summary>
         ///     The logger passed throughout the build and execution process.
         /// </summary>
-        public ILogger Logger { get; }
+        ILogger Logger { get; }
+
+        /// <summary>
+        ///     Registers all assemblies and starts listening for commands.
+        /// </summary>
+        /// <param name="autoConfigureAssemblies">If all assemblies should be iterated to register typereaders, result handlers and modules automatically.</param>
+        /// <param name="resultHandle">Called when a command returns result. This delegate is useless when asynchronous execution is enabled.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task RunAsync(bool autoConfigureAssemblies = true, Action<IContext, IResult> resultHandle = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Creates a new <see cref="TypeReaderProvider"/> with all <see cref="ITypeReader"/>'s in the default definition and registration assemblies.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task ConfigureTypeReadersAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Called when typereaders are automatically registered from the available assemblies.
+        /// </summary>
+        /// <param name="assembly">The assembly to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Task BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Called when <see cref="BuildTypeReaders(Assembly)"/> finds a type to resolve.
+        /// </summary>
+        /// <param name="type">The type to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Task BuildTypeReaderAsync(Type type, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Creates a new <see cref="ResultHandlerProvider"/> with all <see cref="IResultHandler"/>'s in the registration assemblies.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task ConfigureResultHandlersAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Called when result handlers are automatically registered from the available assemblies.
+        /// </summary>
+        /// <param name="assembly">The assembly to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Task BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Called when <see cref="BuildResultHandlers(Assembly)"/> finds a type to resolve.
+        /// </summary>
+        /// <param name="type">The type to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Task BuildResultHandlerAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Builds all modules in the provided assemblies in <see cref="CommandConfiguration.RegistrationAssemblies"/>.
         /// </summary>
-        public void BuildModuleAssemblies();
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task ConfigureModulesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Builds all modules in the provided <see cref="Assembly"/>.
         /// </summary>
-        /// <param name="assembly"></param>
-        public void BuildModuleAssembly(Assembly assembly = null);
-
+        /// <param name="assembly">The assembly to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public void BuildModule(Type type);
+        Task BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Called when <see cref="BuildModules(Assembly)"/>
+        /// </summary>
+        /// <param name="type">The type to build.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Task BuildModuleAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Tries to parse an <see cref="IPrefix"/> from the provided raw input and will remove the length of the prefix from it.
@@ -61,7 +127,7 @@ namespace CSF
         /// <param name="rawInput">The raw text input to try and parse a prefix for.</param>
         /// <param name="prefix">The resulting prefix. <see langword="null"/> if not found.</param>
         /// <returns><see langword="true"/> if a matching <see cref="IPrefix"/> was found in the <see cref="PrefixProvider"/>. <see langword="false"/> if not.</returns>
-        public bool TryParsePrefix(ref string rawInput, out IPrefix prefix);
+        bool TryParsePrefix(ref string rawInput, out IPrefix prefix);
 
         /// <summary>
         ///     Tries to execute a command with provided <see cref="IContext"/>.
@@ -75,8 +141,9 @@ namespace CSF
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
-        public Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider provider = null)
+        Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider provider = null, CancellationToken cancellationToken = default)
             where TContext : IContext;
     }
 }

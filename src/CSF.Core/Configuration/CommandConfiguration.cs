@@ -32,8 +32,18 @@ namespace CSF
         public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };
 
         /// <summary>
-        ///     If assemblies registered in <see cref="RegistrationAssemblies"/> should auto-register.
+        ///     The prefixes that should be used to validate incoming command values.
         /// </summary>
-        public bool AutoRegisterAssemblies { get; set; } = true;
+        public PrefixProvider Prefixes { get; set; }
+
+        /// <summary>
+        ///     The typereaders that should be used to parse command input.
+        /// </summary>
+        public TypeReaderProvider TypeReaders { get; set; }
+
+        /// <summary>
+        ///     The result handlers that should be used to handle command and build results.
+        /// </summary>
+        public ResultHandlerProvider ResultHandlers { get; set; }
     }
 }

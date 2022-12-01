@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CSF.Utils
+namespace CSF
 {
     internal static class ComponentExtensions
     {

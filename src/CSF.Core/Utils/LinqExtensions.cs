@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSF.Utils
+namespace CSF
 {
     internal static class LinqExtensions
     {

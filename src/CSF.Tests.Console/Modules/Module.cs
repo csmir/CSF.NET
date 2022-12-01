@@ -19,7 +19,7 @@
         [Command("test")]
         public IResult Test(long helping, long helping2)
         {
-            return Success("Success");
+            return Success("Success {0}, {1}", helping, helping2);
         }
 
         [Command("test")]
@@ -33,7 +33,7 @@
         [ErrorOverload]
         public void Group()
         {
-
+            Success("Success");
         }
 
         [Group("group", "gr")]

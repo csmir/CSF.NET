@@ -4,6 +4,6 @@ using CSF.Tests.Hosting;
 using Microsoft.Extensions.Hosting;
 
 await Host.CreateDefaultBuilder(args)
-    .ConfigureCommandFramework<PipelineProvider, CommandResolver>()
+    .ConfigureCommands<PipelineService, CommandService>()
     .Build()
     .RunAsync();
