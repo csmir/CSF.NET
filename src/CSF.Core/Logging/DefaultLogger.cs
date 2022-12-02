@@ -33,27 +33,27 @@ namespace CSF
             });
 
         /// <inheritdoc/>
-        public void Trace(object message, Exception exception = null)
+        public void Trace(string message, Exception exception = null)
             => Write(new Log(LogLevel.Trace, message, exception));
 
         /// <inheritdoc/>
-        public void Debug(object message, Exception exception = null)
+        public void Debug(string message, Exception exception = null)
             => Write(new Log(LogLevel.Debug, message, exception));
 
         /// <inheritdoc/>
-        public void Info(object message, Exception exception = null)
+        public void Info(string message, Exception exception = null)
             => Write(new Log(LogLevel.Information, message, exception));
 
         /// <inheritdoc/>
-        public void Warning(object message, Exception exception = null)
+        public void Warning(string message, Exception exception = null)
             => Write(new Log(LogLevel.Warning, message, exception));
 
         /// <inheritdoc/>
-        public void Error(object message, Exception exception)
+        public void Error(string message, Exception exception)
             => Write(new Log(LogLevel.Error, message, exception));
 
         /// <inheritdoc/>
-        public void Critical(object message, Exception exception)
+        public void Critical(string message, Exception exception)
             => Write(new Log(LogLevel.Critical, message, exception));
 
         /// <inheritdoc/>

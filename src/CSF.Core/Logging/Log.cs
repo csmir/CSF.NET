@@ -10,7 +10,7 @@ namespace CSF
         /// <summary>
         ///     The message of this log.
         /// </summary>
-        public object Value { get; }
+        public string Value { get; }
 
         /// <summary>
         ///     The severity of this log.
@@ -28,7 +28,7 @@ namespace CSF
         /// <param name="level"></param>
         /// <param name="value"></param>
         /// <param name="exception"></param>
-        public Log(LogLevel level, object value, Exception exception = null)
+        public Log(LogLevel level, string value, Exception exception = null)
         {
             Value = value;
             LogLevel = level;

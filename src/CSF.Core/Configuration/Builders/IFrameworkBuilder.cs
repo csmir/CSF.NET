@@ -4,6 +4,9 @@ using System.Text;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a builder for the <see cref="CommandFramework"/>.
+    /// </summary>
     public interface IFrameworkBuilder
     {
         /// <summary>
@@ -25,20 +28,20 @@ namespace CSF
         ///     Modifies the <see cref="Configuration"/> of this builder.
         /// </summary>
         /// <param name="action"></param>
-        /// <returns>The current <see cref="FrameworkBuilder{T}"/> for chaining calls.</returns>
+        /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</returns>
         IFrameworkBuilder ConfigureCommands(Action<CommandConfiguration> action);
 
         /// <summary>
         ///     Sets the <see cref="Services"/> of this builder.
         /// </summary>
         /// <param name="services"></param>
-        /// <returns>The current <see cref="FrameworkBuilder{T}"/> for chaining calls.</returns>
+        /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</returns>
         IFrameworkBuilder ConfigureServices(IServiceProvider services);
 
         /// <summary>
         ///     Builds the current builder into a new <see cref="CommandFramework{T}"/>.
         /// </summary>
-        /// <returns>A new <see cref="CommandFramework{T}"/> with provided builder configuration.</returns>
+        /// <returns>A new <see cref="IFrameworkBuilder"/> with provided builder configuration.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         ICommandFramework Build();
     }

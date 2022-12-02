@@ -20,44 +20,32 @@ namespace CSF
         /// <summary>
         ///     Writes a trace log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Trace(object message, Exception exception = null);
+        void Trace(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes a debug log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Debug(object message, Exception exception = null);
+        void Debug(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes an information log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Info(object message, Exception exception = null);
+        void Info(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes a warning log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Warning(object message, Exception exception = null);
+        void Warning(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes an error log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Error(object message, Exception exception = null);
+        void Error(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes a critical log.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="values"></param>
-        void Critical(object message, Exception exception = null);
+        void Critical(string message, Exception exception = null);
 
         /// <summary>
         ///     Writes a log.

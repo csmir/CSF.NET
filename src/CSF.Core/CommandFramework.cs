@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +11,42 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the handler for registered commands.
+    /// </summary>
+    public static class CommandFramework
+    {
+        /// <summary>
+        ///     Creates a new <see cref="IFrameworkBuilder"/> from the provided pipeline setup.
+        /// </summary>
+        /// <param name="pipelineService"></param>
+        /// <returns></returns>
+        public static IFrameworkBuilder CreateDefaultBuilder<TService>(TService pipelineService)
+            where TService : PipelineService
+        {
+            return new FrameworkBuilder<TService>(pipelineService);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IFrameworkBuilder"/> with default setup.
+        /// </summary>
+        /// <returns></returns>
+        public static IFrameworkBuilder CreateDefaultBuilder()
+        {
+            return new FrameworkBuilder<PipelineService>(new PipelineService());
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IFrameworkBuilder"/> with default setup directly. It skips all configuration.
+        /// </summary>
+        /// <returns></returns>
+        public static ICommandFramework BuildWithMinimalSetup()
+        {
+            return CreateDefaultBuilder()
+                .Build();
+        }
+    }
+
     /// <summary>
     ///     Represents the handler for registered commands.
     /// </summary>

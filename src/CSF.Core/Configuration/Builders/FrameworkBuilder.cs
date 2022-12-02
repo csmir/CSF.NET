@@ -72,37 +72,4 @@ namespace CSF
             return new CommandFramework<T>(Services, Configuration, PipelineService);
         }
     }
-
-    public static class FrameworkBuilder
-    {
-        /// <summary>
-        ///     Creates a new <see cref="FrameworkBuilder{T}"/> from the provided pipeline setup.
-        /// </summary>
-        /// <param name="pipelineService"></param>
-        /// <returns></returns>
-        public static IFrameworkBuilder CreateDefaultBuilder<TService>(TService pipelineService)
-            where TService : PipelineService
-        {
-            return new FrameworkBuilder<TService>(pipelineService);
-        }
-
-        /// <summary>
-        ///     Creates a new <see cref="FrameworkBuilder{T}"/> with default setup.
-        /// </summary>
-        /// <returns></returns>
-        public static IFrameworkBuilder CreateDefaultBuilder()
-        {
-            return new FrameworkBuilder<PipelineService>(new PipelineService());
-        }
-
-        /// <summary>
-        ///     Creates a new <see cref="CommandFramework{T}"/> with default setup directly. It skips all configuration.
-        /// </summary>
-        /// <returns></returns>
-        public static ICommandFramework BuildWithMinimalSetup()
-        {
-            return CreateDefaultBuilder()
-                .Build();
-        }
-    }
 }
