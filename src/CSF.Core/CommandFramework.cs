@@ -116,7 +116,7 @@ namespace CSF
 
                 var context = await PipelineService.BuildContextAsync(input, cancellationToken);
 
-                var result = await ExecuteCommandAsync(context, cancellationToken: cancellationToken);
+                await ExecuteCommandAsync(context, cancellationToken: cancellationToken);
             }
         }
 

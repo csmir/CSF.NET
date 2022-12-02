@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CSF.Commands.Results.Implementation
+namespace CSF
 {
     /// <inheritdoc/>
     public abstract class ResultHandler : IResultHandler

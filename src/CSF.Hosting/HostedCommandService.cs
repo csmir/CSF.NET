@@ -44,7 +44,7 @@ namespace CSF.Hosting
         /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await Framework.RunAsync(true, null, cancellationToken)
+            await Framework.RunAsync(true, cancellationToken)
                 .ConfigureAwait(false);
         }
 
