@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -13,16 +14,16 @@ namespace CSF
         /// </summary>
         public T PipelineService { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the services used to configure the framework.
-        /// </summary>
+        /// <inheritdoc/>
         public IServiceProvider Services { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the configuration used to configure the framework.
-        /// </summary>
+        /// <inheritdoc/>
         public CommandConfiguration Configuration { get; set; }
 
+        /// <inheritdoc/>
+        public IHandlerBuilder HandlerBuilder { get; set; }
+
+        /// <inheritdoc/>
         IPipelineService IFrameworkBuilder.PipelineService { get; set; }
 
         /// <summary>
@@ -35,41 +36,42 @@ namespace CSF
             Configuration = new CommandConfiguration();
         }
 
-        /// <summary>
-        ///     Modifies the <see cref="Configuration"/> of this builder.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns>The current <see cref="FrameworkBuilder{T}"/> for chaining calls.</returns>
+        /// <inheritdoc/>
         public IFrameworkBuilder ConfigureCommands(Action<CommandConfiguration> action)
         {
             action(Configuration);
-
             return this;
         }
 
-        /// <summary>
-        ///     Sets the <see cref="Services"/> of this builder.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns>The current <see cref="FrameworkBuilder{T}"/> for chaining calls.</returns>
+        /// <inheritdoc/>
         public IFrameworkBuilder ConfigureServices(IServiceProvider services)
         {
             Services = services;
-
             return this;
         }
 
-        /// <summary>
-        ///     Builds the current builder into a new <see cref="CommandFramework{T}"/>.
-        /// </summary>
-        /// <returns>A new <see cref="CommandFramework{T}"/> with provided builder configuration.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <inheritdoc/>
+        public IFrameworkBuilder ConfigureHandlers(Action<IHandlerBuilder> action)
+        {
+            action(HandlerBuilder);
+            return this;
+        }
+
+        /// <inheritdoc/>
         public ICommandFramework Build()
         {
+            var handler = HandlerBuilder.Build();
+
+            Configuration.ResultHandlers.Include(handler);
+
             if (PipelineService is null)
                 throw new ArgumentNullException(nameof(PipelineService));
 
             return new CommandFramework<T>(Services, Configuration, PipelineService);
         }
+
+        /// <inheritdoc/>
+        public async Task BuildAndRunAsync(CancellationToken cancellationToken = default)
+            => await Build().RunAsync();
     }
 }

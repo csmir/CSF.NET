@@ -99,7 +99,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public async Task RunAsync(bool autoConfigureAssemblies = true, Action<IContext, IResult> resultStream = null, CancellationToken cancellationToken = default)
+        public async Task RunAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default)
         {
             if (autoConfigureAssemblies)
             {
@@ -117,8 +117,6 @@ namespace CSF
                 var context = await PipelineService.BuildContextAsync(input, cancellationToken);
 
                 var result = await ExecuteCommandAsync(context, cancellationToken: cancellationToken);
-
-                resultStream?.Invoke(context, result);
             }
         }
 

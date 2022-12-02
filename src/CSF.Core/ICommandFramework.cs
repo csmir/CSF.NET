@@ -38,10 +38,9 @@ namespace CSF
         ///     Registers all assemblies and starts listening for commands.
         /// </summary>
         /// <param name="autoConfigureAssemblies">If all assemblies should be iterated to register typereaders, result handlers and modules automatically.</param>
-        /// <param name="resultHandle">Called when a command returns result. This delegate is useless when asynchronous execution is enabled.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task RunAsync(bool autoConfigureAssemblies = true, Action<IContext, IResult> resultHandle = null, CancellationToken cancellationToken = default);
+        Task RunAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Creates a new <see cref="TypeReaderProvider"/> with all <see cref="ITypeReader"/>'s in the default definition and registration assemblies.
