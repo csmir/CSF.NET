@@ -16,7 +16,7 @@ namespace CSF
         /// <param name="result">The result of this execution.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken);
+        ValueTask OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Invoked when <see cref="CommandFramework{T}.BuildModuleAsync(System.Type)"/> returns a result.
@@ -24,7 +24,7 @@ namespace CSF
         /// <param name="component">The registered component.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken);
+        ValueTask OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Invoked when <see cref="CommandFramework{T}.BuildTypeReaderAsync(System.Type)"/> returns a result.
@@ -32,7 +32,7 @@ namespace CSF
         /// <param name="typeReader">The registered typereader.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken);
+        ValueTask OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Invoked when <see cref="CommandFramework{T}.BuildResultHandlerAsync(System.Type)"/> returns a result.
@@ -40,6 +40,6 @@ namespace CSF
         /// <param name="resultHandler">The registered result handler. This includes the current handler, which is the first time this method is called.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken);
+        ValueTask OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken);
     }
 }

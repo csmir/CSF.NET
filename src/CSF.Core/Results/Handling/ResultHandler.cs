@@ -12,27 +12,27 @@ namespace CSF
     public abstract class ResultHandler : IResultHandler
     {
         /// <inheritdoc/>
-        public virtual Task OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
+        public virtual ValueTask OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return new ValueTask();
         }
 
         /// <inheritdoc/>
-        public virtual Task OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken)
+        public virtual ValueTask OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return new ValueTask();
         }
 
         /// <inheritdoc/>
-        public virtual Task OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
+        public virtual ValueTask OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return new ValueTask();
         }
 
         /// <inheritdoc/>
-        public virtual Task OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken)
+        public virtual ValueTask OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return new ValueTask();
         }
     }
 }

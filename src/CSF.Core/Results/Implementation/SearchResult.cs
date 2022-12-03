@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CSF.Utils;
+using System;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -28,6 +30,9 @@ namespace CSF
             ErrorMessage = msg;
             Exception = exception;
         }
+
+        public static implicit operator ValueTask<SearchResult>(SearchResult result)
+            => result.AsValueTask();
 
         /// <summary>
         ///     Creates a failed result with provided parameters.

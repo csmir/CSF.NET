@@ -9,40 +9,53 @@ namespace CSF
     public sealed class HandlerBuilder : IHandlerBuilder
     {
         /// <inheritdoc/>
-        public Func<IContext, IResult, CancellationToken, Task> CommandResultDelegate { get; set; }
+        public Func<IContext, IResult, CancellationToken, ValueTask> CommandResultDelegate { get; set; }
 
         /// <inheritdoc/>
-        public Func<IConditionalComponent, CancellationToken, Task> CommandRegistrationDelegate { get; set; }
+        public Func<IConditionalComponent, CancellationToken, ValueTask> CommandRegistrationDelegate { get; set; }
 
         /// <inheritdoc/>
-        public Func<IResultHandler, CancellationToken, Task> HandlerRegistrationDelegate { get; set; }
+        public Func<IResultHandler, CancellationToken, ValueTask> HandlerRegistrationDelegate { get; set; }
 
         /// <inheritdoc/>
-        public Func<ITypeReader, CancellationToken, Task> ReaderRegistrationDelegate { get; set; }
+        public Func<ITypeReader, CancellationToken, ValueTask> ReaderRegistrationDelegate { get; set; }
+
+        internal bool IsUselessToBuild
+        {
+            get
+            {
+                if (CommandResultDelegate is null
+                    && CommandRegistrationDelegate is null
+                    && HandlerRegistrationDelegate is null
+                    && ReaderRegistrationDelegate is null)
+                    return true;
+                return false;
+            }
+        }
 
         /// <inheritdoc/>
-        public IHandlerBuilder ConfigureDelegate(Func<IContext, IResult, CancellationToken, Task> cmdResultHandle)
+        public IHandlerBuilder ConfigureDelegate(Func<IContext, IResult, CancellationToken, ValueTask> cmdResultHandle)
         {
             CommandResultDelegate = cmdResultHandle;
             return this;
         }
 
         /// <inheritdoc/>
-        public IHandlerBuilder ConfigureDelegate(Func<IConditionalComponent, CancellationToken, Task> cmdRegisterHandle)
+        public IHandlerBuilder ConfigureDelegate(Func<IConditionalComponent, CancellationToken, ValueTask> cmdRegisterHandle)
         {
             CommandRegistrationDelegate = cmdRegisterHandle;
             return this;
         }
 
         /// <inheritdoc/>
-        public IHandlerBuilder ConfigureDelegate(Func<IResultHandler, CancellationToken, Task> rhrRegisterHandle)
+        public IHandlerBuilder ConfigureDelegate(Func<IResultHandler, CancellationToken, ValueTask> rhrRegisterHandle)
         {
             HandlerRegistrationDelegate = rhrRegisterHandle;
             return this;
         }
 
         /// <inheritdoc/>
-        public IHandlerBuilder ConfigureDelegate(Func<ITypeReader, CancellationToken, Task> tprRegisterHandle)
+        public IHandlerBuilder ConfigureDelegate(Func<ITypeReader, CancellationToken, ValueTask> tprRegisterHandle)
         {
             ReaderRegistrationDelegate = tprRegisterHandle;
             return this;

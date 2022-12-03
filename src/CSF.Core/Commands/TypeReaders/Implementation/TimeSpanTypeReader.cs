@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -38,7 +39,7 @@ namespace CSF
             };
         }
 
-        public override Task<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken)
+        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken)
         {
             var str = value.ToString();
             if (!TimeSpan.TryParse(str, out TimeSpan span))
@@ -47,15 +48,15 @@ namespace CSF
                 MatchCollection matches = _regex.Matches(str);
                 if (matches.Count != 0)
                 {
-                    foreach (Match match in matches.Cast<Match>())
+                    foreach (Match match in matches)
                         if (_callback.TryGetValue(match.Groups[2].Value, out var result))
                             span += result(match.Groups[1].Value);
                 }
                 else
-                    return Task.FromResult(TypeReaderResult.FromError($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'"));
+                    return TypeReaderResult.FromError($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'");
             }
 
-            return Task.FromResult(TypeReaderResult.FromSuccess(span));
+            return TypeReaderResult.FromSuccess(span);
         }
 
         private static TimeSpan Seconds(string match)

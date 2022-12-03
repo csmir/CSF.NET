@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Utils;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -19,8 +20,17 @@ namespace CSF
         /// <summary>
         ///     Creates a new <see cref="IFrameworkBuilder"/> from the provided pipeline setup.
         /// </summary>
-        /// <param name="pipelineService"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     This method sets up a number of default values for the returned <see cref="IFrameworkBuilder"/>.
+        ///     <list type="bullet">
+        ///         <item><description>Defines <paramref name="pipelineService"/> as the specified <see cref="IPipelineService"/> for this builder.</description></item>
+        ///         <item><description>Creates a new <see cref="CommandConfiguration"/> with default values.</description></item>
+        ///         <item><description>Sets up a new <see cref="IServiceProvider"/> from <see cref="EmptyServiceProvider.Instance"/> with no defined services.</description></item>
+        ///         <item><description>Sets up a new <see cref="IHandlerBuilder"/> exposed in <see cref="IFrameworkBuilder.HandlerBuilder"/> for result handling.</description></item>
+        ///     </list>
+        /// </remarks>
+        /// <param name="pipelineService">The pipeline service.</param>
+        /// <returns>A new <see cref="IFrameworkBuilder"/> with default arguments and the defined <see cref="IPipelineService"/>.</returns>
         public static IFrameworkBuilder CreateDefaultBuilder<TService>(TService pipelineService)
             where TService : PipelineService
         {
@@ -30,16 +40,28 @@ namespace CSF
         /// <summary>
         ///     Creates a new <see cref="IFrameworkBuilder"/> with default setup.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     This method sets up a number of default values for the returned <see cref="IFrameworkBuilder"/>.
+        ///     <list type="bullet">
+        ///         <item><description>Creates a new <see cref="IPipelineService"/> with unmodified arguments.</description></item>
+        ///         <item><description>Creates a new <see cref="CommandConfiguration"/> with default values.</description></item>
+        ///         <item><description>Creates a new <see cref="IServiceProvider"/> from <see cref="EmptyServiceProvider.Instance"/> with no defined services.</description></item>
+        ///         <item><description>Creates a new <see cref="IHandlerBuilder"/> exposed in <see cref="IFrameworkBuilder.HandlerBuilder"/> for default result handling.</description></item>
+        ///     </list>
+        /// </remarks>
+        /// <returns>A new <see cref="IFrameworkBuilder"/> with default arguments.</returns>
         public static IFrameworkBuilder CreateDefaultBuilder()
         {
             return new FrameworkBuilder<PipelineService>(new PipelineService());
         }
 
         /// <summary>
-        ///     Creates a new <see cref="IFrameworkBuilder"/> with default setup directly. It skips all configuration.
+        ///     Creates a new <see cref="ICommandFramework"/> with default setup directly. It skips all configuration.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        ///     This method sets up the command framework with configuration that matches <see cref="CreateDefaultBuilder"/>. Read this method for more information.
+        /// </remarks>
+        /// <returns>A new <see cref="ICommandFramework"/>.</returns>
         public static ICommandFramework BuildWithMinimalSetup()
         {
             return CreateDefaultBuilder()
@@ -85,7 +107,7 @@ namespace CSF
         public CommandFramework(CommandConfiguration configuration, T pipelineProvider)
             : this(EmptyServiceProvider.Instance, configuration, pipelineProvider)
         {
-
+            
         }
 
         /// <summary>
@@ -121,7 +143,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public async Task ConfigureModulesAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ConfigureModulesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var assembly in Configuration.RegistrationAssemblies)
                 await BuildModulesAsync(assembly, cancellationToken);
@@ -129,7 +151,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken)
+        public async ValueTask BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken)
         {
             var mt = typeof(IModuleBase);
 
@@ -140,7 +162,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildModuleAsync(Type type, CancellationToken cancellationToken)
+        public async ValueTask BuildModuleAsync(Type type, CancellationToken cancellationToken)
         {
             var module = ModuleInfo.Build(Configuration.TypeReaders, type);
 
@@ -152,7 +174,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public async Task ConfigureTypeReadersAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ConfigureTypeReadersAsync(CancellationToken cancellationToken = default)
         {
             foreach (var assembly in Configuration.RegistrationAssemblies)
                 await BuildTypeReadersAsync(assembly, cancellationToken);
@@ -160,7 +182,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken)
+        public async ValueTask BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken)
         {
             var tt = typeof(ITypeReader);
 
@@ -171,7 +193,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildTypeReaderAsync(Type type, CancellationToken cancellationToken)
+        public async ValueTask BuildTypeReaderAsync(Type type, CancellationToken cancellationToken)
         {
             var reader = TypeReaderInfo.Build(type);
 
@@ -190,7 +212,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public async Task ConfigureResultHandlersAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ConfigureResultHandlersAsync(CancellationToken cancellationToken = default)
         {
             foreach (var assembly in Configuration.RegistrationAssemblies)
                 await BuildResultHandlersAsync(assembly, cancellationToken);
@@ -198,7 +220,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken)
+        public async ValueTask BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken)
         {
             var tt = typeof(IResultHandler);
 
@@ -209,7 +231,7 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public async Task BuildResultHandlerAsync(Type type, CancellationToken cancellationToken)
+        public async ValueTask BuildResultHandlerAsync(Type type, CancellationToken cancellationToken)
         {
             var handler = ResultHandlerInfo.Build(type);
 
@@ -232,7 +254,7 @@ namespace CSF
         {
             if (Configuration.Prefixes.TryGetPrefix(rawInput, out prefix))
             {
-                rawInput = rawInput.Substring(prefix.Value.Length).TrimStart();
+                rawInput = rawInput[prefix.Value.Length..].TrimStart();
                 return true;
             }
             return false;
@@ -242,8 +264,7 @@ namespace CSF
         public async Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider services = null, CancellationToken cancellationToken = default)
             where TContext : IContext
         {
-            if (services is null)
-                services = Services;
+            services ??= Services;
 
             if (Configuration.DoAsynchronousExecution)
             {
@@ -266,45 +287,45 @@ namespace CSF
             }
         }
 
-        private async Task<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
+        private async ValueTask<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
 
-            var searchResult = Search(context);
+            var searchResult = await SearchAsync(context).ConfigureAwait(false);
 
             if (!searchResult.IsSuccess)
                 return searchResult;
 
-            var preconResult = await CheckPreconditionsAsync(context, searchResult.Result, provider, cancellationToken);
+            var preconResult = await CheckPreconditionsAsync(context, searchResult.Result, provider, cancellationToken).ConfigureAwait(false);
 
             if (!preconResult.IsSuccess)
                 return preconResult;
 
-            var constructResult = Construct(context, searchResult.Result, provider);
+            var constructResult = await ConstructAsync(context, searchResult.Result, provider).ConfigureAwait(false);
 
             if (!constructResult.IsSuccess)
                 return constructResult;
 
-            var readResult = await ParseAsync(context, searchResult.Result, cancellationToken);
+            var readResult = await ParseAsync(context, searchResult.Result, cancellationToken).ConfigureAwait(false);
 
             if (!readResult.IsSuccess)
                 return readResult;
 
-            return await ExecuteAsync(context, searchResult.Result, (ModuleBase<TContext>)constructResult.Result, ((ParseResult)readResult).Result, cancellationToken);
+            return await ExecuteAsync(context, searchResult.Result, (ModuleBase<TContext>)constructResult.Result, ((ParseResult)readResult).Result, cancellationToken).ConfigureAwait(false);
         }
 
-        private SearchResult Search<TContext>(TContext context)
+        private async ValueTask<SearchResult> SearchAsync<TContext>(TContext context)
             where TContext : IContext
         {
             var matches = Commands
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
 
-            var groups = matches.SelectWhere<ModuleInfo>()
+            var groups = matches.CastWhere<ModuleInfo>()
                 .OrderBy(x => x.Components.Count)
                 .ToList();
 
-            var commands = matches.SelectWhere<CommandInfo>()
+            var commands = matches.CastWhere<CommandInfo>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
@@ -318,7 +339,7 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    var result = SearchModule(context, groups[0]);
+                    var result = await SearchModuleAsync(context, groups[0]).ConfigureAwait(false);
 
                     if (result.IsSuccess)
                         return result;
@@ -329,24 +350,24 @@ namespace CSF
             }
 
             if (commands.Any())
-                return SearchCommands(context, commands);
+                return await SearchCommandsAsync(context, commands).ConfigureAwait(false);
 
             return PipelineService.CommandNotFoundResult(context);
         }
 
-        private SearchResult SearchModule<TContext>(TContext context, ModuleInfo module)
+        private async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, ModuleInfo module)
             where TContext : IContext
         {
             var matches = module.Components
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
 
-            var commands = matches.SelectWhere<CommandInfo>()
+            var commands = matches.CastWhere<CommandInfo>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
             if (commands.Count < 1)
             {
-                var groups = matches.SelectWhere<ModuleInfo>()
+                var groups = matches.CastWhere<ModuleInfo>()
                     .OrderBy(x => x.Components.Count)
                     .ToList();
 
@@ -355,17 +376,17 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    return SearchModule(context, groups[0]);
+                    return await SearchModuleAsync(context, groups[0]).ConfigureAwait(false);
                 }
 
                 else
                     return PipelineService.CommandNotFoundResult(context);
             }
 
-            return SearchCommands(context, commands);
+            return await SearchCommandsAsync(context, commands).ConfigureAwait(false);
         }
 
-        private SearchResult SearchCommands<TContext>(TContext context, IEnumerable<CommandInfo> commands)
+        private ValueTask<SearchResult> SearchCommandsAsync<TContext>(TContext context, IEnumerable<CommandInfo> commands)
             where TContext : IContext
         {
             CommandInfo match = null;
@@ -432,12 +453,12 @@ namespace CSF
             return SearchResult.FromSuccess(match);
         }
 
-        private async Task<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
+        private async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             foreach (var precon in command.Preconditions)
             {
-                var result = await precon.CheckAsync(context, command, provider, cancellationToken);
+                var result = await precon.CheckAsync(context, command, provider, cancellationToken).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
                     return result;
@@ -448,7 +469,7 @@ namespace CSF
             return PreconditionResult.FromSuccess();
         }
 
-        private ConstructionResult Construct<TContext>(TContext context, CommandInfo command, IServiceProvider provider)
+        private ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider)
             where TContext : IContext
         {
             var services = new List<object>();
@@ -483,7 +504,7 @@ namespace CSF
             return PipelineService.InvalidModuleTypeResult(context, command.Module);
         }
 
-        private async Task<IResult> ParseAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
+        private async ValueTask<IResult> ParseAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
             where TContext : IContext
         {
             int index = 0;
@@ -522,7 +543,7 @@ namespace CSF
                     continue;
                 }
 
-                var result = await parameter.TypeReader.ReadAsync(context, parameter, context.Parameters[index], cancellationToken);
+                var result = await parameter.TypeReader.ReadAsync(context, parameter, context.Parameters[index], cancellationToken).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
                     return result;
@@ -536,7 +557,7 @@ namespace CSF
             return ParseResult.FromSuccess(parameters.ToArray());
         }
 
-        private async Task<IResult> ExecuteAsync<TContext>(TContext context, CommandInfo command, ModuleBase<TContext> commandBase, object[] parameters, CancellationToken cancellationToken)
+        private async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, CommandInfo command, ModuleBase<TContext> commandBase, object[] parameters, CancellationToken cancellationToken)
             where TContext : IContext
         {
             try
@@ -544,7 +565,7 @@ namespace CSF
                 Logger.Debug($"Starting execution of {commandBase.CommandInfo.Name}.");
                 var sw = Stopwatch.StartNew();
 
-                await commandBase.BeforeExecuteAsync(command, context, cancellationToken);
+                await commandBase.BeforeExecuteAsync(command, context, cancellationToken).ConfigureAwait(false);
 
                 var returnValue = command.Method.Invoke(commandBase, parameters);
 
@@ -573,7 +594,7 @@ namespace CSF
                         break;
                 }
 
-                await commandBase.AfterExecuteAsync(command, context, cancellationToken);
+                await commandBase.AfterExecuteAsync(command, context, cancellationToken).ConfigureAwait(false);
 
                 sw.Stop();
                 Logger.Debug($"Finished execution of {commandBase.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");

@@ -34,6 +34,7 @@ namespace CSF
             PipelineService = pipelineService;
             Services = EmptyServiceProvider.Instance;
             Configuration = new CommandConfiguration();
+            HandlerBuilder = new HandlerBuilder();
         }
 
         /// <inheritdoc/>
@@ -60,9 +61,12 @@ namespace CSF
         /// <inheritdoc/>
         public ICommandFramework Build()
         {
-            var handler = HandlerBuilder.Build();
+            if (!HandlerBuilder.Cast<HandlerBuilder>().IsUselessToBuild)
+            {
+                var handler = HandlerBuilder.Build();
 
-            Configuration.ResultHandlers.Include(handler);
+                Configuration.ResultHandlers.Include(handler);
+            }
 
             if (PipelineService is null)
                 throw new ArgumentNullException(nameof(PipelineService));

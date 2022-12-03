@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CSF.Utils;
+using System;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -28,6 +30,9 @@ namespace CSF
             Exception = exception;
             Result = result;
         }
+
+        public static implicit operator ValueTask<ParseResult>(ParseResult result)
+            => result.AsValueTask();
 
         /// <summary>
         ///     Creates a failed result with provided parameters.

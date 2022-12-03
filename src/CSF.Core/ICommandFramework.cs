@@ -47,7 +47,7 @@ namespace CSF
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task ConfigureTypeReadersAsync(CancellationToken cancellationToken = default);
+        ValueTask ConfigureTypeReadersAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Called when typereaders are automatically registered from the available assemblies.
@@ -56,7 +56,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken);
+        ValueTask BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when <see cref="BuildTypeReaders(Assembly)"/> finds a type to resolve.
@@ -65,14 +65,14 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildTypeReaderAsync(Type type, CancellationToken cancellationToken);
+        ValueTask BuildTypeReaderAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Creates a new <see cref="ResultHandlerProvider"/> with all <see cref="IResultHandler"/>'s in the registration assemblies.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task ConfigureResultHandlersAsync(CancellationToken cancellationToken = default);
+        ValueTask ConfigureResultHandlersAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Called when result handlers are automatically registered from the available assemblies.
@@ -81,7 +81,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken);
+        ValueTask BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when <see cref="BuildResultHandlers(Assembly)"/> finds a type to resolve.
@@ -90,14 +90,14 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildResultHandlerAsync(Type type, CancellationToken cancellationToken);
+        ValueTask BuildResultHandlerAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Builds all modules in the provided assemblies in <see cref="CommandConfiguration.RegistrationAssemblies"/>.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task ConfigureModulesAsync(CancellationToken cancellationToken = default);
+        ValueTask ConfigureModulesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Builds all modules in the provided <see cref="Assembly"/>.
@@ -106,7 +106,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken);
+        ValueTask BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when <see cref="BuildModules(Assembly)"/>
@@ -115,7 +115,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Task BuildModuleAsync(Type type, CancellationToken cancellationToken);
+        ValueTask BuildModuleAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Tries to parse an <see cref="IPrefix"/> from the provided raw input and will remove the length of the prefix from it.

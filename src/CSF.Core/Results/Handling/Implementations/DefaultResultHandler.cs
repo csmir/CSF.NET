@@ -8,19 +8,19 @@ namespace CSF
 {
     internal class DefaultResultHandler : ResultHandler
     {
-        public Func<IContext, IResult, CancellationToken, Task> CommandResultDelegate { get; }
+        public Func<IContext, IResult, CancellationToken, ValueTask> CommandResultDelegate { get; }
 
-        public Func<IConditionalComponent, CancellationToken, Task> CommandRegistrationDelegate { get; }
+        public Func<IConditionalComponent, CancellationToken, ValueTask> CommandRegistrationDelegate { get; }
 
-        public Func<IResultHandler, CancellationToken, Task> HandlerRegistrationDelegate { get; }
+        public Func<IResultHandler, CancellationToken, ValueTask> HandlerRegistrationDelegate { get; }
 
-        public Func<ITypeReader, CancellationToken, Task> ReaderRegistrationDelegate { get; }
+        public Func<ITypeReader, CancellationToken, ValueTask> ReaderRegistrationDelegate { get; }
 
         internal DefaultResultHandler(
-            Func<IContext, IResult, CancellationToken, Task> cmdfunc, 
-            Func<IConditionalComponent, CancellationToken, Task> cmdregfunc, 
-            Func<IResultHandler, CancellationToken, Task> resfunc, 
-            Func<ITypeReader, CancellationToken, Task> typfunc)
+            Func<IContext, IResult, CancellationToken, ValueTask> cmdfunc, 
+            Func<IConditionalComponent, CancellationToken, ValueTask> cmdregfunc, 
+            Func<IResultHandler, CancellationToken, ValueTask> resfunc, 
+            Func<ITypeReader, CancellationToken, ValueTask> typfunc)
         {
             CommandResultDelegate = cmdfunc;
             CommandRegistrationDelegate = cmdregfunc;
@@ -28,24 +28,28 @@ namespace CSF
             ReaderRegistrationDelegate = typfunc;
         }
 
-        public override async Task OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken)
+        public override async ValueTask OnCommandExecutedAsync(IContext context, IResult result, CancellationToken cancellationToken)
         {
-            await CommandResultDelegate?.Invoke(context, result, cancellationToken);
+            if (!(CommandResultDelegate is null))
+                await CommandResultDelegate(context, result, cancellationToken).ConfigureAwait(false);
         }
 
-        public override async Task OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
+        public override async ValueTask OnCommandRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
         {
-            await CommandRegistrationDelegate?.Invoke(component, cancellationToken);
+            if (!(CommandResultDelegate is null))
+                await CommandRegistrationDelegate(component, cancellationToken).ConfigureAwait(false);
         }
 
-        public override async Task OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken)
+        public override async ValueTask OnResultHandlerRegisteredAsync(IResultHandler resultHandler, CancellationToken cancellationToken)
         {
-            await HandlerRegistrationDelegate?.Invoke(resultHandler, cancellationToken);
+            if (!(HandlerRegistrationDelegate is null))
+                await HandlerRegistrationDelegate(resultHandler, cancellationToken);
         }
 
-        public override async Task OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
+        public override async ValueTask OnTypeReaderRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
         {
-            await ReaderRegistrationDelegate?.Invoke(typeReader, cancellationToken);
+            if (!(ReaderRegistrationDelegate is null))
+                await ReaderRegistrationDelegate(typeReader, cancellationToken);
         }
     }
 }

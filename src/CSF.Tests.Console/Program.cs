@@ -9,7 +9,7 @@ await CommandFramework.CreateDefaultBuilder()
     })
     .ConfigureHandlers(configure =>
     {
-        configure.ConfigureDelegate(async (x, y, z) =>
+        configure.ConfigureDelegate(async (ctx, result, ctoken) =>
         {
             await Task.CompletedTask;
         });
