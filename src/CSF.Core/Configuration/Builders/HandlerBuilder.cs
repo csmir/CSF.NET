@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the default <see cref="IHandlerBuilder"/> implementation.
+    /// </summary>
     public sealed class HandlerBuilder : IHandlerBuilder
     {
         /// <inheritdoc/>

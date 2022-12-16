@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a builder for <see cref="IResultHandler"/>'s.
+    /// </summary>
     public interface IHandlerBuilder
     {
         /// <summary>

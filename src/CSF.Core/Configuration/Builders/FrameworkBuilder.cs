@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a builder for a new <see cref="CommandFramework{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="IPipelineService"/> used for building the new <see cref="CommandFramework{T}"/>.</typeparam>
     public sealed class FrameworkBuilder<T> : IFrameworkBuilder
         where T : PipelineService
     {

@@ -1,5 +1,4 @@
-﻿using CSF.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -70,7 +69,7 @@ namespace CSF
     }
 
     /// <summary>
-    ///     Represents the handler for registered commands.
+    ///     Represents the handler for registering and handling incoming commands.
     /// </summary>
     public sealed class CommandFramework<T> : ICommandFramework
         where T : PipelineService
@@ -115,9 +114,14 @@ namespace CSF
         /// </summary>
         public CommandFramework(IServiceProvider serviceProvider, CommandConfiguration configuration, T pipelineProvider)
         {
+            configuration.Prefixes ??= new PrefixProvider();
+            configuration.TypeReaders ??= new TypeReaderProvider();
+            configuration.ResultHandlers ??= new ResultHandlerProvider();
+            
+            Configuration = configuration;
+
             PipelineService = pipelineProvider;
             Services = serviceProvider;
-            Configuration = configuration;
         }
 
         /// <inheritdoc/>
@@ -125,6 +129,8 @@ namespace CSF
         {
             if (autoConfigureAssemblies)
             {
+                if (Configuration.RegistrationAssemblies is null || !Configuration.RegistrationAssemblies.Any())
+                    throw new 
                 await ConfigureResultHandlersAsync(cancellationToken);
 
                 await ConfigureTypeReadersAsync(cancellationToken);
