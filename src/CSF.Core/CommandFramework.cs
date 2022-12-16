@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -130,7 +131,8 @@ namespace CSF
             if (autoConfigureAssemblies)
             {
                 if (Configuration.RegistrationAssemblies is null || !Configuration.RegistrationAssemblies.Any())
-                    throw new 
+                    throw new MissingValueException("Array was found to be null or empty.", nameof(Configuration.RegistrationAssemblies));
+
                 await ConfigureResultHandlersAsync(cancellationToken);
 
                 await ConfigureTypeReadersAsync(cancellationToken);
