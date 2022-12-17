@@ -1,4 +1,5 @@
 ﻿using CSF.TShock;
+using TShockAPI;
 
 namespace CSF.Tests.TShock
 {
@@ -6,8 +7,10 @@ namespace CSF.Tests.TShock
     public class Module : TSModuleBase<TSCommandContext>
     {
         [RequirePermission("test")]
-        [Command("test", "t")]
-        public void Test()
-            => Success("tested!");
+        [Command("test")]
+        public void Test(TSPlayer player, TSPlayer _)
+        {
+            Respond(player.Name);
+        }
     }
 }
