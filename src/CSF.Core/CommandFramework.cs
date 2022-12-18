@@ -434,16 +434,16 @@ namespace CSF
                     int requiredLength = 0;
                     foreach (var parameter in command.Parameters)
                     {
-                        if (contextLength >= requiredLength)
-                        {
-                            match = command;
-                            break;
-                        }
-
                         if (!parameter.Flags.HasFlag(ParameterFlags.IsOptional))
                         {
                             requiredLength++;
                         }
+                    }
+
+                    if (contextLength >= requiredLength)
+                    {
+                        match = command;
+                        break;
                     }
                 }
             }
