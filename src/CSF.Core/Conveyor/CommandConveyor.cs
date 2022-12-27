@@ -9,9 +9,6 @@ namespace CSF
     ///     <br/>
     ///     This type <b>can</b> be used when providing the <see cref="CommandFramework{T}"/> with a provider, or overwritten for custom implementations.
     /// </summary>
-    /// <remarks>
-    ///     
-    /// </remarks>
     public class CommandConveyor : ICommandConveyor
     {
         /// <inheritdoc/>

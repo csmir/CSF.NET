@@ -1,53 +1,57 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CSF.Hosting
 {
-    /// <summary>
-    ///     Represents the necessary extensions to set up a hosted environment for CSF.NET.
-    /// </summary>
     public static class HostBuilderExtensions
     {
         /// <summary>
-        ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
+        ///     Configures the necessary settings to set up the command framework for the use of <see cref="IHost"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
-        /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
+        /// <typeparam name="THost">The <see cref="HostedCommandService{T}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
-        public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder, Action<HostBuilderContext, CommandHostingContext> action)
-            where T : CommandConveyor where TService : class, IHostedCommandService
+        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<HostBuilderContext, CommandConfiguration> action)
+            where T : CommandConveyor where THost : HostedCommandService<T>
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
-                var cmdConfig = new CommandHostingContext();
+                var config = new CommandConfiguration();
 
-                action.Invoke(context, cmdConfig);
+                action(context, config);
 
-                services.ConfigureCommands<T, TService>(cmdConfig);
+                services.ConfigureCommands<T, THost>(config);
             });
 
             return hostBuilder;
         }
 
         /// <summary>
-        ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
+        ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>. 
         /// </summary>
         /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
-        /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
+        /// <typeparam name="THost">The <see cref="HostedCommandService{T}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
-        public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder, Action<HostBuilderContext> action)
-            where T : CommandConveyor where TService : class, IHostedCommandService
+        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<CommandConfiguration> action)
+            where T : CommandConveyor where THost : HostedCommandService<T>
         {
-            hostBuilder.ConfigureServices((context, services) =>
+            hostBuilder.ConfigureServices(services =>
             {
-                action.Invoke(context);
+                var config = new CommandConfiguration();
 
-                services.ConfigureCommands<T, TService>(new());
+                action(config);
+
+                services.ConfigureCommands<T, THost>(config);
             });
 
             return hostBuilder;
@@ -57,17 +61,16 @@ namespace CSF.Hosting
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
-        /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
+        /// <typeparam name="THost">The <see cref="HostedCommandService{T}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
-        public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder)
-            where T : CommandConveyor where TService : class, IHostedCommandService
+        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder)
+            where T : CommandConveyor where THost : HostedCommandService<T>
         {
-            hostBuilder.ConfigureServices((context, services) =>
+            hostBuilder.ConfigureServices(services =>
             {
-                services.ConfigureCommands<T, TService>(new());
+                services.ConfigureCommands<T, THost>(new CommandConfiguration());
             });
-
             return hostBuilder;
         }
 
@@ -75,22 +78,17 @@ namespace CSF.Hosting
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
-        /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
+        /// <typeparam name="THost">The <see cref="HostedCommandService{T}"/> implementation to use.</typeparam>
         /// <param name="services"></param>
         /// <returns>The same <see cref="IServiceCollection"/> for chaining calls.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IServiceCollection ConfigureCommands<T, TService>(this IServiceCollection services, CommandHostingContext cmdContext)
-            where T : CommandConveyor where TService : class, IHostedCommandService
+        public static IServiceCollection ConfigureCommands<T, THost>(this IServiceCollection services, CommandConfiguration configuration)
+            where T : CommandConveyor where THost : HostedCommandService<T>
         {
-            services.AddSingleton(cmdContext);
+            services.AddSingleton(configuration);
 
-            cmdContext.Configuration ??= new();
-
-            services.AddSingleton(cmdContext.Configuration);
             services.AddSingleton<T>();
-            services.AddSingleton<CommandFramework<T>>();
-
-            services.AddHostedService<TService>();
+            services.AddHostedService<THost>();
 
             return services;
         }

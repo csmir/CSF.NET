@@ -13,26 +13,26 @@ namespace CSF
     public sealed class FrameworkBuilder<T> : IFrameworkBuilder
         where T : CommandConveyor
     {
-        /// <summary>
-        ///     Gets or sets the pipeline service that will populate the framework.
-        /// </summary>
-        public T PipelineService { get; set; }
-
-        /// <inheritdoc/>
-        public IServiceProvider Services { get; set; }
-
         /// <inheritdoc/>
         public CommandConfiguration Configuration { get; set; }
 
         /// <inheritdoc/>
-        ICommandConveyor IFrameworkBuilder.PipelineService { get; set; }
+        public IServiceProvider Services { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the pipeline service that will populate the framework.
+        /// </summary>
+        public T Conveyor { get; set; }
+
+        /// <inheritdoc/>
+        ICommandConveyor IFrameworkBuilder.Conveyor { get; set; }
 
         /// <summary>
         ///     Creates a new <see cref="FrameworkBuilder{T}"/>.
         /// </summary>
         internal FrameworkBuilder(T pipelineService)
         {
-            PipelineService = pipelineService;
+            Conveyor = pipelineService;
             Services = EmptyServiceProvider.Instance;
             Configuration = new CommandConfiguration();
         }
@@ -52,12 +52,26 @@ namespace CSF
         }
 
         /// <inheritdoc/>
+        public IFrameworkBuilder ConfigureConveyor(ICommandConveyor conveyor)
+        {
+            Conveyor = conveyor.Cast<T>();
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IFrameworkBuilder ConfigureConveyor(T conveyor)
+        {
+            Conveyor = conveyor;
+            return this;
+        }
+
+        /// <inheritdoc/>
         public ICommandFramework Build()
         {
-            if (PipelineService is null)
-                throw new ArgumentNullException(nameof(PipelineService));
+            if (Conveyor is null)
+                throw new ArgumentNullException(nameof(Conveyor));
 
-            return new CommandFramework<T>(Services, Configuration, PipelineService);
+            return new CommandFramework<T>(Services, Configuration, Conveyor);
         }
 
         /// <inheritdoc/>

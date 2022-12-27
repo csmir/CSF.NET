@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 [assembly: CLSCompliant(true)]
-
 namespace CSF
 {
     /// <summary>
@@ -78,9 +77,12 @@ namespace CSF
     ///         <item><description>Logging the workflow to the provided <see cref="ILogger"/>.</description></item>
     ///     </list>
     /// </remarks>
+    /// <typeparam name="T">The conveyor used to provide support in handling the command pipeline.</typeparam>
     public class CommandFramework<T> : ICommandFramework
         where T : CommandConveyor
     {
+        private CancellationTokenSource _globalSource;
+
         /// <summary>
         ///     The conveyor that handles command creation, handle results and result invocation.
         /// </summary>
@@ -131,26 +133,60 @@ namespace CSF
         }
 
         /// <inheritdoc/>
+        public virtual async Task StartAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+
+            _ = RunAsync(autoConfigureAssemblies, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public virtual async Task RunAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default)
         {
+            _globalSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
             if (autoConfigureAssemblies)
             {
                 if (Configuration.RegistrationAssemblies is null || !Configuration.RegistrationAssemblies.Any())
                     throw new MissingValueException("Array was found to be null or empty.", nameof(Configuration.RegistrationAssemblies));
 
-                await ConfigureTypeReadersAsync(cancellationToken);
+                await ConfigureTypeReadersAsync(_globalSource.Token);
 
-                await ConfigureModulesAsync(cancellationToken);
+                await ConfigureModulesAsync(_globalSource.Token);
             }
 
-            while (!cancellationToken.IsCancellationRequested)
+            await RunAsync();
+        }
+
+        protected virtual async Task RunAsync()
+        {
+            try
             {
-                var input = await Conveyor.GetInputAsync(cancellationToken);
+                while (!_globalSource.IsCancellationRequested)
+                {
+                    var input = await Conveyor.GetInputAsync(_globalSource.Token);
 
-                var context = await Conveyor.BuildContextAsync(input, cancellationToken);
+                    var context = await Conveyor.BuildContextAsync(input, _globalSource.Token);
 
-                await ExecuteCommandsAsync(context, cancellationToken: cancellationToken);
+                    await ExecuteCommandsAsync(context, cancellationToken: _globalSource.Token);
+                }
             }
+            catch
+            {
+                _globalSource.Cancel();
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task StopAsync(CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+
+            if (_globalSource is null)
+                throw new MemberUnpreparedException();
+
+            _globalSource.Cancel();
         }
 
         /// <inheritdoc/>

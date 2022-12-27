@@ -12,7 +12,7 @@ namespace CSF
     /// <summary>
     ///     Represents the root interface of the <see cref="CommandFramework{T}"/>. This type is not to be used in creating your own command framework.
     /// </summary>
-    public interface ICommandFramework : IDisposable
+    public interface ICommandFramework
     {
         /// <summary>
         ///     The range of registered commands.
@@ -37,10 +37,31 @@ namespace CSF
         /// <summary>
         ///     Registers all assemblies and starts listening for commands.
         /// </summary>
-        /// <param name="autoConfigureAssemblies">If all assemblies should be iterated to register typereaders, result handlers and modules automatically.</param>
+        /// <remarks>
+        ///     This call is not holding. If you want the application to hold after calling start, consider using <see cref="RunAsync(bool, CancellationToken)"/> instead.
+        /// </remarks>
+        /// <param name="autoConfigureAssemblies">If all assemblies should be iterated to register typereaders and modules automatically.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task StartAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Registers all assemblies and holds to listen for commands. 
+        /// </summary>
+        /// <param name="autoConfigureAssemblies">If all assemblies should be iterated to register typereaders and modules automatically.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         Task RunAsync(bool autoConfigureAssemblies = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Cancels all internal loops used in command handling.
+        /// </summary>
+        /// <remarks>
+        ///     This call will cause <see cref="RunAsync(bool, CancellationToken)"/> to quit out of the loop and return to the caller.
+        /// </remarks>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task StopAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///     Creates a new <see cref="TypeReaderProvider"/> with all <see cref="ITypeReader"/>'s in the default definition and registration assemblies.

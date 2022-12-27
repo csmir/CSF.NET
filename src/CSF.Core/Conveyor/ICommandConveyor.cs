@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents the default interface for an implementation factory.
+    ///     Represents the default interface for a command conveyor. This type cannot be used to invoke commands.
     /// </summary>
     public interface ICommandConveyor
     {

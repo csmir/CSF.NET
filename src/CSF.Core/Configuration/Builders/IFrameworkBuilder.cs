@@ -14,7 +14,7 @@ namespace CSF
         /// <summary>
         ///     Gets or sets the pipeline service that will populate the framework.
         /// </summary>
-        ICommandConveyor PipelineService { get; set; }
+        ICommandConveyor Conveyor { get; set; }
 
         /// <summary>
         ///     Gets or sets the services used to configure the framework.
@@ -39,6 +39,13 @@ namespace CSF
         /// <param name="services"></param>
         /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</returns>
         IFrameworkBuilder ConfigureServices(IServiceProvider services);
+
+        /// <summary>
+        ///     Sets the <see cref="Conveyor"/> of this builder.
+        /// </summary>
+        /// <param name="conveyor"></param>
+        /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</returns>
+        IFrameworkBuilder ConfigureConveyor(ICommandConveyor conveyor);
 
         /// <summary>
         ///     Builds the current builder into a new <see cref="CommandFramework{T}"/>.
