@@ -12,7 +12,7 @@ namespace CSF
     /// <summary>
     ///     Represents the default interface for an implementation factory.
     /// </summary>
-    public interface IPipelineService
+    public interface ICommandConveyor
     {
         /// <summary>
         ///     Waits for an input and returns it to the caller.

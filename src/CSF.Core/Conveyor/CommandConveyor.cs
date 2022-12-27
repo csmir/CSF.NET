@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents the default implementation factory. 
+    ///     Represents the default command factory. 
     ///     <br/>
     ///     This type <b>can</b> be used when providing the <see cref="CommandFramework{T}"/> with a provider, or overwritten for custom implementations.
     /// </summary>
-    public class PipelineService : IPipelineService
+    /// <remarks>
+    ///     
+    /// </remarks>
+    public class CommandConveyor : ICommandConveyor
     {
         /// <inheritdoc/>
         public virtual async ValueTask<string> GetInputAsync(CancellationToken cancellationToken)

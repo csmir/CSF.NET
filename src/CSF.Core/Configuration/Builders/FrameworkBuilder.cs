@@ -9,9 +9,9 @@ namespace CSF
     /// <summary>
     ///     Represents a builder for a new <see cref="CommandFramework{T}"/>.
     /// </summary>
-    /// <typeparam name="T">The <see cref="IPipelineService"/> used for building the new <see cref="CommandFramework{T}"/>.</typeparam>
+    /// <typeparam name="T">The <see cref="ICommandConveyor"/> used for building the new <see cref="CommandFramework{T}"/>.</typeparam>
     public sealed class FrameworkBuilder<T> : IFrameworkBuilder
-        where T : PipelineService
+        where T : CommandConveyor
     {
         /// <summary>
         ///     Gets or sets the pipeline service that will populate the framework.
@@ -25,7 +25,7 @@ namespace CSF
         public CommandConfiguration Configuration { get; set; }
 
         /// <inheritdoc/>
-        IPipelineService IFrameworkBuilder.PipelineService { get; set; }
+        ICommandConveyor IFrameworkBuilder.PipelineService { get; set; }
 
         /// <summary>
         ///     Creates a new <see cref="FrameworkBuilder{T}"/>.

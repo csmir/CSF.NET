@@ -12,13 +12,13 @@ namespace CSF.Hosting
         /// <summary>
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
-        /// <typeparam name="T">The <see cref="PipelineService"/> instance to use.</typeparam>
+        /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
         /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder, Action<HostBuilderContext, CommandHostingContext> action)
-            where T : PipelineService where TService : class, IHostedCommandService
+            where T : CommandConveyor where TService : class, IHostedCommandService
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -35,13 +35,13 @@ namespace CSF.Hosting
         /// <summary>
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
-        /// <typeparam name="T">The <see cref="PipelineService"/> instance to use.</typeparam>
+        /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
         /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder, Action<HostBuilderContext> action)
-            where T : PipelineService where TService : class, IHostedCommandService
+            where T : CommandConveyor where TService : class, IHostedCommandService
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -56,12 +56,12 @@ namespace CSF.Hosting
         /// <summary>
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
-        /// <typeparam name="T">The <see cref="PipelineService"/> instance to use.</typeparam>
+        /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
         /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
         /// <param name="hostBuilder"></param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
         public static IHostBuilder ConfigureCommands<T, TService>(this IHostBuilder hostBuilder)
-            where T : PipelineService where TService : class, IHostedCommandService
+            where T : CommandConveyor where TService : class, IHostedCommandService
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
@@ -74,13 +74,13 @@ namespace CSF.Hosting
         /// <summary>
         ///     Configures the necessary settings to set up the command framework for the use of <see cref="Microsoft.Extensions.Hosting"/>.
         /// </summary>
-        /// <typeparam name="T">The <see cref="PipelineService"/> instance to use.</typeparam>
+        /// <typeparam name="T">The <see cref="CommandConveyor"/> instance to use.</typeparam>
         /// <typeparam name="TService">The <see cref="HostedCommandService{T, TContext}"/> implementation to use.</typeparam>
         /// <param name="services"></param>
         /// <returns>The same <see cref="IServiceCollection"/> for chaining calls.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IServiceCollection ConfigureCommands<T, TService>(this IServiceCollection services, CommandHostingContext cmdContext)
-            where T : PipelineService where TService : class, IHostedCommandService
+            where T : CommandConveyor where TService : class, IHostedCommandService
         {
             services.AddSingleton(cmdContext);
 

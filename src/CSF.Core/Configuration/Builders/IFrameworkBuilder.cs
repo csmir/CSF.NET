@@ -14,7 +14,7 @@ namespace CSF
         /// <summary>
         ///     Gets or sets the pipeline service that will populate the framework.
         /// </summary>
-        IPipelineService PipelineService { get; set; }
+        ICommandConveyor PipelineService { get; set; }
 
         /// <summary>
         ///     Gets or sets the services used to configure the framework.

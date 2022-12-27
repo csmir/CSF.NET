@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents the default implementation of the <see cref="CommandFramework{T}"/>.
+    ///     Represents the root interface of the <see cref="CommandFramework{T}"/>. This type is not to be used in creating your own command framework.
     /// </summary>
-    public interface ICommandFramework
+    public interface ICommandFramework : IDisposable
     {
         /// <summary>
         ///     The range of registered commands.
@@ -46,7 +46,7 @@ namespace CSF
         ///     Creates a new <see cref="TypeReaderProvider"/> with all <see cref="ITypeReader"/>'s in the default definition and registration assemblies.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         ValueTask ConfigureTypeReadersAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -54,16 +54,16 @@ namespace CSF
         /// </summary>
         /// <param name="assembly">The assembly to build.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         ValueTask BuildTypeReadersAsync(Assembly assembly, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Called when <see cref="BuildTypeReaders(Assembly)"/> finds a type to resolve.
+        ///     Called when <see cref="BuildTypeReadersAsync(Assembly, CancellationToken)"/> finds a type to resolve.
         /// </summary>
         /// <param name="type">The type to build.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         ValueTask BuildTypeReaderAsync(Type type, CancellationToken cancellationToken);
 
@@ -71,7 +71,7 @@ namespace CSF
         ///     Builds all modules in the provided assemblies in <see cref="CommandConfiguration.RegistrationAssemblies"/>.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         ValueTask ConfigureModulesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -79,16 +79,16 @@ namespace CSF
         /// </summary>
         /// <param name="assembly">The assembly to build.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         ValueTask BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Called when <see cref="BuildModules(Assembly)"/>
+        ///     Called when <see cref="BuildModulesAsync(Assembly, CancellationToken)"/>
         /// </summary>
         /// <param name="type">The type to build.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        /// <returns>An asynchronous <see cref="ValueTask"/> with no return type.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         ValueTask BuildModuleAsync(Type type, CancellationToken cancellationToken);
 
