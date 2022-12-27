@@ -27,11 +27,6 @@ namespace CSF
         CommandConfiguration Configuration { get; set; }
 
         /// <summary>
-        ///     Gets or sets the result handler builder used to handle post result execution.
-        /// </summary>
-        IHandlerBuilder HandlerBuilder { get; set; }
-
-        /// <summary>
         ///     Modifies the <see cref="Configuration"/> of this builder.
         /// </summary>
         /// <param name="action"></param>
@@ -44,13 +39,6 @@ namespace CSF
         /// <param name="services"></param>
         /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</returns>
         IFrameworkBuilder ConfigureServices(IServiceProvider services);
-
-        /// <summary>
-        ///     Sets the <see cref="HandlerBuilder"/> of this builder.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns>The current <see cref="IFrameworkBuilder"/> for chaining calls.</ret
-        IFrameworkBuilder ConfigureHandlers(Action<IHandlerBuilder> action);
 
         /// <summary>
         ///     Builds the current builder into a new <see cref="CommandFramework{T}"/>.

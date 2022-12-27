@@ -7,11 +7,4 @@ await CommandFramework.CreateDefaultBuilder()
             .Include(new EnumTypeReader<LogLevel>());
         configure.DefaultLogLevel = LogLevel.Trace;
     })
-    .ConfigureHandlers(configure =>
-    {
-        configure.ConfigureDelegate(async (ctx, result, ctoken) =>
-        {
-            await Task.CompletedTask;
-        });
-    })
     .BuildAndRunAsync();

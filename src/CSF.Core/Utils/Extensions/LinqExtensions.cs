@@ -35,10 +35,10 @@ namespace CSF
                     yield return @out;
         }
 
-        public static IEnumerable<TOut> CastWhere<TOut>(this IEnumerable input, Func<TOut, bool> predicate)
+        public static IEnumerable<T> CastWhere<T>(this IEnumerable input, Func<T, bool> predicate)
         {
             foreach (var @in in input)
-                if (@in is TOut @out)
+                if (@in is T @out)
                     if (predicate(@out))
                         yield return @out;
         }

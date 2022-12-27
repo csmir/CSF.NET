@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSF.Exceptions
+namespace CSF
 {
     public sealed class MissingValueException : ArgumentException
     {

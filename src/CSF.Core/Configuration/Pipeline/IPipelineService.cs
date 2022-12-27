@@ -19,7 +19,7 @@ namespace CSF
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>The provided input.</returns>
-        Task<string> GetInputAsync(CancellationToken cancellationToken);
+        ValueTask<string> GetInputAsync(CancellationToken cancellationToken);
 
         /// <summary>
         ///     Builds a new <see cref="IContext"/> from the provided raw string.
@@ -28,7 +28,34 @@ namespace CSF
         /// <param name="rawInput">The raw input.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>The built command context.</returns>
-        Task<IContext> BuildContextAsync(string rawInput, CancellationToken cancellationToken);
+        ValueTask<IContext> BuildContextAsync(string rawInput, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Called when a command succesfully (or unsuccesfully) executed.
+        /// </summary>
+        /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="result">The result returned by the caller.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task OnResultAsync<TContext>(TContext context, IResult result, CancellationToken cancellationToken)
+            where TContext : IContext;
+
+        /// <summary>
+        ///     Called when a command group is succesfully registered to the command framework.
+        /// </summary>
+        /// <param name="component">The component (command group) that has been registered.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Called when a typereader is succesfully registered to the command framework.
+        /// </summary>
+        /// <param name="typeReader">The type reader to register.</param>
+        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
+        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
+        Task OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Returns the error message when the context input was not found.
@@ -36,7 +63,7 @@ namespace CSF
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="SearchResult"/> holding the returned error.</returns>
-        SearchResult CommandNotFoundResult<TContext>(TContext context)
+        SearchResult OnCommandNotFound<TContext>(TContext context)
             where TContext : IContext;
 
         /// <summary>
@@ -45,7 +72,7 @@ namespace CSF
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="SearchResult"/> holding the returned error.</returns>
-        SearchResult NoApplicableOverloadResult<TContext>(TContext context)
+        SearchResult OnBestOverloadUnavailable<TContext>(TContext context)
             where TContext : IContext;
 
         /// <summary>
@@ -55,7 +82,7 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="dependency">Information about the service to inject.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        ConstructionResult ServiceNotFoundResult<TContext>(TContext context, DependencyInfo dependency)
+        ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyInfo dependency)
             where TContext : IContext;
 
         /// <summary>
@@ -65,7 +92,7 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="module">The module that failed to cast to an <see cref="IModuleBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        ConstructionResult InvalidModuleTypeResult<TContext>(TContext context, ModuleInfo module)
+        ConstructionResult OnInvalidModule<TContext>(TContext context, ModuleInfo module)
             where TContext : IContext;
 
         /// <summary>
@@ -77,28 +104,28 @@ namespace CSF
         /// <param name="context"></param>
         /// <param name="param"></param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
-        TypeReaderResult ResolveMissingValue<TContext>(TContext context, ParameterInfo param)
+        TypeReaderResult OnMissingValue<TContext>(TContext context, ParameterInfo param)
             where TContext : IContext;
 
         /// <summary>
-        ///     Returns the error when <see cref="ResolveMissingValue{T}(T, ParameterInfo)"/> returned a type that did not match the expected type.
+        ///     Returns the error when <see cref="OnMissingValue{T}(T, ParameterInfo)"/> returned a type that did not match the expected type.
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="expectedType">The type that was expected to return.</param>
         /// <param name="returnedType">The returned type.</param>
         /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
-        ParseResult MissingOptionalFailedMatch<TContext>(TContext context, Type expectedType, Type returnedType)
+        ParseResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)
             where TContext : IContext;
 
         /// <summary>
-        ///     Returns the error when <see cref="ResolveMissingValue{T}(T, ParameterInfo)"/> failed to return a valid result. 
+        ///     Returns the error when <see cref="OnMissingValue{T}(T, ParameterInfo)"/> failed to return a valid result. 
         ///     This method has to return <see cref="Type.Missing"/> if no self-implemented value has been returned.
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
-        ParseResult OptionalValueNotPopulated<TContext>(TContext context)
+        ParseResult OnOptionalNotPopulated<TContext>(TContext context)
             where TContext : IContext;
 
         /// <summary>
@@ -108,7 +135,7 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="returnValue">The returned value of the method.</param>
         /// <returns>An <see cref="ExecuteResult"/> holding the returned error.</returns>
-        ExecuteResult ProcessUnhandledReturnType<TContext>(TContext context, object returnValue)
+        ExecuteResult OnUnhandledReturnType<TContext>(TContext context, object returnValue)
             where TContext : IContext;
 
         /// <summary>
@@ -119,7 +146,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="ex">The exception that occurred while executing the command.</param>
         /// <returns>An <see cref="ExecuteResult"/> holding the returned error.</returns>
-        ExecuteResult UnhandledExceptionResult<TContext>(TContext context, CommandInfo command, Exception ex)
+        ExecuteResult OnUnhandledException<TContext>(TContext context, CommandInfo command, Exception ex)
             where TContext : IContext;
     }
 }

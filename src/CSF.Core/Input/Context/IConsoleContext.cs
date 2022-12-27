@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     Represents an abstract context for text commands.
     /// </summary>
-    public interface ICommandContext : IContext
+    public interface IConsoleContext : IContext
     {
         /// <remarks>
         ///     The raw input of the command.

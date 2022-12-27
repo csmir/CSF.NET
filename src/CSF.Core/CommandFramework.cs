@@ -1,5 +1,4 @@
-﻿using CSF.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -84,6 +83,9 @@ namespace CSF
         public IList<IConditionalComponent> Commands { get; }
 
         /// <inheritdoc/>
+        public TypeReaderProvider TypeReaders { get; }
+
+        /// <inheritdoc/>
         public CommandConfiguration Configuration { get; }
 
         /// <inheritdoc/>
@@ -117,7 +119,6 @@ namespace CSF
         {
             configuration.Prefixes ??= new PrefixProvider();
             configuration.TypeReaders ??= new TypeReaderProvider();
-            configuration.ResultHandlers ??= new ResultHandlerProvider();
             
             Configuration = configuration;
 
@@ -133,8 +134,6 @@ namespace CSF
                 if (Configuration.RegistrationAssemblies is null || !Configuration.RegistrationAssemblies.Any())
                     throw new MissingValueException("Array was found to be null or empty.", nameof(Configuration.RegistrationAssemblies));
 
-                await ConfigureResultHandlersAsync(cancellationToken);
-
                 await ConfigureTypeReadersAsync(cancellationToken);
 
                 await ConfigureModulesAsync(cancellationToken);
@@ -146,7 +145,7 @@ namespace CSF
 
                 var context = await PipelineService.BuildContextAsync(input, cancellationToken);
 
-                await ExecuteCommandAsync(context, cancellationToken: cancellationToken);
+                await ExecuteCommandsAsync(context, cancellationToken: cancellationToken);
             }
         }
 
@@ -177,7 +176,7 @@ namespace CSF
             foreach (var component in module.Components)
             {
                 Commands.Add(component);
-                await Configuration.ResultHandlers.InvokeBuildResultAsync(component, cancellationToken);
+                await component.RequestToHandleAsync(PipelineService, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -213,48 +212,10 @@ namespace CSF
             if (output is ITypeReader typeReader)
             {
                 Configuration.TypeReaders.Include(typeReader);
-                await Configuration.ResultHandlers.InvokeTypeReaderBuildResultAsync(typeReader, cancellationToken);
+                await typeReader.RequestToHandleAsync(PipelineService, cancellationToken).ConfigureAwait(false);
             }
 
             throw new InvalidOperationException($"Could not box {type.Name} as {nameof(ITypeReader)}.");
-        }
-
-        /// <inheritdoc/>
-        public async ValueTask ConfigureResultHandlersAsync(CancellationToken cancellationToken = default)
-        {
-            foreach (var assembly in Configuration.RegistrationAssemblies)
-                await BuildResultHandlersAsync(assembly, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public async ValueTask BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken)
-        {
-            var tt = typeof(IResultHandler);
-
-            foreach (var type in assembly.ExportedTypes)
-                if (tt.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
-                    await BuildResultHandlerAsync(type, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public async ValueTask BuildResultHandlerAsync(Type type, CancellationToken cancellationToken)
-        {
-            var handler = ResultHandlerInfo.Build(type);
-
-            var output = handler.Construct(Services);
-
-            if (output is null)
-                throw new ArgumentNullException(nameof(type), "The provided type caused an invalid return type.");
-
-            if (output is IResultHandler resultHandler)
-            {
-                Configuration.ResultHandlers.Include(resultHandler);
-                await Configuration.ResultHandlers.InvokeResultHandlerBuildResultAsync(resultHandler, cancellationToken);
-            }
-
-            throw new InvalidOperationException($"Could not box {type.Name} as {nameof(IResultHandler)}.");
         }
 
         /// <inheritdoc/>
@@ -269,7 +230,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public async Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider services = null, CancellationToken cancellationToken = default)
+        public async Task<IResult> ExecuteCommandsAsync<TContext>(TContext context, IServiceProvider services = null, CancellationToken cancellationToken = default)
             where TContext : IContext
         {
             services ??= Services;
@@ -278,18 +239,18 @@ namespace CSF
             {
                 _ = Task.Run(async () =>
                 {
-                    var result = await RunPipelineAsync(context, services, cancellationToken);
+                    var result = await RunPipelineAsync(context, services, cancellationToken).ConfigureAwait(false);
 
-                    await Configuration.ResultHandlers.InvokeCommandResultAsync(context, result, cancellationToken);
+                    await result.RequestToHandleAsync(context, PipelineService, cancellationToken).ConfigureAwait(false);
                 });
                 return ExecuteResult.FromSuccess();
             }
 
             else
             {
-                var result = await RunPipelineAsync(context, services, cancellationToken);
+                var result = await RunPipelineAsync(context, services, cancellationToken).ConfigureAwait(false);
 
-                await Configuration.ResultHandlers.InvokeCommandResultAsync(context, result, cancellationToken);
+                await result.RequestToHandleAsync(context, PipelineService, cancellationToken).ConfigureAwait(false);
 
                 return result;
             }
@@ -300,27 +261,44 @@ namespace CSF
         {
             Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
 
+            // find commands
             var searchResult = await SearchAsync(context).ConfigureAwait(false);
 
             if (!searchResult.IsSuccess)
                 return searchResult;
 
-            var preconResult = await CheckPreconditionsAsync(context, searchResult.Result, provider, cancellationToken).ConfigureAwait(false);
+            // check commands for availability.
+            var checkResult = await CheckAsync(context, searchResult.Result, provider, cancellationToken).ConfigureAwait(false);
 
-            if (!preconResult.IsSuccess)
-                return preconResult;
+            if (!checkResult.IsSuccess)
+                return checkResult;
 
-            var constructResult = await ConstructAsync(context, searchResult.Result, provider).ConfigureAwait(false);
+            // select commands.
+            var commands = checkResult.Result;
+            if (!Configuration.ExecuteAllValidMatches)
+                commands = new[] { checkResult.Result[0] };
 
-            if (!constructResult.IsSuccess)
-                return constructResult;
+            foreach (var command in commands)
+            {
+                // build module.
+                var constructResult = await ConstructAsync(context, command, provider).ConfigureAwait(false);
 
-            var readResult = await ParseAsync(context, searchResult.Result, cancellationToken).ConfigureAwait(false);
+                if (!constructResult.IsSuccess)
+                    return constructResult;
 
-            if (!readResult.IsSuccess)
-                return readResult;
+                // parse types.
+                var readResult = await ParseAsync(context, command, cancellationToken).ConfigureAwait(false);
 
-            return await ExecuteAsync(context, searchResult.Result, (ModuleBase<TContext>)constructResult.Result, ((ParseResult)readResult).Result, cancellationToken).ConfigureAwait(false);
+                if (!readResult.IsSuccess)
+                    return readResult;
+
+                // execute command.
+                var result = await ExecuteAsync(context, command, (ModuleBase<TContext>)constructResult.Result, ((ParseResult)readResult).Result, cancellationToken).ConfigureAwait(false);
+
+                if (!result.IsSuccess)
+                    return result;
+            }
+            return ExecuteResult.FromSuccess();
         }
 
         private async ValueTask<SearchResult> SearchAsync<TContext>(TContext context)
@@ -360,7 +338,7 @@ namespace CSF
             if (commands.Any())
                 return await SearchCommandsAsync(context, commands).ConfigureAwait(false);
 
-            return PipelineService.CommandNotFoundResult(context);
+            return PipelineService.OnCommandNotFound(context);
         }
 
         private async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, ModuleInfo module)
@@ -388,7 +366,7 @@ namespace CSF
                 }
 
                 else
-                    return PipelineService.CommandNotFoundResult(context);
+                    return PipelineService.OnCommandNotFound(context);
             }
 
             return await SearchCommandsAsync(context, commands).ConfigureAwait(false);
@@ -397,68 +375,77 @@ namespace CSF
         private ValueTask<SearchResult> SearchCommandsAsync<TContext>(TContext context, IEnumerable<CommandInfo> commands)
             where TContext : IContext
         {
-            CommandInfo match = null;
-            CommandInfo errormatch = null;
-            foreach (var command in commands)
+            CommandInfo overload = null;
+            IEnumerable<CommandInfo> SearchMatches()
             {
-                if (errormatch is null && command.IsErrorOverload)
-                    errormatch = command;
-
-                var commandLength = command.Parameters.Count;
-                var contextLength = context.Parameters.Count;
-
-                // If parameter & input length is equal, prefer it over all matches & exit the loop.
-                if (commandLength == contextLength)
+                foreach (var command in commands)
                 {
-                    match = command;
-                    break;
-                }
+                    if (overload is null && command.IsErrorOverload)
+                        overload = command;
 
-                // If command length is lower than context length, look for a remainder attribute.
-                // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
-                if (commandLength <= contextLength)
-                {
-                    foreach (var parameter in command.Parameters)
-                    {
-                        if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
-                        {
-                            match = command;
-                            break;
-                        }
-                    }
-                }
+                    var commandLength = command.Parameters.Count;
+                    var contextLength = context.Parameters.Count;
 
-                // If context length is lower than command length, return the command with least optionals.
-                if (commandLength > contextLength)
-                {
-                    int requiredLength = 0;
-                    foreach (var parameter in command.Parameters)
-                    {
-                        if (!parameter.Flags.HasFlag(ParameterFlags.IsOptional))
-                        {
-                            requiredLength++;
-                        }
-                    }
+                    // If parameter & input length is equal, prefer it over all matches.
+                    if (commandLength == contextLength)
+                        yield return command;
 
-                    if (contextLength >= requiredLength)
+                    // If command length is lower than context length, look for a remainder attribute.
+                    // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
+                    if (commandLength <= contextLength)
+                        foreach (var parameter in command.Parameters)
+                            if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
+                                yield return command;
+
+                    // If context length is lower than command length, return the command with least optionals.
+                    if (commandLength > contextLength)
                     {
-                        match = command;
-                        break;
+                        int requiredLength = 0;
+                        foreach (var parameter in command.Parameters)
+                            if (!parameter.Flags.HasFlag(ParameterFlags.IsOptional))
+                                requiredLength++;
+
+                        if (contextLength >= requiredLength)
+                            yield return command;
                     }
                 }
             }
 
-            if (match is null)
+            var matches = SearchMatches();
+
+            if (!matches.Any())
             {
-                if (errormatch is null)
-                    return PipelineService.NoApplicableOverloadResult(context);
+                if (overload is null)
+                    return PipelineService.OnBestOverloadUnavailable(context);
                 else
-                    return SearchResult.FromSuccess(errormatch);
+                    return SearchResult.FromSuccess(new[] { overload });
             }
 
-            Logger.Trace($"Found matching command for name: '{context.Name}': {match.Name}");
+            Logger.Trace($"Found matches for name: '{context.Name}': {string.Join(", ", matches)}");
 
-            return SearchResult.FromSuccess(match);
+            return SearchResult.FromSuccess(matches.ToArray());
+        }
+
+        private async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<CommandInfo> matches, IServiceProvider provider, CancellationToken cancellationToken)
+            where TContext : IContext
+        {
+            var commands = new List<CommandInfo>();
+            var failureResult = PreconditionResult.FromSuccess();
+
+            foreach (var match in matches)
+            {
+                var result = await CheckPreconditionsAsync(context, match, provider, cancellationToken);
+
+                if (result.IsSuccess)
+                    commands.Add(match);
+                else
+                    failureResult = result;
+            }
+
+            if (!commands.Any())
+                return CheckResult.FromError(failureResult.ErrorMessage, failureResult.Exception);
+
+            return CheckResult.FromSuccess(commands.ToArray());
         }
 
         private async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
@@ -490,7 +477,7 @@ namespace CSF
                     var t = provider.GetService(dependency.Type);
 
                     if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
-                        return PipelineService.ServiceNotFoundResult(context, dependency);
+                        return PipelineService.OnServiceNotFound(context, dependency);
 
                     services.Add(t);
                 }
@@ -509,7 +496,7 @@ namespace CSF
 
                 return ConstructionResult.FromSuccess(commandBase);
             }
-            return PipelineService.InvalidModuleTypeResult(context, command.Module);
+            return PipelineService.OnInvalidModule(context, command.Module);
         }
 
         private async ValueTask<IResult> ParseAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
@@ -528,10 +515,10 @@ namespace CSF
 
                 if (parameter.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
                 {
-                    var missingResult = PipelineService.ResolveMissingValue(context, parameter);
+                    var missingResult = PipelineService.OnMissingValue(context, parameter);
 
                     if (!missingResult.IsSuccess)
-                        return PipelineService.OptionalValueNotPopulated(context);
+                        return PipelineService.OnOptionalNotPopulated(context);
 
                     var resultType = missingResult.Result.GetType();
 
@@ -541,7 +528,7 @@ namespace CSF
                         continue;
                     }
                     else
-                        return PipelineService.MissingOptionalFailedMatch(context, parameter.Type, resultType);
+                        return PipelineService.OnMissingReturnedInvalid(context, parameter.Type, resultType);
                 }
 
                 if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
@@ -594,11 +581,9 @@ namespace CSF
                     default:
                         if (returnValue is null)
                             break;
-
-                        var unhandledResult = PipelineService.ProcessUnhandledReturnType(context, returnValue);
-                        if (!unhandledResult.IsSuccess)
-                            return unhandledResult;
-
+                        var returnResult = PipelineService.OnUnhandledReturnType(context, returnValue);
+                        if (!returnResult.IsSuccess)
+                            return returnResult;
                         break;
                 }
 
@@ -611,7 +596,7 @@ namespace CSF
             }
             catch (Exception ex)
             {
-                return PipelineService.UnhandledExceptionResult(context, command, ex);
+                return PipelineService.OnUnhandledException(context, command, ex);
             }
         }
     }

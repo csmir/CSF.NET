@@ -68,31 +68,6 @@ namespace CSF
         ValueTask BuildTypeReaderAsync(Type type, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Creates a new <see cref="ResultHandlerProvider"/> with all <see cref="IResultHandler"/>'s in the registration assemblies.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        ValueTask ConfigureResultHandlersAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///     Called when result handlers are automatically registered from the available assemblies.
-        /// </summary>
-        /// <param name="assembly">The assembly to build.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        ValueTask BuildResultHandlersAsync(Assembly assembly, CancellationToken cancellationToken);
-
-        /// <summary>
-        ///     Called when <see cref="BuildResultHandlers(Assembly)"/> finds a type to resolve.
-        /// </summary>
-        /// <param name="type">The type to build.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        ValueTask BuildResultHandlerAsync(Type type, CancellationToken cancellationToken);
-
-        /// <summary>
         ///     Builds all modules in the provided assemblies in <see cref="CommandConfiguration.RegistrationAssemblies"/>.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
@@ -142,7 +117,7 @@ namespace CSF
         /// <param name="provider">The <see cref="IServiceProvider"/> used to populate modules. If null, non-nullable services to inject will throw.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="IResult"/> of the execution.</returns>
-        Task<IResult> ExecuteCommandAsync<TContext>(TContext context, IServiceProvider provider = null, CancellationToken cancellationToken = default)
+        Task<IResult> ExecuteCommandsAsync<TContext>(TContext context, IServiceProvider provider = null, CancellationToken cancellationToken = default)
             where TContext : IContext;
     }
 }

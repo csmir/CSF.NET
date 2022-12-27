@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSF.Utils
+namespace CSF
 {
     internal static class AsyncExtensions
     {

@@ -5,7 +5,7 @@ namespace CSF
     /// <summary>
     ///     Represents a class that's used to describe data from the command.
     /// </summary>
-    public class CommandContext : ICommandContext
+    public class CommandContext : IConsoleContext
     {
         /// <inheritdoc/>
         public string Name { get; set; }
@@ -29,8 +29,7 @@ namespace CSF
         /// <param name="prefix">The prefix of the command.</param>
         public CommandContext(string rawInput, IPrefix prefix = null)
         {
-            if (prefix is null)
-                prefix = EmptyPrefix.Create();
+            prefix ??= EmptyPrefix.Create();
 
             Prefix = prefix;
 

@@ -1,5 +1,5 @@
-﻿using CSF.Utils;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -16,16 +16,16 @@ namespace CSF
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The command that matched the search best, and will be used for continuing the pipeline.
+        ///     The commands that matched the search best, and will be used for continuing the pipeline.
         /// </summary>
-        internal CommandInfo Result { get; }
+        internal CommandInfo[] Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private SearchResult(bool success, CommandInfo match = null, string msg = null, Exception exception = null)
+        private SearchResult(bool success, CommandInfo[] matches = null, string msg = null, Exception exception = null)
         {
-            Result = match;
+            Result = matches;
             IsSuccess = success;
             ErrorMessage = msg;
             Exception = exception;
@@ -47,7 +47,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static SearchResult FromSuccess(CommandInfo match)
-            => new SearchResult(true, match);
+        internal static SearchResult FromSuccess(CommandInfo[] matches)
+            => new SearchResult(true, matches);
     }
 }
