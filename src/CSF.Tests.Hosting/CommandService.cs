@@ -3,12 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace CSF.Tests.Hosting
 {
-    internal class CommandService : HostedCommandService<CommandFramework<CommandConveyor>, CommandContext>
+    internal class CommandService : HostedCommandService<CommandConveyor>
     {
-        public CommandService(CommandFramework<CommandConveyor> framework, IServiceProvider collection, ILogger<CommandFramework<CommandConveyor>> logger)
-            : base(framework, collection, logger)
+        public CommandService(CommandConveyor conveyor, CommandConfiguration configuration, IServiceProvider provider, ILogger<HostedCommandService<CommandConveyor>> logger) 
+            : base(conveyor, configuration, provider, logger)
         {
-
         }
     }
 }
