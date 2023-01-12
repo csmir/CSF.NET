@@ -20,6 +20,11 @@ namespace CSF
         IList<IConditionalComponent> Commands { get; }
 
         /// <summary>
+        ///     Represents the actively scoped modules.
+        /// </summary>
+        IList<IConditionalComponent> Scopes { get; }
+
+        /// <summary>
         ///     The configuration used to configure the command framework.
         /// </summary>
         CommandConfiguration Configuration { get; }

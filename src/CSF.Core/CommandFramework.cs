@@ -92,6 +92,9 @@ namespace CSF
         public IList<IConditionalComponent> Commands { get; }
 
         /// <inheritdoc/>
+        public IList<IConditionalComponent> Scopes { get; }
+
+        /// <inheritdoc/>
         public CommandConfiguration Configuration { get; }
 
         /// <inheritdoc/>
