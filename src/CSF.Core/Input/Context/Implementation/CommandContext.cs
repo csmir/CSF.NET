@@ -20,27 +20,19 @@ namespace CSF
         public IPrefix Prefix { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<string, object> Flags { get; }
+        public IReadOnlyDictionary<string, object> NamedParameters { get; }
 
         /// <summary>
         ///     Creates a new <see cref="CommandContext"/> from the provided raw input.
         /// </summary>
         /// <param name="rawInput">The raw input, modified in length if the prefix is populated.</param>
         /// <param name="prefix">The prefix of the command.</param>
-        public CommandContext(string rawInput, IPrefix prefix = null)
+        public CommandContext(ParseResult result)
         {
-            prefix ??= EmptyPrefix.Create();
-
-            Prefix = prefix;
-
-            var param = Parser.Parse(rawInput);
-
-            RawInput = rawInput;
-            Prefix = prefix;
-
-            Parameters = param.Parameters;
-            Flags = param.Flags;
-            Name = param.Name;
+            Prefix = result.Prefix;
+            Parameters = result.Arguments;
+            NamedParameters = result.NamedArguments;
+            Name = result.Name;
         }
     }
 }

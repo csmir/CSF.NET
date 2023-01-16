@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents typereader parsing results.
-    /// </summary>
     public readonly struct ParseResult : IResult
     {
         /// <inheritdoc/>
@@ -15,38 +14,69 @@ namespace CSF
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The result objects of this parse result.
+        ///     The unnamed output values of this command.
         /// </summary>
-        internal object[] Result { get; }
+        internal IReadOnlyList<object> Arguments { get; }
+
+        /// <summary>
+        ///     The named output values of this command.
+        /// </summary>
+        internal IReadOnlyDictionary<string, object> NamedArguments { get; }
+
+        /// <summary>
+        ///     The prefix of this command.
+        /// </summary>
+        internal IPrefix Prefix { get; }
+
+        /// <summary>
+        ///     The name of the command.
+        /// </summary>
+        internal string Name { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private ParseResult(bool success, object[] result = null, string msg = null, Exception exception = null)
+        private ParseResult(bool success, string name = null, IPrefix prefix = null, List<object> args = null, Dictionary<string, object> namedArgs = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
+
+            if (IsSuccess)
+            {
+                if (string.IsNullOrEmpty(name))
+                    throw new MissingValueException("Found null or empty.", nameof(name));
+
+                if (args is null)
+                    throw new ArgumentNullException(nameof(args));
+
+                namedArgs ??= new Dictionary<string, object>();
+                prefix ??= EmptyPrefix.Create();
+            }
+
+            Prefix = prefix;
+            Name = name;
+            Arguments = args;
+            NamedArguments = namedArgs;
             ErrorMessage = msg;
             Exception = exception;
-            Result = result;
         }
 
         public static implicit operator ValueTask<ParseResult>(ParseResult result)
             => result.AsValueTask();
 
         /// <summary>
-        ///     Creates a failed result with provided parameters.
+        ///     Creates a failed args with provided parameters.
         /// </summary>
-        /// <param name="errorMessage"></param>
-        /// <param name="exception"></param>
+        /// <args name="errorMessage"></args>
+        /// <args name="exception"></args>
         /// <returns></returns>
         public static ParseResult FromError(string errorMessage, Exception exception = null)
-            => new ParseResult(false, null, errorMessage, exception);
+            => new ParseResult(false, null, null, null, null, errorMessage, exception);
 
         /// <summary>
-        ///     Creates a succesful result with provided parameters.
+        ///     Creates a succesful args with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ParseResult FromSuccess(object[] value)
-            => new ParseResult(true, value);
+        public static ParseResult FromSuccess(string name, IPrefix prefix, List<object> args, Dictionary<string, object> namedArgs)
+            => new ParseResult(true, name, prefix, args, namedArgs);
     }
 }

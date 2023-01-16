@@ -34,7 +34,7 @@ namespace CSF
         /// <remarks>
         ///     This value is automatically populated by extension packages, but not by the core package alone.
         /// </remarks>
-        public IParser Parser { get; set; }
+        public IParser Parser { get; set; } = new TextParser();
 
         /// <summary>
         ///     Represents the log level at which the <see cref="ILogger"/> is created during the creation of the target <see cref="CommandFramework"/>.

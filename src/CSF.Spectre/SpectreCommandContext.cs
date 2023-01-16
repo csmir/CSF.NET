@@ -13,7 +13,7 @@ namespace CSF.Spectre
         public IAnsiConsole Console { get; }
 
         /// <inheritdoc/>
-        public SpectreCommandContext(string rawInput) : base(rawInput)
+        public SpectreCommandContext(ParseResult result) : base(result)
         {
             Console = AnsiConsole.Console;
         }

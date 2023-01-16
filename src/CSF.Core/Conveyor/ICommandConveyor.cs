@@ -28,7 +28,7 @@ namespace CSF
         /// <param name="rawInput">The raw input.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>The built command context.</returns>
-        ValueTask<IContext> BuildContextAsync(string rawInput, CancellationToken cancellationToken);
+        ValueTask<IContext> BuildContextAsync(IParser parser, string rawInput, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when a command succesfully (or unsuccesfully) executed.
@@ -114,8 +114,8 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="expectedType">The type that was expected to return.</param>
         /// <param name="returnedType">The returned type.</param>
-        /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
-        ParseResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)
+        /// <returns>A <see cref="ArgsResult"/> holding the returned error.</returns>
+        ArgsResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)
             where TContext : IContext;
 
         /// <summary>
@@ -124,8 +124,8 @@ namespace CSF
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
-        /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
-        ParseResult OnOptionalNotPopulated<TContext>(TContext context)
+        /// <returns>A <see cref="ArgsResult"/> holding the returned error.</returns>
+        ArgsResult OnOptionalNotPopulated<TContext>(TContext context)
             where TContext : IContext;
 
         /// <summary>

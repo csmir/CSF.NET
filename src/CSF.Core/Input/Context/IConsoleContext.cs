@@ -15,7 +15,7 @@ namespace CSF
         /// <summary>
         ///     The flags present on the command input.
         /// </summary>
-        IReadOnlyDictionary<string, object> Flags { get; }
+        IReadOnlyDictionary<string, object> NamedParameters { get; }
 
         /// <summary>
         ///     The prefix for the command.

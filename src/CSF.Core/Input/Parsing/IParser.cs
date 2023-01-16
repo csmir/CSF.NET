@@ -14,13 +14,13 @@ namespace CSF
         /// </summary>
         /// <param name="rawInput">The command input.</param>
         /// <returns>A new <see cref="ParserOutput"/> from the provided values.</returns>
-        public ArgsResult Parse(string rawInput);
+        public ParseResult Parse(string rawInput);
 
         /// <summary>
         ///     Parses the command input into a new <see cref="ParserOutput"/>.
         /// </summary>
         /// <param name="rawInput">The command input.</param>
         /// <returns>A new <see cref="ParserOutput"/> from the provided values.</returns>
-        public ArgsResult Parse(object rawInput);
+        public ParseResult Parse(object rawInput);
     }
 }

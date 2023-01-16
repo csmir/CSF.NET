@@ -30,9 +30,7 @@ namespace CSF
         /// <returns>A new <see cref="IFrameworkBuilder"/> with default arguments and the defined <see cref="ICommandConveyor"/>.</returns>
         public static IFrameworkBuilder CreateDefaultBuilder<T>(T conveyor)
             where T : CommandConveyor
-        {
-            return new FrameworkBuilder<T>(conveyor);
-        }
+            => new FrameworkBuilder<T>(conveyor);
 
         /// <summary>
         ///     Creates a new <see cref="IFrameworkBuilder"/> with default setup.
@@ -47,9 +45,7 @@ namespace CSF
         /// </remarks>
         /// <returns>A new <see cref="IFrameworkBuilder"/> with default arguments.</returns>
         public static IFrameworkBuilder CreateDefaultBuilder()
-        {
-            return new FrameworkBuilder<CommandConveyor>(new CommandConveyor());
-        }
+            => new FrameworkBuilder<CommandConveyor>(new CommandConveyor());
 
         /// <summary>
         ///     Creates a new <see cref="ICommandFramework"/> with default setup directly. It skips all configuration.
@@ -59,10 +55,8 @@ namespace CSF
         /// </remarks>
         /// <returns>A new <see cref="ICommandFramework"/>.</returns>
         public static ICommandFramework BuildWithMinimalSetup()
-        {
-            return CreateDefaultBuilder()
+            => CreateDefaultBuilder()
                 .Build();
-        }
     }
 
     /// <summary>
@@ -169,7 +163,7 @@ namespace CSF
                 {
                     var input = await Conveyor.GetInputAsync(_globalSource.Token);
 
-                    var context = await Conveyor.BuildContextAsync(input, _globalSource.Token);
+                    var context = await Conveyor.BuildContextAsync(Configuration.Parser, input, _globalSource.Token);
 
                     await ExecuteCommandsAsync(context, cancellationToken: _globalSource.Token);
                 }
@@ -262,17 +256,6 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual bool TryParsePrefix(ref string rawInput, out IPrefix prefix)
-        {
-            if (Configuration.Prefixes.TryGetPrefix(rawInput, out prefix))
-            {
-                rawInput = rawInput[prefix.Value.Length..].TrimStart();
-                return true;
-            }
-            return false;
-        }
-
-        /// <inheritdoc/>
         public virtual async Task<IResult> ExecuteCommandsAsync<TContext>(TContext context, IServiceProvider services = null, CancellationToken cancellationToken = default)
             where TContext : IContext
         {
@@ -342,13 +325,13 @@ namespace CSF
                     return constructResult;
 
                 // parse types.
-                var readResult = await ParseAsync(context, command, cancellationToken).ConfigureAwait(false);
+                var readResult = await ReadAsync(context, command, cancellationToken).ConfigureAwait(false);
 
                 if (!readResult.IsSuccess)
                     return readResult;
 
                 // execute command.
-                var result = await ExecuteAsync(context, command, (ModuleBase<TContext>)constructResult.Result, ((ParseResult)readResult).Result, cancellationToken).ConfigureAwait(false);
+                var result = await ExecuteAsync(context, command, (ModuleBase<TContext>)constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
                     return result;
@@ -640,7 +623,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ParseAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
+        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
             where TContext : IContext
         {
             int index = 0;
@@ -690,7 +673,7 @@ namespace CSF
 
             Logger.Trace($"Succesfully populated parameters for {command.Name}. Count: {parameters.Count}");
 
-            return ParseResult.FromSuccess(parameters.ToArray());
+            return ArgsResult.FromSuccess(parameters.ToArray());
         }
 
         /// <summary>

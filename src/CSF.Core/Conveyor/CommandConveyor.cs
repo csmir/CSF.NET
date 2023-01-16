@@ -19,10 +19,10 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IContext> BuildContextAsync(string rawInput, CancellationToken cancellationToken)
+        public virtual async ValueTask<IContext> BuildContextAsync(IParser parser, string rawInput, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
-            return new CommandContext(rawInput);
+            return new CommandContext(parser.Parse(rawInput));
         }
 
         /// <inheritdoc/>
@@ -70,14 +70,14 @@ namespace CSF
             => TypeReaderResult.FromSuccess(Type.Missing);
 
         /// <inheritdoc/>
-        public virtual ParseResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)
+        public virtual ArgsResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)
             where TContext : IContext
-            => ParseResult.FromError($"Returned type does not match expected result. Expected: '{expectedType.Name}'. Got: '{returnedType.Name}'");
+            => ArgsResult.FromError($"Returned type does not match expected result. Expected: '{expectedType.Name}'. Got: '{returnedType.Name}'");
 
         /// <inheritdoc/>
-        public virtual ParseResult OnOptionalNotPopulated<TContext>(TContext context)
+        public virtual ArgsResult OnOptionalNotPopulated<TContext>(TContext context)
             where TContext : IContext
-            => ParseResult.FromError($"Optional parameter did not get {nameof(Type.Missing)} or self-populated value.");
+            => ArgsResult.FromError($"Optional parameter did not get {nameof(Type.Missing)} or self-populated value.");
 
         /// <inheritdoc/>
         public virtual ExecuteResult OnUnhandledReturnType<TContext>(TContext context, object returnValue)
