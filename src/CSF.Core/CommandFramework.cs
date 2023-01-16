@@ -103,7 +103,7 @@ namespace CSF
         public CommandFramework(T conveyor)
             : this(new CommandConfiguration(), conveyor)
         {
-            
+
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace CSF
         public CommandFramework(CommandConfiguration configuration, T conveyor)
             : this(EmptyServiceProvider.Instance, configuration, conveyor)
         {
-            
+
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace CSF
         {
             configuration.Prefixes ??= new PrefixProvider();
             configuration.TypeReaders ??= new TypeReaderProvider();
-            
+
             Configuration = configuration;
 
             Conveyor = conveyor;

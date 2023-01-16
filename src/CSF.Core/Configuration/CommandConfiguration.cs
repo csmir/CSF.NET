@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Xml.Serialization;
 
 namespace CSF
 {

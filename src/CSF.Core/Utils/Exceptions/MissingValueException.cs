@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CSF
 {
@@ -26,7 +24,7 @@ namespace CSF
         /// </summary>
         /// <param name="message">The error message that occurred from this exception.</param>
         /// <param name="paramName">The parameter name that was found to have missing values.</param>
-        public MissingValueException(string message, string paramName) 
+        public MissingValueException(string message, string paramName)
             : base(paramName, message)
         {
 

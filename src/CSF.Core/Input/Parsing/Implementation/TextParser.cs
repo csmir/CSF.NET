@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CSF
@@ -125,7 +124,7 @@ namespace CSF
                 }
 
                 args.Add(entry);
-            } 
+            }
 
             return ParseResult.FromSuccess(name, prefix, args, namedArgs);
         }
