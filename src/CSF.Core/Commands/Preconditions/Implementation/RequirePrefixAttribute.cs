@@ -58,7 +58,7 @@ namespace CSF
                 if (context.Parameters[0].ToString().StartsWith(prefix.Value))
                     return PreconditionResult.FromSuccess();
             }
-            return PreconditionResult.FromError("Failed to find any allowed prefix with matching type.");
+            return PreconditionResult.FromError("IsSuccess to find any allowed prefix with matching type.");
         }
     }
 }

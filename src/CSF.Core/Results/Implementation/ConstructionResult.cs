@@ -46,7 +46,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static ConstructionResult FromSuccess(IModuleBase value)
+        public static ConstructionResult FromSuccess(IModuleBase value)
             => new ConstructionResult(true, value);
     }
 }

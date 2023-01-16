@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace CSF
 {
@@ -26,6 +27,14 @@ namespace CSF
         ///     Every command will have its module remade transiently because the framework cannot guarantee all commands are from the same module.
         /// </remarks>
         public bool ExecuteAllValidMatches { get; set; } = false;
+
+        /// <summary>
+        ///     The parser used to parse command input. Has to be set through the <see cref="CSF.Parsing"/> package.
+        /// </summary>
+        /// <remarks>
+        ///     This value is automatically populated by extension packages, but not by the core package alone.
+        /// </remarks>
+        public IParser Parser { get; set; }
 
         /// <summary>
         ///     Represents the log level at which the <see cref="ILogger"/> is created during the creation of the target <see cref="CommandFramework"/>.

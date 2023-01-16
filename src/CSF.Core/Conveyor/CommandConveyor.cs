@@ -47,12 +47,12 @@ namespace CSF
         /// <inheritdoc/>
         public virtual SearchResult OnCommandNotFound<TContext>(TContext context)
             where TContext : IContext
-            => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
+            => SearchResult.FromError($"IsSuccess to find command with name: {context.Name}.");
 
         /// <inheritdoc/>
         public virtual SearchResult OnBestOverloadUnavailable<TContext>(TContext context)
             where TContext : IContext
-            => SearchResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
+            => SearchResult.FromError($"IsSuccess to find overload that best matches input: {context.Name}.");
 
         /// <inheritdoc/>
         public virtual ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyInfo dependency)
@@ -62,7 +62,7 @@ namespace CSF
         /// <inheritdoc/>
         public virtual ConstructionResult OnInvalidModule<TContext>(TContext context, ModuleInfo module)
             where TContext : IContext
-            => ConstructionResult.FromError($"Failed to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
+            => ConstructionResult.FromError($"IsSuccess to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
 
         /// <inheritdoc/>
         public virtual TypeReaderResult OnMissingValue<TContext>(TContext context, ParameterInfo param)

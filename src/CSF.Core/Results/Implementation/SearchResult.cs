@@ -47,7 +47,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static SearchResult FromSuccess(CommandInfo[] matches)
+        public static SearchResult FromSuccess(CommandInfo[] matches)
             => new SearchResult(true, matches);
     }
 }

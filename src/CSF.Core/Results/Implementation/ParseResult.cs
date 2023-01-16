@@ -46,7 +46,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static ParseResult FromSuccess(object[] value)
+        public static ParseResult FromSuccess(object[] value)
             => new ParseResult(true, value);
     }
 }
