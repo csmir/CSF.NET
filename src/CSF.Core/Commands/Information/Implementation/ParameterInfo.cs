@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -41,6 +45,20 @@ namespace CSF
             Flags = SetFlags(paramInfo);
 
             Name = paramInfo.Name;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public async ValueTask<TypeReaderResult> BuildAsync<T>(T context, int index, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            return await TypeReader.ReadAsync(context, this, context.Parameters[index], cancellationToken).ConfigureAwait(false);
         }
 
         private ITypeReader GetTypeReader(TypeReaderProvider typeReaders)

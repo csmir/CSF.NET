@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -155,6 +156,11 @@ namespace CSF
             await RunAsync();
         }
 
+        /// <summary>
+        ///     internally starts a loop that listens for commands and executes them.
+        /// </summary>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
         protected virtual async Task RunAsync()
         {
             try
@@ -456,29 +462,24 @@ namespace CSF
                     if (overload is null && command.IsErrorOverload)
                         overload = command;
 
-                    var commandLength = command.Parameters.Count;
+                    var min = command.OptimalLength;
                     var contextLength = context.Parameters.Count;
 
                     // If parameter & input length is equal, prefer it over all matches.
-                    if (commandLength == contextLength)
+                    if (command.OptimalLength == contextLength)
                         yield return command;
 
                     // If command length is lower than context length, look for a remainder attribute.
                     // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
-                    if (commandLength <= contextLength)
+                    if (command.OptimalLength <= contextLength)
                         foreach (var parameter in command.Parameters)
                             if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
                                 yield return command;
 
                     // If context length is lower than command length, return the command with least optionals.
-                    if (commandLength > contextLength)
+                    if (command.OptimalLength > contextLength)
                     {
-                        int requiredLength = 0;
-                        foreach (var parameter in command.Parameters)
-                            if (!parameter.Flags.HasFlag(ParameterFlags.IsOptional))
-                                requiredLength++;
-
-                        if (contextLength >= requiredLength)
+                        if (command.MinLength <= contextLength)
                             yield return command;
                     }
                 }
@@ -617,19 +618,43 @@ namespace CSF
         /// <remarks>
         ///     This method can be overridden to modify the execution flow.
         /// </remarks>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
+            where TContext : IContext
+        {
+            var args = new List<object>();
+
+            var result = await ReadContainerAsync(context, 0, command, cancellationToken).ConfigureAwait(false);
+
+            if (!result.IsSuccess)
+                return result;
+
+            return ArgsResult.FromSuccess(args.ToArray(), -1);
+        }
+
+        /// <summary>
+        ///     Parses the types found in the container parameters from the provided context.
+        /// </summary>
+        /// <remarks>
+        ///     This method can be overridden to modify the execution flow.
+        /// </remarks>
         /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
         /// <param name="context">The context to execute the pipeline for.</param>
         /// <param name="command">The command to be used for execution.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
+        protected virtual async ValueTask<IResult> ReadContainerAsync<TContext>(TContext context, int index, IParameterContainer container, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            int index = 0;
             var parameters = new List<object>();
 
-            foreach (var parameter in command.Parameters)
+            foreach (var parameter in container.Parameters)
             {
                 if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
                 {
@@ -662,18 +687,35 @@ namespace CSF
                     continue;
                 }
 
-                var result = await parameter.TypeReader.ReadAsync(context, parameter, context.Parameters[index], cancellationToken).ConfigureAwait(false);
+                if (parameter is ComplexParameterInfo complexParam)
+                {
+                    var result = await ReadContainerAsync(context, index, complexParam, cancellationToken).ConfigureAwait(false);
 
-                if (!result.IsSuccess)
-                    return result;
+                    if (!result.IsSuccess)
+                        return result;
 
-                parameters.Add(result.Result);
-                index++;
+                    if (result is ArgsResult argsResult)
+                    {
+                        index = argsResult.Placement;
+                        parameters.Add(complexParam.Constructor.EntryPoint.Invoke(argsResult.Result.ToArray()));
+                    }
+                }
+
+                else if (parameter is ParameterInfo normal)
+                {
+                    var result = await normal.TypeReader.ReadAsync(context, normal, context.Parameters[index], cancellationToken).ConfigureAwait(false);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    index++;
+                    parameters.Add(result.Result);
+                }
             }
 
-            Logger.Trace($"Succesfully populated parameters for {command.Name}. Count: {parameters.Count}");
+            Logger.Trace($"Succesfully populated parameters. Count: {parameters.Count}");
 
-            return ArgsResult.FromSuccess(parameters.ToArray());
+            return ArgsResult.FromSuccess(parameters.ToArray(), index);
         }
 
         /// <summary>

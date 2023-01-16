@@ -38,6 +38,11 @@ namespace CSF
             Name = paramInfo.Name;
         }
 
+        /// <summary>
+        ///     Builds the provided dependency into a valid type.
+        /// </summary>
+        /// <param name="paramInfo"></param>
+        /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public DependencyInfo Build(System.Reflection.ParameterInfo paramInfo)
         {

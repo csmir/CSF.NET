@@ -65,9 +65,14 @@ namespace CSF
             => ConstructionResult.FromError($"IsSuccess to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
 
         /// <inheritdoc/>
-        public virtual TypeReaderResult OnMissingValue<TContext>(TContext context, ParameterInfo param)
+        public virtual TypeReaderResult OnMissingValue<TContext>(TContext context, IParameterComponent param)
             where TContext : IContext
             => TypeReaderResult.FromSuccess(Type.Missing);
+
+        /// <inheritdoc/>
+        public virtual TypeReaderResult ParameterTypeUnsupported<TContext>(TContext context, IParameterComponent param)
+            where TContext : IContext
+            => TypeReaderResult.FromError("Parameter information type is unsupported.");
 
         /// <inheritdoc/>
         public virtual ArgsResult OnMissingReturnedInvalid<TContext>(TContext context, Type expectedType, Type returnedType)

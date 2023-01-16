@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace CSF
@@ -35,6 +36,12 @@ namespace CSF
             Name = EntryPoint.Name;
         }
 
+        /// <summary>
+        ///     Builds the constructor from the provided <see cref="IServiceProvider"/>.
+        /// </summary>
+        /// <param name="provider">The services to build this constructor with.</param>
+        /// <returns>An object representing the built object instance.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public object Construct(IServiceProvider provider)
         {
             var services = new List<object>();
@@ -58,6 +65,19 @@ namespace CSF
             return obj;
         }
 
+        /// <summary>
+        ///     Builds the constructor from the provided parameters.
+        /// </summary>
+        /// <param name="parameters">The parameters to build this object from.</param>
+        /// <returns>An object representing the built object instance.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object Construct(List<object> parameters)
+        {
+            var obj = EntryPoint.Invoke(parameters.ToArray());
+
+            return obj;
+        }
+
         private System.Reflection.ConstructorInfo GetEntryConstructor(Type type)
         {
             var constructors = type.GetConstructors();
@@ -72,7 +92,7 @@ namespace CSF
 
             for (int i = 0; i < constructors.Length; i++)
                 foreach (var attribute in constructors[i].GetCustomAttributes(true))
-                    if (attribute is InjectionConstructorAttribute)
+                    if (attribute is PrimaryConstructorAttribute)
                         return constructors[i];
 
             return constructor;

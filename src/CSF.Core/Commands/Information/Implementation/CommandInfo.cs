@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 
@@ -8,7 +9,7 @@ namespace CSF
     /// <summary>
     ///     Represents the information required to execute commands.
     /// </summary>
-    public sealed class CommandInfo : IConditionalComponent
+    public sealed class CommandInfo : IConditionalComponent, IParameterContainer
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -19,6 +20,15 @@ namespace CSF
         /// <inheritdoc/>
         public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<IParameterComponent> Parameters { get; }
+
+        /// <inheritdoc/>
+        public int MinLength { get; }
+
+        /// <inheritdoc/>
+        public int OptimalLength { get; }
+
         /// <summary>
         ///     The command aliases.
         /// </summary>
@@ -28,11 +38,6 @@ namespace CSF
         ///     The command module.
         /// </summary>
         public ModuleInfo Module { get; }
-
-        /// <summary>
-        ///     The list of parameters for this command.
-        /// </summary>
-        public IReadOnlyCollection<ParameterInfo> Parameters { get; }
 
         /// <summary>
         ///     The command method.
@@ -74,12 +79,53 @@ namespace CSF
 
             Name = aliases[0];
             Aliases = aliases;
+
+            (int min, int nom) = GetLength();
+
+            MinLength = min;
+            OptimalLength = nom;
         }
 
-        private IEnumerable<ParameterInfo> GetParameters(TypeReaderProvider typeReaders)
+        private (int, int) GetLength()
         {
-            foreach (var param in Method.GetParameters())
-                yield return new ParameterInfo(param, typeReaders);
+            var minLength = 0;
+            var nomLength = 0;
+            bool maxOut = false;
+
+            foreach (var parameter in Parameters)
+            {
+                if (parameter is ComplexParameterInfo complexParam)
+                {
+                    nomLength += complexParam.OptimalLength;
+                    minLength += complexParam.MinLength;
+                }
+
+                if (parameter is ParameterInfo defaultParam)
+                {
+                    nomLength++;
+                    if (!defaultParam.Flags.HasFlag(ParameterFlags.IsOptional))
+                        minLength++;
+
+                    if (defaultParam.Flags.HasFlag(ParameterFlags.IsRemainder))
+                        maxOut = true;
+                }
+            }
+
+            if (maxOut)
+                nomLength = int.MaxValue;
+
+            return (minLength, nomLength);
+        }
+
+        private IEnumerable<IParameterComponent> GetParameters(TypeReaderProvider typeReaders)
+        {
+            foreach (var parameter in Method.GetParameters())
+            {
+                if (parameter.GetCustomAttributes(true).Any(x => x is ComplexAttribute))
+                    yield return new ComplexParameterInfo(parameter, typeReaders);
+                else
+                    yield return new ParameterInfo(parameter, typeReaders);
+            }
         }
 
         private IEnumerable<PreconditionAttribute> GetPreconditions()

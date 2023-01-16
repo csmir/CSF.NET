@@ -15,7 +15,7 @@ namespace CSF
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The result object of this reader.
+        ///     The result object of this read operation.
         /// </summary>
         internal object Result { get; }
 

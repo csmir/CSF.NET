@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Information about a typereader.
+    /// </summary>
     public sealed class TypeReaderInfo : IComponent
     {
         /// <inheritdoc/>

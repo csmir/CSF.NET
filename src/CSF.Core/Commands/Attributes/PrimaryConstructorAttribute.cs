@@ -9,7 +9,7 @@ namespace CSF
     ///     It is not intended to use this attribute on multiple constructors. If it is, it will pick the highest constructor specified with this attribute.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = false)]
-    public sealed class InjectionConstructorAttribute : Attribute
+    public sealed class PrimaryConstructorAttribute : Attribute
     {
 
     }

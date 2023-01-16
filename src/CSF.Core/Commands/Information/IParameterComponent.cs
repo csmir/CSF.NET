@@ -10,11 +10,11 @@ namespace CSF
         /// <summary>
         ///     The type of the parameter.
         /// </summary>
-        Type Type { get; }
+        public Type Type { get; }
 
         /// <summary>
         ///     The flag collection specifying member data about the parameter.
         /// </summary>
-        ParameterFlags Flags { get; }
+        public ParameterFlags Flags { get; }
     }
 }

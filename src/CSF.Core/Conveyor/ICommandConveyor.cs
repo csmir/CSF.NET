@@ -96,10 +96,21 @@ namespace CSF
         /// <remarks>
         ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="ParameterInfo.Type"/> or <see cref="Type.Missing"/>.
         /// </remarks>
-        /// <param name="context"></param>
-        /// <param name="param"></param>
-        /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> for the target parameter.</returns>
-        TypeReaderResult OnMissingValue<TContext>(TContext context, ParameterInfo param)
+        /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="param">The parameter that failed to handle.</param>
+        /// <returns>A <see cref="TypeReaderResult"/> for the target parameter.</returns>
+        TypeReaderResult OnMissingValue<TContext>(TContext context, IParameterComponent param)
+            where TContext : IContext;
+
+        /// <summary>
+        ///     Called when the parameter information type is not supported.
+        /// </summary>
+        /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
+        /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
+        /// <param name="param">The parameter that failed to handle.</param>
+        /// <returns>A <see cref="TypeReaderResult"/> for the target parameter.</returns>
+        TypeReaderResult ParameterTypeUnsupported<TContext>(TContext context, IParameterComponent param)
             where TContext : IContext;
 
         /// <summary>

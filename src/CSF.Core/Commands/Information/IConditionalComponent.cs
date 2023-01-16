@@ -12,12 +12,12 @@ namespace CSF
         /// <summary>
         ///     The aliases of this component.
         /// </summary>
-        string[] Aliases { get; }
+        public string[] Aliases { get; }
 
         /// <summary>
         ///     The preconditions of this component.
         /// </summary>
-        IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
 
         /// <summary>
         ///     Calls the pipeline to handle the exposed result.
