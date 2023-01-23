@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace CSF
 {
     /// <summary>
     ///     Represents an injectable service.
     /// </summary>
-    public sealed class DependencyInfo : IParameterComponent
+    public sealed class DependencyParameter : IParameterComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -22,7 +23,7 @@ namespace CSF
         /// <inheritdoc/>
         public IReadOnlyCollection<Attribute> Attributes { get; }
 
-        internal DependencyInfo(System.Reflection.ParameterInfo paramInfo)
+        internal DependencyParameter(ParameterInfo paramInfo)
         {
             var type = paramInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
@@ -38,18 +39,7 @@ namespace CSF
             Name = paramInfo.Name;
         }
 
-        /// <summary>
-        ///     Builds the provided dependency into a valid type.
-        /// </summary>
-        /// <param name="paramInfo"></param>
-        /// <returns></returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public DependencyInfo Build(System.Reflection.ParameterInfo paramInfo)
-        {
-            return new DependencyInfo(paramInfo);
-        }
-
-        private IEnumerable<Attribute> GetAttributes(System.Reflection.ParameterInfo paramInfo)
+        private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
         {
             foreach (var obj in paramInfo.GetCustomAttributes(false))
                 if (obj is Attribute attribute)

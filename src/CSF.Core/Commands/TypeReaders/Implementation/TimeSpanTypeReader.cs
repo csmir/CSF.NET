@@ -37,7 +37,7 @@ namespace CSF
             };
         }
 
-        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken)
+        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
             var str = value.ToString();
             if (!TimeSpan.TryParse(str, out TimeSpan span))

@@ -17,6 +17,6 @@ namespace CSF
         /// <param name="provider">The service provider used to enter this handler.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> holding the <see cref="PreconditionResult"/> of this call.</returns>
-        public abstract ValueTask<PreconditionResult> CheckAsync(IContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken);
+        public abstract ValueTask<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken);
     }
 }

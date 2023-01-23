@@ -15,5 +15,10 @@ namespace CSF
         ///     The minimum required length to use a command.
         /// </summary>
         public int MinLength { get; }
+
+        /// <summary>
+        ///     The optimal length to use a command. If remainder is specified, the count will be set to infinity.
+        /// </summary>
+        public int MaxLength { get; }
     }
 }

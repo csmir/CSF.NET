@@ -55,12 +55,12 @@ namespace CSF
             => SearchResult.FromError($"IsSuccess to find overload that best matches input: {context.Name}.");
 
         /// <inheritdoc/>
-        public virtual ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyInfo dependency)
+        public virtual ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyParameter dependency)
             where TContext : IContext
             => ConstructionResult.FromError($"The service of type {dependency.Type.FullName} does not exist in the current {nameof(IServiceProvider)}.");
 
         /// <inheritdoc/>
-        public virtual ConstructionResult OnInvalidModule<TContext>(TContext context, ModuleInfo module)
+        public virtual ConstructionResult OnInvalidModule<TContext>(TContext context, Module module)
             where TContext : IContext
             => ConstructionResult.FromError($"IsSuccess to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
 
@@ -90,7 +90,7 @@ namespace CSF
             => ExecuteResult.FromError($"Received an unhandled type from method execution: {returnValue.GetType().Name}. \n\rConsider overloading {nameof(OnUnhandledReturnType)} if this is intended.");
 
         /// <inheritdoc/>
-        public virtual ExecuteResult OnUnhandledException<TContext>(TContext context, CommandInfo command, Exception ex)
+        public virtual ExecuteResult OnUnhandledException<TContext>(TContext context, Command command, Exception ex)
             where TContext : IContext
             => ExecuteResult.FromError(ex.Message, ex);
     }

@@ -11,7 +11,7 @@ namespace CSF
     /// <summary>
     ///     Represents a single parameter for the method.
     /// </summary>
-    public sealed class ParameterInfo : IParameterComponent
+    public sealed class BaseParameter : IParameterComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -30,7 +30,7 @@ namespace CSF
         /// </summary>
         public ITypeReader TypeReader { get; }
 
-        internal ParameterInfo(System.Reflection.ParameterInfo paramInfo, TypeReaderProvider typeReaders)
+        internal BaseParameter(ParameterInfo paramInfo, TypeReaderProvider typeReaders)
         {
             var type = paramInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
@@ -47,20 +47,6 @@ namespace CSF
             Name = paramInfo.Name;
         }
 
-        /// <summary>
-        ///     
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public async ValueTask<TypeReaderResult> BuildAsync<T>(T context, int index, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            return await TypeReader.ReadAsync(context, this, context.Parameters[index], cancellationToken).ConfigureAwait(false);
-        }
-
         private ITypeReader GetTypeReader(TypeReaderProvider typeReaders)
         {
             if (typeReaders.TryGetReader(Type, out var reader))
@@ -69,14 +55,14 @@ namespace CSF
             throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {Type.Name}.");
         }
 
-        private IEnumerable<Attribute> GetAttributes(System.Reflection.ParameterInfo paramInfo)
+        private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
         {
             foreach (var attribute in paramInfo.GetCustomAttributes(false))
                 if (attribute is Attribute attr)
                     yield return attr;
         }
 
-        private ParameterFlags SetFlags(System.Reflection.ParameterInfo paramInfo)
+        private ParameterFlags SetFlags(ParameterInfo paramInfo)
         {
             var type = paramInfo.ParameterType;
             var isNullable = Nullable.GetUnderlyingType(type) != null;

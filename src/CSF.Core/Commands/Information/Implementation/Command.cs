@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 
@@ -9,7 +8,7 @@ namespace CSF
     /// <summary>
     ///     Represents the information required to execute commands.
     /// </summary>
-    public sealed class CommandInfo : IConditionalComponent, IParameterContainer
+    public sealed class Command : IConditionalComponent, IParameterContainer
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -27,7 +26,7 @@ namespace CSF
         public int MinLength { get; }
 
         /// <inheritdoc/>
-        public int OptimalLength { get; }
+        public int MaxLength { get; }
 
         /// <summary>
         ///     The command aliases.
@@ -37,7 +36,7 @@ namespace CSF
         /// <summary>
         ///     The command module.
         /// </summary>
-        public ModuleInfo Module { get; }
+        public Module Module { get; }
 
         /// <summary>
         ///     The command method.
@@ -49,7 +48,7 @@ namespace CSF
         /// </summary>
         public bool IsErrorOverload { get; }
 
-        internal CommandInfo(TypeReaderProvider typeReaders, ModuleInfo module, MethodInfo method, string[] aliases)
+        internal Command(TypeReaderProvider typeReaders, Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
             Module = module;
@@ -80,41 +79,35 @@ namespace CSF
             Name = aliases[0];
             Aliases = aliases;
 
-            (int min, int nom) = GetLength();
+            (int min, int max) = GetLength();
 
             MinLength = min;
-            OptimalLength = nom;
+            MaxLength = max;
         }
 
         private (int, int) GetLength()
         {
             var minLength = 0;
-            var nomLength = 0;
-            bool maxOut = false;
+            var maxLength = 0;
 
             foreach (var parameter in Parameters)
             {
-                if (parameter is ComplexParameterInfo complexParam)
+                if (parameter is ComplexParameter complexParam)
                 {
-                    nomLength += complexParam.OptimalLength;
+                    maxLength += complexParam.MaxLength;
                     minLength += complexParam.MinLength;
                 }
 
-                if (parameter is ParameterInfo defaultParam)
+                if (parameter is BaseParameter defaultParam)
                 {
-                    nomLength++;
+                    maxLength++;
                     if (!defaultParam.Flags.HasFlag(ParameterFlags.IsOptional))
                         minLength++;
-
-                    if (defaultParam.Flags.HasFlag(ParameterFlags.IsRemainder))
-                        maxOut = true;
                 }
             }
 
-            if (maxOut)
-                nomLength = int.MaxValue;
 
-            return (minLength, nomLength);
+            return (minLength, maxLength);
         }
 
         private IEnumerable<IParameterComponent> GetParameters(TypeReaderProvider typeReaders)
@@ -122,9 +115,9 @@ namespace CSF
             foreach (var parameter in Method.GetParameters())
             {
                 if (parameter.GetCustomAttributes(true).Any(x => x is ComplexAttribute))
-                    yield return new ComplexParameterInfo(parameter, typeReaders);
+                    yield return new ComplexParameter(parameter, typeReaders);
                 else
-                    yield return new ParameterInfo(parameter, typeReaders);
+                    yield return new BaseParameter(parameter, typeReaders);
             }
         }
 

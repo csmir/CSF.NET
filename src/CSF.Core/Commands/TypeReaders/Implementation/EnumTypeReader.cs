@@ -14,7 +14,7 @@ namespace CSF
     public class EnumTypeReader<T> : TypeReader<T>
         where T : struct, Enum
     {
-        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken)
+        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
             if (Enum.TryParse<T>(value.ToString(), out var result))
                 return TypeReaderResult.FromSuccess(result);

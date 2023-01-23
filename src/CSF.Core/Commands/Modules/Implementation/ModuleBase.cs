@@ -20,8 +20,8 @@ namespace CSF
         /// <summary>
         ///     Displays all information about the command thats currently in scope.
         /// </summary>
-        public CommandInfo CommandInfo { get; private set; }
-        internal void SetInformation(CommandInfo info)
+        public Command CommandInfo { get; private set; }
+        internal void SetInformation(Command info)
             => CommandInfo = info;
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace CSF
         /// <param name="info"></param>
         /// <param name="context"></param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task BeforeExecuteAsync(CommandInfo info, T context, CancellationToken cancellationToken)
+        public virtual Task BeforeExecuteAsync(Command info, T context, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
@@ -108,7 +108,7 @@ namespace CSF
         /// <param name="info"></param>
         /// <param name="context"></param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task AfterExecuteAsync(CommandInfo info, T context, CancellationToken cancellationToken)
+        public virtual Task AfterExecuteAsync(Command info, T context, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

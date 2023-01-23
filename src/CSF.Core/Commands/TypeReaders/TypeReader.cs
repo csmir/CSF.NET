@@ -29,6 +29,6 @@ namespace CSF
         public Type Type { get; } = typeof(T);
 
         /// <inheritdoc />
-        public abstract ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo info, object value, CancellationToken cancellationToken);
+        public abstract ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter info, object value, CancellationToken cancellationToken);
     }
 }

@@ -8,7 +8,7 @@ namespace CSF
     /// <summary>
     ///     Information about a typereader.
     /// </summary>
-    public sealed class TypeReaderInfo : IComponent
+    public sealed class Reader : IComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -24,19 +24,19 @@ namespace CSF
         /// <summary>
         ///     The constructor used to create an instance of the reader type.
         /// </summary>
-        public ConstructorInfo Constructor { get; }
+        public Constructor Constructor { get; }
 
-        internal TypeReaderInfo(Type type)
+        internal Reader(Type type)
         {
             Type = type;
             Name = type.Name;
-            Constructor = new ConstructorInfo(type);
+            Constructor = new Constructor(type);
             Attributes = GetAttributes()
                 .ToList();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static TypeReaderInfo Build(Type type)
+        public static Reader Build(Type type)
         {
             if (type == typeof(ITypeReader))
             {
@@ -46,7 +46,7 @@ namespace CSF
             else
                 throw new InvalidOperationException($"Provided type is not a valid {nameof(ITypeReader)}.");
 
-            return new TypeReaderInfo(type);
+            return new Reader(type);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

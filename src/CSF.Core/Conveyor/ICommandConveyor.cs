@@ -77,7 +77,7 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="dependency">Information about the service to inject.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyInfo dependency)
+        ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyParameter dependency)
             where TContext : IContext;
 
         /// <summary>
@@ -87,14 +87,14 @@ namespace CSF
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="module">The module that failed to cast to an <see cref="IModuleBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
-        ConstructionResult OnInvalidModule<TContext>(TContext context, ModuleInfo module)
+        ConstructionResult OnInvalidModule<TContext>(TContext context, Module module)
             where TContext : IContext;
 
         /// <summary>
         ///     Called when an optional parameter has a lacking value.
         /// </summary>
         /// <remarks>
-        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="ParameterInfo.Type"/> or <see cref="Type.Missing"/>.
+        ///     The result will fail to resolve and exit execution if the type does not match the provided <see cref="BaseParameter.Type"/> or <see cref="Type.Missing"/>.
         /// </remarks>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
@@ -114,7 +114,7 @@ namespace CSF
             where TContext : IContext;
 
         /// <summary>
-        ///     Returns the error when <see cref="OnMissingValue{T}(T, ParameterInfo)"/> returned a type that did not match the expected type.
+        ///     Returns the error when <see cref="OnMissingValue{T}(T, BaseParameter)"/> returned a type that did not match the expected type.
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
@@ -125,7 +125,7 @@ namespace CSF
             where TContext : IContext;
 
         /// <summary>
-        ///     Returns the error when <see cref="OnMissingValue{T}(T, ParameterInfo)"/> failed to return a valid result. 
+        ///     Returns the error when <see cref="OnMissingValue{T}(T, BaseParameter)"/> failed to return a valid result. 
         ///     This method has to return <see cref="Type.Missing"/> if no self-implemented value has been returned.
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
@@ -152,7 +152,7 @@ namespace CSF
         /// <param name="command">Information about the command that's being executed.</param>
         /// <param name="ex">The exception that occurred while executing the command.</param>
         /// <returns>An <see cref="ExecuteResult"/> holding the returned error.</returns>
-        ExecuteResult OnUnhandledException<TContext>(TContext context, CommandInfo command, Exception ex)
+        ExecuteResult OnUnhandledException<TContext>(TContext context, Command command, Exception ex)
             where TContext : IContext;
     }
 }

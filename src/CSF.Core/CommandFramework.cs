@@ -214,7 +214,7 @@ namespace CSF
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual async ValueTask BuildModuleAsync(Type type, CancellationToken cancellationToken)
         {
-            var module = ModuleInfo.Build(Configuration.TypeReaders, type);
+            var module = Module.Build(Configuration.TypeReaders, type);
 
             foreach (var component in module.Components)
             {
@@ -245,7 +245,7 @@ namespace CSF
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual async ValueTask BuildTypeReaderAsync(Type type, CancellationToken cancellationToken)
         {
-            var reader = TypeReaderInfo.Build(type);
+            var reader = Reader.Build(type);
 
             var output = reader.Construct(Services);
 
@@ -362,11 +362,11 @@ namespace CSF
             var matches = Commands
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
 
-            var groups = matches.CastWhere<ModuleInfo>()
+            var groups = matches.CastWhere<Module>()
                 .OrderBy(x => x.Components.Count)
                 .ToList();
 
-            var commands = matches.CastWhere<CommandInfo>()
+            var commands = matches.CastWhere<Command>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
@@ -408,19 +408,19 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, ModuleInfo module, CancellationToken cancellationToken)
+        protected virtual async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, Module module, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var matches = module.Components
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
 
-            var commands = matches.CastWhere<CommandInfo>()
+            var commands = matches.CastWhere<Command>()
                 .OrderBy(x => x.Parameters.Count)
                 .ToList();
 
             if (commands.Count < 1)
             {
-                var groups = matches.CastWhere<ModuleInfo>()
+                var groups = matches.CastWhere<Module>()
                     .OrderBy(x => x.Components.Count)
                     .ToList();
 
@@ -451,33 +451,33 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual ValueTask<SearchResult> SearchCommandsAsync<TContext>(TContext context, IEnumerable<CommandInfo> commands, CancellationToken cancellationToken)
+        protected virtual ValueTask<SearchResult> SearchCommandsAsync<TContext>(TContext context, IEnumerable<Command> commands, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            CommandInfo overload = null;
-            IEnumerable<CommandInfo> SearchMatches()
+            Command overload = null;
+            IEnumerable<Command> SearchMatches()
             {
                 foreach (var command in commands)
                 {
                     if (overload is null && command.IsErrorOverload)
                         overload = command;
 
-                    var min = command.OptimalLength;
+                    var min = command.MaxLength;
                     var contextLength = context.Parameters.Count;
 
                     // If parameter & input length is equal, prefer it over all matches.
-                    if (command.OptimalLength == contextLength)
+                    if (command.MaxLength == contextLength)
                         yield return command;
 
                     // If command length is lower than context length, look for a remainder attribute.
                     // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
-                    if (command.OptimalLength <= contextLength)
+                    if (command.MaxLength <= contextLength)
                         foreach (var parameter in command.Parameters)
                             if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
                                 yield return command;
 
                     // If context length is lower than command length, return the command with least optionals.
-                    if (command.OptimalLength > contextLength)
+                    if (command.MaxLength > contextLength)
                     {
                         if (command.MinLength <= contextLength)
                             yield return command;
@@ -513,10 +513,10 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<CommandInfo> matches, IServiceProvider provider, CancellationToken cancellationToken)
+        protected virtual async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> matches, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            var commands = new List<CommandInfo>();
+            var commands = new List<Command>();
             var failureResult = PreconditionResult.FromSuccess();
 
             foreach (var match in matches)
@@ -548,7 +548,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
+        protected virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             foreach (var precon in command.Preconditions)
@@ -577,7 +577,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
+        protected virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var services = new List<object>();
@@ -624,7 +624,7 @@ namespace CSF
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, CommandInfo command, CancellationToken cancellationToken)
+        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, Command command, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var args = new List<object>();
@@ -687,7 +687,7 @@ namespace CSF
                     continue;
                 }
 
-                if (parameter is ComplexParameterInfo complexParam)
+                if (parameter is ComplexParameter complexParam)
                 {
                     var result = await ReadContainerAsync(context, index, complexParam, cancellationToken).ConfigureAwait(false);
 
@@ -701,7 +701,7 @@ namespace CSF
                     }
                 }
 
-                else if (parameter is ParameterInfo normal)
+                else if (parameter is BaseParameter normal)
                 {
                     var result = await normal.TypeReader.ReadAsync(context, normal, context.Parameters[index], cancellationToken).ConfigureAwait(false);
 
@@ -732,7 +732,7 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, CommandInfo command, ModuleBase<TContext> module, object[] parameters, CancellationToken cancellationToken)
+        protected virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase<TContext> module, object[] parameters, CancellationToken cancellationToken)
             where TContext : IContext
         {
             try

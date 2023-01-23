@@ -8,7 +8,7 @@ namespace CSF
     /// <summary>
     ///     Represents information about the module this command is executed in.
     /// </summary>
-    public sealed class ModuleInfo : IConditionalComponent
+    public sealed class Module : IConditionalComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -35,20 +35,20 @@ namespace CSF
         /// <summary>
         ///     The constructor used to create an instance of the command type.
         /// </summary>
-        public ConstructorInfo Constructor { get; }
+        public Constructor Constructor { get; }
 
         /// <summary>
         ///     The root module. <see langword="null"/> if not available.
         /// </summary>
-        public ModuleInfo Root { get; }
+        public Module Root { get; }
 
-        internal ModuleInfo(TypeReaderProvider typeReaders, Type type, ModuleInfo rootModule = null, string expectedName = null, string[] aliases = null)
+        internal Module(TypeReaderProvider typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
             if (rootModule != null)
                 Root = rootModule;
 
             Type = type;
-            Constructor = new ConstructorInfo(type);
+            Constructor = new Constructor(type);
 
             Attributes = (Root?.Attributes.Concat(GetAttributes()) ?? GetAttributes()).ToList();
             Preconditions = (Root?.Preconditions.Concat(GetPreconditions()) ?? GetPreconditions()).ToList();
@@ -60,9 +60,9 @@ namespace CSF
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static ModuleInfo Build(TypeReaderProvider typeReaders, Type type)
+        public static Module Build(TypeReaderProvider typeReaders, Type type)
         {
-            var module = new ModuleInfo(typeReaders, type);
+            var module = new Module(typeReaders, type);
 
             return module;
         }
@@ -85,7 +85,7 @@ namespace CSF
                 if (!aliases.Any())
                     continue;
 
-                yield return new CommandInfo(typeReaders, this, method, aliases);
+                yield return new Command(typeReaders, this, method, aliases);
             }
 
             foreach (var group in Type.GetNestedTypes())
@@ -93,7 +93,7 @@ namespace CSF
                 foreach (var attribute in group.GetCustomAttributes(true))
                 {
                     if (attribute is GroupAttribute gattribute)
-                        yield return new ModuleInfo(typeReaders, group, Root, gattribute.Name, gattribute.Aliases);
+                        yield return new Module(typeReaders, group, Root, gattribute.Name, gattribute.Aliases);
                 }
             }
         }

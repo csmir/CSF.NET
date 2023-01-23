@@ -51,7 +51,7 @@ namespace CSF
             AllowedPrefixes = new IPrefix[] { new CharPrefix(prefix) };
         }
 
-        public override ValueTask<PreconditionResult> CheckAsync(IContext context, CommandInfo command, IServiceProvider provider, CancellationToken cancellationToken)
+        public override ValueTask<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
         {
             foreach (var prefix in AllowedPrefixes)
             {

@@ -25,7 +25,7 @@ namespace CSF
         /// <param name="value">The string value that will populate this parameter.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> holding the <see cref="TypeReaderResult"/> with provided error or successful parse.</returns>
-        ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken);
+        ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Calls the pipeline to handle the exposed result.

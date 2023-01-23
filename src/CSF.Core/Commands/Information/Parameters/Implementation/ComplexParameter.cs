@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    public class ComplexParameterInfo : IParameterComponent, IParameterContainer
+    /// <summary>
+    ///     Represents a complex parameter, containing a number of its own parameters.
+    /// </summary>
+    public class ComplexParameter : IParameterComponent, IParameterContainer
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -30,56 +33,56 @@ namespace CSF
         public int MinLength { get; }
 
         /// <inheritdoc/>
-        public int OptimalLength { get; }
+        public int MaxLength { get; }
 
         /// <summary>
         ///     The complexParam constructor for complexParam parameter types.
         /// </summary>
-        public ConstructorInfo Constructor { get; }
+        public Constructor Constructor { get; }
 
-        internal ComplexParameterInfo(System.Reflection.ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
+        internal ComplexParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
         {
             var type = parameterInfo.GetType();
 
             Type = type;
             Flags = SetFlags(parameterInfo);
 
-            Constructor = new ConstructorInfo(Type);
+            Constructor = new Constructor(Type);
 
             Parameters = GetParameters(typeReaders).ToList();
             Attributes = GetAttributes(parameterInfo).ToList();
 
-            (int min, int nom) = GetLength();
+            (int min, int max) = GetLength();
 
             MinLength = min;
-            OptimalLength = nom;
+            MaxLength = max;
         }
 
         private (int, int) GetLength()
         {
             var minLength = 0;
-            var nomLength = 0;
+            var maxLength = 0;
 
             foreach (var parameter in Parameters)
             {
-                if (parameter is ComplexParameterInfo complexParam)
+                if (parameter is ComplexParameter complexParam)
                 {
-                    nomLength += complexParam.OptimalLength;
+                    maxLength += complexParam.MaxLength;
                     minLength += complexParam.MinLength;
                 }
 
-                if (parameter is ParameterInfo defaultParam)
+                if (parameter is BaseParameter defaultParam)
                 {
-                    nomLength++;
+                    maxLength++;
                     if (!defaultParam.Flags.HasFlag(ParameterFlags.IsOptional))
                         minLength++;
                 }
             }
 
-            return (minLength, nomLength);
+            return (minLength, maxLength);
         }
 
-        private ParameterFlags SetFlags(System.Reflection.ParameterInfo paramInfo)
+        private ParameterFlags SetFlags(ParameterInfo paramInfo)
         {
             var type = paramInfo.ParameterType;
             var isNullable = Nullable.GetUnderlyingType(type) != null;
@@ -104,13 +107,13 @@ namespace CSF
             foreach (var parameter in Constructor.EntryPoint.GetParameters())
             {
                 if (parameter.GetCustomAttributes(true).Any(x => x is ComplexAttribute))
-                    yield return new ComplexParameterInfo(parameter, typeReaders);
+                    yield return new ComplexParameter(parameter, typeReaders);
                 else
-                    yield return new ParameterInfo(parameter, typeReaders);
+                    yield return new BaseParameter(parameter, typeReaders);
             }
         }
 
-        private IEnumerable<Attribute> GetAttributes(System.Reflection.ParameterInfo paramInfo)
+        private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
         {
             foreach (var attribute in paramInfo.GetCustomAttributes(false))
                 if (attribute is Attribute attr)

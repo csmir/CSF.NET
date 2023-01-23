@@ -9,7 +9,7 @@ namespace CSF
         {
             var values = new List<string>();
 
-            if (component is ModuleInfo module)
+            if (component is Module module)
                 values.AddRange(GetRoot(module));
             else
                 values.Add(component.Name);
@@ -17,12 +17,12 @@ namespace CSF
             return string.Join(" -> ", values);
         }
 
-        private static List<string> GetRoot(ModuleInfo components)
+        private static List<string> GetRoot(Module components)
         {
             var values = new List<string>();
 
             foreach (var component in components.Components)
-                if (component is ModuleInfo module)
+                if (component is Module module)
                     values.AddRange(GetRoot(module));
                 else
                     values.Add(component.Name);

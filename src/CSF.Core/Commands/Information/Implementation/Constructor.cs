@@ -8,7 +8,7 @@ namespace CSF
     /// <summary>
     ///     Represents information about the primary constructor of a module.
     /// </summary>
-    public class ConstructorInfo : IComponent
+    public class Constructor : IComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -19,14 +19,14 @@ namespace CSF
         /// <summary>
         ///     The parameters of this module.
         /// </summary>
-        public IReadOnlyCollection<DependencyInfo> Dependencies { get; }
+        public IReadOnlyCollection<DependencyParameter> Dependencies { get; }
 
         /// <summary>
         ///     The constructor entry point.
         /// </summary>
         public System.Reflection.ConstructorInfo EntryPoint { get; }
 
-        internal ConstructorInfo(Type type)
+        internal Constructor(Type type)
         {
             EntryPoint = GetEntryConstructor(type);
             Attributes = GetAttributes(EntryPoint).ToList();
@@ -105,10 +105,10 @@ namespace CSF
                     yield return attribute;
         }
 
-        private IEnumerable<DependencyInfo> GetDependencies(System.Reflection.ConstructorInfo ctorInfo)
+        private IEnumerable<DependencyParameter> GetDependencies(System.Reflection.ConstructorInfo ctorInfo)
         {
             foreach (var param in ctorInfo.GetParameters())
-                yield return new DependencyInfo(param);
+                yield return new DependencyParameter(param);
         }
     }
 }

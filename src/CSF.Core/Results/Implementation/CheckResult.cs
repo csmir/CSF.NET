@@ -14,12 +14,12 @@ namespace CSF
         /// <summary>
         ///     The commands that passed through the preconditions, the first of which will be selected for execution.
         /// </summary>
-        internal CommandInfo[] Result { get; }
+        internal Command[] Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private CheckResult(bool success, CommandInfo[] matches, string msg = null, Exception exception = null)
+        private CheckResult(bool success, Command[] matches, string msg = null, Exception exception = null)
         {
             Result = matches;
             IsSuccess = success;
@@ -43,7 +43,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static CheckResult FromSuccess(CommandInfo[] matches)
+        public static CheckResult FromSuccess(Command[] matches)
             => new CheckResult(true, matches);
     }
 }

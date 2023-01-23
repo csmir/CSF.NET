@@ -49,7 +49,7 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, ParameterInfo parameter, object value, CancellationToken cancellationToken)
+        public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
             var str = value.ToString();
             if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
