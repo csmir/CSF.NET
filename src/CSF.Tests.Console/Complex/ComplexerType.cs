@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 
 namespace CSF.Tests.Console.Complex
 {
-    public class ComplexType
+    public class ComplexerType
     {
         public int X, Y, Z;
 
-        public ComplexerType Complexer;
-
         [PrimaryConstructor]
-        public ComplexType(int x, int y, int z, [Complex] ComplexerType complexer)
+        public ComplexerType(int x, int y, int z)
         {
             X = x; Y = y; Z = z;
-            Complexer = complexer;
         }
     }
 }
