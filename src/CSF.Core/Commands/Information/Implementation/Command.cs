@@ -114,7 +114,7 @@ namespace CSF
         {
             foreach (var parameter in Method.GetParameters())
             {
-                if (parameter.GetCustomAttributes(true).Any(x => x is ComplexAttribute))
+                if (parameter.GetCustomAttributes().Any(x => x is ComplexAttribute))
                     yield return new ComplexParameter(parameter, typeReaders);
                 else
                     yield return new BaseParameter(parameter, typeReaders);

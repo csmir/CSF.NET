@@ -87,16 +87,10 @@ namespace CSF
         public IList<IConditionalComponent> Commands { get; }
 
         /// <inheritdoc/>
-        public IList<IConditionalComponent> Scopes { get; }
-
-        /// <inheritdoc/>
         public CommandConfiguration Configuration { get; }
 
         /// <inheritdoc/>
         public IServiceProvider Services { get; }
-
-        /// <inheritdoc/>
-        public ILogger Logger { get; }
 
         /// <summary>
         ///     Creates a new instance of <see cref="CommandFramework{T}"/>.
@@ -128,6 +122,10 @@ namespace CSF
 
             Conveyor = conveyor;
             Services = serviceProvider;
+
+            Commands = new List<IConditionalComponent>();
+
+            Conveyor.SetLogger(Configuration, Services);
         }
 
         /// <inheritdoc/>
@@ -203,7 +201,7 @@ namespace CSF
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual async ValueTask BuildModulesAsync(Assembly assembly, CancellationToken cancellationToken)
         {
-            var mt = typeof(IModuleBase);
+            var mt = typeof(ModuleBase);
 
             foreach (var type in assembly.ExportedTypes)
                 if (mt.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
@@ -303,7 +301,7 @@ namespace CSF
         protected virtual async ValueTask<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
+            Conveyor.Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
 
             // find commands
             var searchResult = await SearchAsync(context, cancellationToken).ConfigureAwait(false);
@@ -337,7 +335,7 @@ namespace CSF
                     return readResult;
 
                 // execute command.
-                var result = await ExecuteAsync(context, command, (ModuleBase<TContext>)constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken).ConfigureAwait(false);
+                var result = await ExecuteAsync(context, command, constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken).ConfigureAwait(false);
 
                 if (!result.IsSuccess)
                     return result;
@@ -495,7 +493,7 @@ namespace CSF
                     return SearchResult.FromSuccess(new[] { overload });
             }
 
-            Logger.Trace($"Found matches for name: '{context.Name}': {string.Join(", ", matches)}");
+            Conveyor.Logger.Trace($"Found matches for name: '{context.Name}': {string.Join(", ", matches)}");
 
             return SearchResult.FromSuccess(matches.ToArray());
         }
@@ -559,7 +557,7 @@ namespace CSF
                     return result;
             }
 
-            Logger.Trace($"Succesfully ran precondition checks for {command.Name}.");
+            Conveyor.Logger.Trace($"Succesfully ran precondition checks for {command.Name}.");
 
             return PreconditionResult.FromSuccess();
         }
@@ -598,14 +596,14 @@ namespace CSF
 
             var obj = command.Module.Constructor.EntryPoint.Invoke(services.ToArray());
 
-            if (obj is ModuleBase<TContext> commandBase)
+            if (obj is ModuleBase commandBase)
             {
                 commandBase.SetContext(context);
                 commandBase.SetInformation(command);
 
-                commandBase.SetLogger(Logger);
+                commandBase.SetLogger(Conveyor.Logger);
 
-                Logger.Trace($"Succesfully constructed module for {command.Name}");
+                Conveyor.Logger.Trace($"Succesfully constructed module for {command.Name}");
 
                 return ConstructionResult.FromSuccess(commandBase);
             }
@@ -627,14 +625,12 @@ namespace CSF
         protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, Command command, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            var args = new List<object>();
-
             var result = await ReadContainerAsync(context, 0, command, cancellationToken).ConfigureAwait(false);
 
             if (!result.IsSuccess)
                 return result;
 
-            return ArgsResult.FromSuccess(args.ToArray(), -1);
+            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
         }
 
         /// <summary>
@@ -713,7 +709,7 @@ namespace CSF
                 }
             }
 
-            Logger.Trace($"Succesfully populated parameters. Count: {parameters.Count}");
+            Conveyor.Logger.Trace($"Succesfully populated parameters. Count: {parameters.Count}");
 
             return ArgsResult.FromSuccess(parameters.ToArray(), index);
         }
@@ -732,15 +728,15 @@ namespace CSF
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase<TContext> module, object[] parameters, CancellationToken cancellationToken)
+        protected virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase module, object[] parameters, CancellationToken cancellationToken)
             where TContext : IContext
         {
             try
             {
-                Logger.Debug($"Starting execution of {module.CommandInfo.Name}.");
+                Conveyor.Logger.Debug($"Starting execution of {module.CommandInfo.Name}.");
                 var sw = Stopwatch.StartNew();
 
-                await module.BeforeExecuteAsync(command, context, cancellationToken).ConfigureAwait(false);
+                await module.BeforeExecuteAsync(command, cancellationToken).ConfigureAwait(false);
 
                 var returnValue = command.Method.Invoke(module, parameters);
 
@@ -767,10 +763,10 @@ namespace CSF
                         break;
                 }
 
-                await module.AfterExecuteAsync(command, context, cancellationToken).ConfigureAwait(false);
+                await module.AfterExecuteAsync(command, cancellationToken).ConfigureAwait(false);
 
                 sw.Stop();
-                Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
+                Conveyor.Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
 
                 return ExecuteResult.FromSuccess();
             }

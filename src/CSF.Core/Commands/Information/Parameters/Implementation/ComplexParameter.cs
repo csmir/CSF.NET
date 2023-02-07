@@ -42,15 +42,15 @@ namespace CSF
 
         internal ComplexParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
         {
-            var type = parameterInfo.GetType();
+            var type = parameterInfo.ParameterType;
 
             Type = type;
+            Attributes = GetAttributes(parameterInfo).ToList();
             Flags = SetFlags(parameterInfo);
 
             Constructor = new Constructor(Type);
 
             Parameters = GetParameters(typeReaders).ToList();
-            Attributes = GetAttributes(parameterInfo).ToList();
 
             (int min, int max) = GetLength();
 
@@ -106,7 +106,7 @@ namespace CSF
 
             foreach (var parameter in Constructor.EntryPoint.GetParameters())
             {
-                if (parameter.GetCustomAttributes(true).Any(x => x is ComplexAttribute))
+                if (parameter.GetCustomAttributes().Any(x => x is ComplexAttribute))
                     yield return new ComplexParameter(parameter, typeReaders);
                 else
                     yield return new BaseParameter(parameter, typeReaders);

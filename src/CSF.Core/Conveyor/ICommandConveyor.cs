@@ -9,6 +9,16 @@ namespace CSF
     /// </summary>
     public interface ICommandConveyor
     {
+        public ILogger Logger { get; }
+
+        /// <summary>
+        ///     Gets the logger to be used when reporting command execution flow.
+        /// </summary>
+        /// <param name="configuration">The configuration to fetch configuration values from.</param>
+        /// <param name="services">The service provider to fetch a Microsoft.Extensions.Logging.ILogger or other alternatives to report logging to.</param>
+        /// <returns>An <see cref="ILogger"/> created with provided configuration values.</returns>
+        ILogger GetLogger(CommandConfiguration configuration, IServiceProvider services);
+
         /// <summary>
         ///     Waits for an input and returns it to the caller.
         /// </summary>
@@ -81,11 +91,11 @@ namespace CSF
             where TContext : IContext;
 
         /// <summary>
-        ///     Returns the error message when the module in question cannot be cast to an <see cref="IModuleBase"/>.
+        ///     Returns the error message when the module in question cannot be cast to an <see cref="ModuleBase"/>.
         /// </summary>
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
-        /// <param name="module">The module that failed to cast to an <see cref="IModuleBase"/>.</param>
+        /// <param name="module">The module that failed to cast to an <see cref="ModuleBase"/>.</param>
         /// <returns>A <see cref="ConstructionResult"/> holding the returned error.</returns>
         ConstructionResult OnInvalidModule<TContext>(TContext context, Module module)
             where TContext : IContext;

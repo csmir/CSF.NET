@@ -11,6 +11,19 @@ namespace CSF
     /// </summary>
     public class CommandConveyor : ICommandConveyor
     {
+        /// <summary>
+        ///     The logger used to 
+        /// </summary>
+        public ILogger Logger { get; private set; }
+        internal void SetLogger(CommandConfiguration configuration, IServiceProvider services)
+            => Logger = GetLogger(configuration, services);
+
+        /// <inheritdoc/>
+        public virtual ILogger GetLogger(CommandConfiguration configuration, IServiceProvider services)
+        {
+            return DefaultLogger.Create(configuration.DefaultLogLevel);
+        }
+
         /// <inheritdoc/>
         public virtual async ValueTask<string> GetInputAsync(CancellationToken cancellationToken)
         {
@@ -29,6 +42,7 @@ namespace CSF
         public virtual async Task OnResultAsync<TContext>(TContext context, IResult result, CancellationToken cancellationToken)
             where TContext : IContext
         {
+            Logger.Send(result.AsLog());
             await Task.CompletedTask;
         }
 

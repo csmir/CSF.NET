@@ -17,12 +17,12 @@ namespace CSF.Hosting
         /// <summary>
         ///     Represents a <see cref="Microsoft.Extensions.Logging"/> counterpart to the internal <see cref="CommandFramework.Logger"/> and resolves through the intended stream at logging configuration.
         /// </summary>
-        public new ILogger<HostedCommandService<T>> Logger { get; }
+        public ILogger<HostedCommandService<T>> Logger { get; }
 
         public HostedCommandService(T conveyor, CommandConfiguration configuration, IServiceProvider provider, ILogger<HostedCommandService<T>> logger)
             : base(provider, configuration, conveyor)
         {
-            base.Logger.SendAction = async (x) => await LogAsync(x);
+            base.Conveyor.Logger.SendAction = async (x) => await LogAsync(x);
             Logger = logger;
         }
 
