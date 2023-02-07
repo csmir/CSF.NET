@@ -28,11 +28,6 @@ namespace CSF
         public CommandConfiguration Configuration { get; }
 
         /// <summary>
-        ///     The logger passed throughout the build and execution process.
-        /// </summary>
-        public ILogger Logger { get; }
-
-        /// <summary>
         ///     Registers all assemblies and starts listening for commands.
         /// </summary>
         /// <remarks>

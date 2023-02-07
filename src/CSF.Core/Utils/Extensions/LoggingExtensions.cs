@@ -6,16 +6,11 @@ namespace CSF
 {
     internal static class LoggingExtensions
     {
-        public static Log AsLog(this IResult result, LogLevel overrideSeverity)
+        public static Log AsLog(this IResult result, LogLevel? overrideSeverity = null)
         {
-            var severity = result.IsSuccess ? LogLevel.Information : overrideSeverity;
+            var severity = overrideSeverity ?? (result.IsSuccess ? LogLevel.Information : LogLevel.Error);
 
             return new Log(severity, result.ErrorMessage, result.Exception);
-        }
-
-        public static Log AsLog(this IConditionalComponent component, LogLevel severity)
-        {
-            var severity = LogLevel.Information;
         }
     }
 }
