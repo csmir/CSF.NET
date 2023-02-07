@@ -57,7 +57,10 @@ namespace CSF
         /// <returns>The same instance for chaining calls.</returns>
         public PrefixProvider Include(IPrefix prefix)
         {
-            _prefixes.Add(prefix.Value, prefix);
+            if (_prefixes.ContainsKey(prefix.Value))
+                _prefixes[prefix.Value] = prefix;
+            else
+                _prefixes.Add(prefix.Value, prefix);
             return this;
         }
 
@@ -137,15 +140,5 @@ namespace CSF
         /// <returns><see langword="true"/> if there are any <see cref="IPrefix"/>'s inside the current <see cref="PrefixProvider"/>. <see langword="false"/> if not.</returns>
         public bool HasValues()
             => _prefixes.Any();
-
-        /// <summary>
-        ///     Copies all keys in the current dictionary to another, overwriting existing keys.
-        /// </summary>
-        /// <param name="targetDictionary">The target dictionary to copy to.</param>
-        public void CopyTo(PrefixProvider targetDictionary)
-        {
-            foreach (var kvp in _prefixes)
-                targetDictionary[kvp.Key] = kvp.Value;
-        }
     }
 }

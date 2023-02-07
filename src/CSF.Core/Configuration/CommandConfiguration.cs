@@ -51,11 +51,11 @@ namespace CSF
         /// <summary>
         ///     The prefixes that should be used to validate incoming command values.
         /// </summary>
-        public PrefixProvider Prefixes { get; set; }
+        public PrefixProvider Prefixes { get; set; } = new PrefixProvider();
 
         /// <summary>
         ///     The typereaders that should be used to parse command input.
         /// </summary>
-        public TypeReaderProvider TypeReaders { get; set; }
+        public TypeReaderProvider TypeReaders { get; set; } = new TypeReaderProvider();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CSF
 {
@@ -49,7 +50,10 @@ namespace CSF
         /// <returns>The same instance for chaining calls.</returns>
         public TypeReaderProvider Include(ITypeReader reader)
         {
-            _typeReaders.Add(reader.Type, reader);
+            if (_typeReaders.ContainsKey(reader.Type))
+                _typeReaders[reader.Type] = reader;
+            else
+                _typeReaders.Add(reader.Type, reader);
             return this;
         }
 
@@ -73,6 +77,14 @@ namespace CSF
         }
 
         /// <summary>
+        ///     Checks if the underlying dictionary contains the provided type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>True if success. False if not.</returns>
+        public bool ContainsType(Type type)
+            => _typeReaders.ContainsKey(type);
+
+        /// <summary>
         ///     Tries to get a <see cref="ITypeReader"/> from the underlying dictionary.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -80,14 +92,6 @@ namespace CSF
         /// <returns>True if success. False if not.</returns>
         public bool TryGetReader<T>(out ITypeReader reader)
             => TryGetReader(typeof(T), out reader);
-
-        /// <summary>
-        ///     Checks if the underlying dictionary contains the provided type.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns>True if success. False if not.</returns>
-        public bool ContainsType(Type type)
-            => _typeReaders.ContainsKey(type);
 
         /// <summary>
         ///     Tries to get a <see cref="ITypeReader"/> from the underlying dictionary.
@@ -114,13 +118,10 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Copies all keys in the current dictionary to another, overwriting existing keys.
+        ///     Gets if the <see cref="TypeReaderProvider"/> has any <see cref="ITypeReader"/>'s defined.
         /// </summary>
-        /// <param name="targetDictionary">The target dictionary to copy to.</param>
-        public void CopyTo(TypeReaderProvider targetDictionary)
-        {
-            foreach (var kvp in _typeReaders)
-                targetDictionary[kvp.Key] = kvp.Value;
-        }
+        /// <returns><see langword="true"/> if there are any <see cref="ITypeReader"/>'s inside the current <see cref="TypeReaderProvider"/>. <see langword="false"/> if not.</returns>
+        public bool HasValues()
+            => _typeReaders.Any();
     }
 }
