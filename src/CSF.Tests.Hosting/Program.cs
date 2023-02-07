@@ -4,6 +4,11 @@ using CSF.Tests.Hosting;
 using Microsoft.Extensions.Hosting;
 
 await Host.CreateDefaultBuilder(args)
-    .ConfigureCommands<CommandConveyor, CommandService>()
+    .ConfigureCommands<CommandConveyor, CommandService>((hostContext, commandConfig) =>
+    {
+        commandConfig.DefaultLogLevel = LogLevel.Trace;
+        commandConfig.Prefixes
+            .Include(new StringPrefix(hostContext.Configuration["Prefixes:DefaultPrefix"]));
+    })
     .Build()
     .RunAsync();

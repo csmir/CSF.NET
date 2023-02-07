@@ -38,13 +38,11 @@ namespace CSF
         /// <summary>
         ///     Called when a command succesfully (or unsuccesfully) executed.
         /// </summary>
-        /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <param name="result">The result returned by the caller.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnResultAsync<TContext>(TContext context, IResult result, CancellationToken cancellationToken)
-            where TContext : IContext;
+        ValueTask OnResultAsync(IContext context, IResult result, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when a command group is succesfully registered to the command framework.
@@ -52,7 +50,7 @@ namespace CSF
         /// <param name="component">The component (command group) that has been registered.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken);
+        ValueTask OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Called when a typereader is succesfully registered to the command framework.
@@ -60,7 +58,7 @@ namespace CSF
         /// <param name="typeReader">The type reader to register.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        Task OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken);
+        ValueTask OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Returns the error message when the context input was not found.

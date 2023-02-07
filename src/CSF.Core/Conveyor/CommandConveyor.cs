@@ -39,21 +39,20 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async Task OnResultAsync<TContext>(TContext context, IResult result, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask OnResultAsync(IContext context, IResult result, CancellationToken cancellationToken)
         {
             Logger.Send(result.AsLog());
             await Task.CompletedTask;
         }
 
         /// <inheritdoc/>
-        public virtual async Task OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
+        public virtual async ValueTask OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
         }
 
         /// <inheritdoc/>
-        public virtual async Task OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
+        public virtual async ValueTask OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
         }
