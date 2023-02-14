@@ -23,9 +23,21 @@ namespace CSF
         /// </summary>
         /// <remarks>
         ///     The commands executed will be handled in order. 
+        ///     <br/>
         ///     Every command will have its module remade transiently because the framework cannot guarantee all commands are from the same module.
         /// </remarks>
         public bool ExecuteAllValidMatches { get; set; } = false;
+
+        /// <summary>
+        ///     If enabled, top level statements can be used for command design. 
+        ///     For simple console applications, this is ideal to keep the app single file, or even single function.
+        /// </summary>
+        /// <remarks>
+        ///     The commands at top level do not have access to <see cref="IContext"/> and the methods exposed by <see cref="ModuleBase"/>.
+        ///     <br/>
+        ///     When this value is set to <see langword="true"/>, modules will no longer be registered automatically. You are forced to use only top level commands, or not use them at all.
+        /// </remarks>
+        public bool UseTopLevelCommands { get; set; } = false;
 
         /// <summary>
         ///     The parser used to parse command input. Has to be set through the <see cref="CSF.Parsing"/> package.
