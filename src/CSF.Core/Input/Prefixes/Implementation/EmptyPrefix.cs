@@ -2,6 +2,9 @@
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents an empty prefix.
+    /// </summary>
     public readonly struct EmptyPrefix : IPrefix<string>
     {
         /// <inheritdoc/>

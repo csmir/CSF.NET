@@ -29,21 +29,10 @@ namespace CSF
         public bool ExecuteAllValidMatches { get; set; } = false;
 
         /// <summary>
-        ///     If enabled, top level statements can be used for command design. 
-        ///     For simple console applications, this is ideal to keep the app single file, or even single function.
+        ///     The parser used to parse command input.
         /// </summary>
         /// <remarks>
-        ///     The commands at top level do not have access to <see cref="IContext"/> and the methods exposed by <see cref="ModuleBase"/>.
-        ///     <br/>
-        ///     When this value is set to <see langword="true"/>, modules will no longer be registered automatically. You are forced to use only top level commands, or not use them at all.
-        /// </remarks>
-        public bool UseTopLevelCommands { get; set; } = false;
-
-        /// <summary>
-        ///     The parser used to parse command input. Has to be set through the <see cref="CSF.Parsing"/> package.
-        /// </summary>
-        /// <remarks>
-        ///     This value is automatically populated by extension packages, but not by the core package alone.
+        ///     This value is automatically populated by <see cref="TextParser"/>. If you defined your own parser, pass it into the <see cref="CommandFramework"/> from here.
         /// </remarks>
         public IParser Parser { get; set; } = new TextParser();
 
@@ -51,7 +40,7 @@ namespace CSF
         ///     Represents the log level at which the <see cref="ILogger"/> is created during the creation of the target <see cref="CommandFramework"/>.
         /// </summary>
         /// <remarks>
-        ///     This value can freely be changed by changing the default <see cref="ILogger.LogLevel"/> in the <see cref="CommandFramework.Logger"/> property or other references across execution.
+        ///     This value can freely be changed by changing the <see cref="ILogger.LogLevel"/> in <see cref="CommandConveyor.Logger"/> or other references across execution.
         /// </remarks>
         public LogLevel DefaultLogLevel { get; set; } = LogLevel.Information;
 

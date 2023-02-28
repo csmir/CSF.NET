@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CSF
@@ -90,7 +91,7 @@ namespace CSF
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns>True if success. False if not.</returns>
-        public bool TryGetReader<T>(out ITypeReader reader)
+        public bool TryGetReader<T>([NotNullWhen(true)] out ITypeReader reader)
             => TryGetReader(typeof(T), out reader);
 
         /// <summary>
@@ -99,7 +100,7 @@ namespace CSF
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns>True if success. False if not.</returns>
-        public bool TryGetReader(Type type, out ITypeReader reader)
+        public bool TryGetReader(Type type, [NotNullWhen(true)] out ITypeReader reader)
         {
             reader = null;
 

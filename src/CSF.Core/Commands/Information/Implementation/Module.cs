@@ -20,7 +20,7 @@ namespace CSF
         public IReadOnlyCollection<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
+        public IList<IPrecondition> Preconditions { get; }
 
         /// <summary>
         ///     The components of this module.

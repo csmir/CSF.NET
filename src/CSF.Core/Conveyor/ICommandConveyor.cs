@@ -9,6 +9,9 @@ namespace CSF
     /// </summary>
     public interface ICommandConveyor
     {
+        /// <summary>
+        ///     The logger used to log handles in the command pipeline.
+        /// </summary>
         public ILogger Logger { get; }
 
         /// <summary>

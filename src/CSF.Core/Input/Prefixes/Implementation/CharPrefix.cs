@@ -2,7 +2,9 @@
 
 namespace CSF
 {
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Represents a character prefix.
+    /// </summary>
     public readonly struct CharPrefix : IPrefix<char>
     {
         /// <inheritdoc/>

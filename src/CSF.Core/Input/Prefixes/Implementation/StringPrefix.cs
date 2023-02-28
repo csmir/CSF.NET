@@ -2,7 +2,9 @@
 
 namespace CSF
 {
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Represents a string prefix.
+    /// </summary>
     public readonly struct StringPrefix : IPrefix<string>
     {
         /// <inheritdoc/>

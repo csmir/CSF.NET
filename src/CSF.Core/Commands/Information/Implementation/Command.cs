@@ -17,7 +17,7 @@ namespace CSF
         public IReadOnlyCollection<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
+        public IList<IPrecondition> Preconditions { get; }
 
         /// <inheritdoc/>
         public IReadOnlyCollection<IParameterComponent> Parameters { get; }

@@ -739,6 +739,11 @@ namespace CSF
 
                 var returnValue = command.Method.Invoke(module, parameters);
 
+                await module.AfterExecuteAsync(command, cancellationToken).ConfigureAwait(false);
+
+                sw.Stop();
+                Conveyor.Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
+
                 switch (returnValue)
                 {
                     case Task<IResult> execTask:
@@ -761,11 +766,6 @@ namespace CSF
                             return returnResult;
                         break;
                 }
-
-                await module.AfterExecuteAsync(command, cancellationToken).ConfigureAwait(false);
-
-                sw.Stop();
-                Conveyor.Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
 
                 return ExecuteResult.FromSuccess();
             }

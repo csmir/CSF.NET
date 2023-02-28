@@ -17,7 +17,7 @@ namespace CSF
         /// <summary>
         ///     The preconditions of this component.
         /// </summary>
-        public IReadOnlyCollection<PreconditionAttribute> Preconditions { get; }
+        public IList<IPrecondition> Preconditions { get; }
 
         /// <summary>
         ///     Calls the pipeline to handle the exposed result.

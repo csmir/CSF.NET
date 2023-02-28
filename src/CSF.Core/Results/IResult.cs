@@ -28,7 +28,7 @@ namespace CSF
         ///     Calls the pipeline to handle the exposed result.
         /// </summary>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        internal async Task RequestToHandleAsync<TContext>(TContext context, ICommandConveyor service, CancellationToken cancellationToken)
+        internal async ValueTask RequestToHandleAsync<TContext>(TContext context, ICommandConveyor service, CancellationToken cancellationToken)
             where TContext : IContext
         {
             await service.OnResultAsync(context, this, cancellationToken);

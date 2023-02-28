@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CSF
@@ -97,7 +98,7 @@ namespace CSF
         /// <param name="rawInput">The raw command input to fetch a prefix for.</param>
         /// <param name="prefix"></param>
         /// <returns>True if success. False if not.</returns>
-        public bool TryGetPrefix(string rawInput, out IPrefix prefix)
+        public bool TryGetPrefix(string rawInput, [NotNullWhen(true)] out IPrefix prefix)
         {
             prefix = null;
 
@@ -122,7 +123,7 @@ namespace CSF
         /// <param name="rawInput"></param>
         /// <param name="prefix"></param>
         /// <returns></returns>
-        public bool TryGetPrefix<T>(string rawInput, out IPrefix<T> prefix)
+        public bool TryGetPrefix<T>(string rawInput, [NotNullWhen(true)] out IPrefix<T> prefix)
         {
             prefix = null;
             if (_prefixes.TryGetValue(rawInput, out var value) && value is IPrefix<T> returnValue)
