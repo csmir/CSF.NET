@@ -744,15 +744,16 @@ namespace CSF
                 sw.Stop();
                 Conveyor.Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");
 
+                var result = default(IResult);
+
                 switch (returnValue)
                 {
                     case Task<IResult> execTask:
-                        var asyncResult = await execTask;
-                        if (!asyncResult.IsSuccess)
-                            return asyncResult;
+                        result = await execTask;
                         break;
                     case Task task:
                         await task;
+                        result = ExecuteResult.FromSuccess();
                         break;
                     case IResult syncResult:
                         if (!syncResult.IsSuccess)
@@ -761,13 +762,11 @@ namespace CSF
                     default:
                         if (returnValue is null)
                             break;
-                        var returnResult = Conveyor.OnUnhandledReturnType(context, returnValue);
-                        if (!returnResult.IsSuccess)
-                            return returnResult;
+                        result = Conveyor.OnUnhandledReturnType(context, returnValue);
                         break;
                 }
 
-                return ExecuteResult.FromSuccess();
+                return result;
             }
             catch (Exception ex)
             {
