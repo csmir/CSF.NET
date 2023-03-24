@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 
 namespace CSF
 {
@@ -41,7 +42,8 @@ namespace CSF
         /// <inheritdoc/>
         public virtual async ValueTask OnResultAsync(IContext context, IResult result, CancellationToken cancellationToken)
         {
-            Logger.Send(result.AsLog());
+            if (!result.IsSuccess)
+                Logger.Send(result.AsLog());
             await Task.CompletedTask;
         }
 
@@ -60,12 +62,12 @@ namespace CSF
         /// <inheritdoc/>
         public virtual SearchResult OnCommandNotFound<TContext>(TContext context)
             where TContext : IContext
-            => SearchResult.FromError($"IsSuccess to find command with name: {context.Name}.");
+            => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
 
         /// <inheritdoc/>
         public virtual SearchResult OnBestOverloadUnavailable<TContext>(TContext context)
             where TContext : IContext
-            => SearchResult.FromError($"IsSuccess to find overload that best matches input: {context.Name}.");
+            => SearchResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
 
         /// <inheritdoc/>
         public virtual ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyParameter dependency)
@@ -75,7 +77,7 @@ namespace CSF
         /// <inheritdoc/>
         public virtual ConstructionResult OnInvalidModule<TContext>(TContext context, Module module)
             where TContext : IContext
-            => ConstructionResult.FromError($"IsSuccess to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
+            => ConstructionResult.FromError($"Failed to interpret module of type {module.Type.FullName} with type of {nameof(ModuleBase<TContext>)}");
 
         /// <inheritdoc/>
         public virtual TypeReaderResult OnMissingValue<TContext>(TContext context, IParameterComponent param)

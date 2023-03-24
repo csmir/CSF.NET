@@ -7,7 +7,7 @@ namespace CSF
         /// <summary>
         ///     The list of parameters for this component.
         /// </summary>
-        public IReadOnlyCollection<IParameterComponent> Parameters { get; }
+        public IList<IParameterComponent> Parameters { get; }
 
         /// <summary>
         ///     The minimum required length to use a command.

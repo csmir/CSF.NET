@@ -16,6 +16,6 @@ namespace CSF
         /// <summary>
         ///     The attribute collection for this component.
         /// </summary>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
     }
 }

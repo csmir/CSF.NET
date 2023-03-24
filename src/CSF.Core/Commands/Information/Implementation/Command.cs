@@ -14,13 +14,13 @@ namespace CSF
         public string Name { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
         public IList<IPrecondition> Preconditions { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<IParameterComponent> Parameters { get; }
+        public IList<IParameterComponent> Parameters { get; }
 
         /// <inheritdoc/>
         public int MinLength { get; }
@@ -53,10 +53,12 @@ namespace CSF
             Method = method;
             Module = module;
 
-            Attributes = module.Attributes.Concat(GetAttributes()).ToList();
-            Preconditions = module.Preconditions.Concat(GetPreconditions()).ToList();
-
-            Parameters = GetParameters(typeReaders).ToList();
+            Attributes = module.Attributes.Concat(GetAttributes())
+                .ToList();
+            Preconditions = module.Preconditions.Concat(GetPreconditions())
+                .ToList();
+            Parameters = GetParameters(typeReaders)
+                .ToList();
 
             var remainderParameters = Parameters.Where(x => x.Flags.HasFlag(ParameterFlags.IsRemainder));
             if (remainderParameters.Any())

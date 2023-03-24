@@ -20,10 +20,10 @@ namespace CSF
         public ParameterFlags Flags { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<IParameterComponent> Parameters { get; }
+        public IList<IParameterComponent> Parameters { get; }
 
         /// <inheritdoc/>
         public int MinLength { get; }
@@ -41,12 +41,15 @@ namespace CSF
             var type = parameterInfo.ParameterType;
 
             Type = type;
-            Attributes = GetAttributes(parameterInfo).ToList();
+
+            Attributes = GetAttributes(parameterInfo)
+                .ToList();
+            Parameters = GetParameters(typeReaders)
+                .ToList();
+
             Flags = SetFlags(parameterInfo);
 
             Constructor = new Constructor(Type);
-
-            Parameters = GetParameters(typeReaders).ToList();
 
             (int min, int max) = GetLength();
 

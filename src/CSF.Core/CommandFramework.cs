@@ -244,12 +244,32 @@ namespace CSF
         {
             var reader = Reader.Build(type);
 
-            var output = reader.Construct(Services);
+            IEnumerable<object> GetServices()
+            {
+                foreach (var dependency in reader.Constructor.Dependencies)
+                {
+                    if (dependency.Type == typeof(IServiceProvider))
+                        yield return Services;
+                    else
+                    {
+                        var t = Services.GetService(dependency.Type);
 
-            if (output is null)
+                        if (t is null && dependency.Flags.HasFlag(ParameterFlags.IsNullable))
+                            yield return Type.Missing;
+                        else if (t is null)
+                            throw new ArgumentNullException(nameof(t), $"Service of type {dependency.Type.Name} is not available in the {nameof(IServiceProvider)}.");
+
+                        yield return t;
+                    }
+                }
+            }
+
+            var obj = reader.Constructor.EntryPoint.Invoke(GetServices().ToArray());
+
+            if (obj is null)
                 throw new ArgumentNullException(nameof(type), "The provided type caused an invalid return type.");
 
-            if (output is ITypeReader typeReader)
+            if (obj is ITypeReader typeReader)
             {
                 Configuration.TypeReaders.Include(typeReader);
                 await typeReader.RequestToHandleAsync(Conveyor, cancellationToken).ConfigureAwait(false);
@@ -336,7 +356,7 @@ namespace CSF
                 // execute command.
                 var result = await ExecuteAsync(context, command, constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken).ConfigureAwait(false);
 
-                if (!result.IsSuccess)
+                if (result != null && !result.IsSuccess)
                     return result;
             }
             return ExecuteResult.FromSuccess();
@@ -577,23 +597,25 @@ namespace CSF
         protected virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            var services = new List<object>();
-            foreach (var dependency in command.Module.Constructor.Dependencies)
+            IEnumerable<object> GetServices()
             {
-                if (dependency.Type == typeof(IServiceProvider))
-                    services.Add(provider);
-                else
+                foreach (var dependency in command.Module.Constructor.Dependencies)
                 {
-                    var t = provider.GetService(dependency.Type);
+                    if (dependency.Type == typeof(IServiceProvider))
+                        yield return provider;
+                    else
+                    {
+                        var t = provider.GetService(dependency.Type);
 
-                    if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
-                        return Conveyor.OnServiceNotFound(context, dependency);
+                        if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
+                            yield return Conveyor.OnServiceNotFound(context, dependency);
 
-                    services.Add(t);
+                        yield return t;
+                    }
                 }
             }
 
-            var obj = command.Module.Constructor.EntryPoint.Invoke(services.ToArray());
+            var obj = command.Module.Constructor.EntryPoint.Invoke(GetServices().ToArray());
 
             if (obj is ModuleBase commandBase)
             {

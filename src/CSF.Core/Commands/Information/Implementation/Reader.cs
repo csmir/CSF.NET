@@ -14,7 +14,7 @@ namespace CSF
         public string Name { get; }
 
         //// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <summary>
         ///     The type of this reader.
@@ -47,17 +47,6 @@ namespace CSF
                 throw new InvalidOperationException($"Provided type is not a valid {nameof(ITypeReader)}.");
 
             return new Reader(type);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public ITypeReader Construct(IServiceProvider provider)
-        {
-            var obj = Constructor.Construct(provider);
-
-            if (obj is ITypeReader reader)
-                return reader;
-            else
-                return null;
         }
 
         private IEnumerable<Attribute> GetAttributes()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace CSF
 {
@@ -14,71 +15,31 @@ namespace CSF
         public string Name { get; }
 
         //// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <summary>
         ///     The parameters of this module.
         /// </summary>
-        public IReadOnlyCollection<DependencyParameter> Dependencies { get; }
+        public IList<DependencyParameter> Dependencies { get; }
 
         /// <summary>
         ///     The constructor entry point.
         /// </summary>
-        public System.Reflection.ConstructorInfo EntryPoint { get; }
+        public ConstructorInfo EntryPoint { get; }
 
         internal Constructor(Type type)
         {
             EntryPoint = GetEntryConstructor(type);
-            Attributes = GetAttributes(EntryPoint).ToList();
 
-            Dependencies = GetDependencies(EntryPoint).ToList();
+            Attributes = GetAttributes(EntryPoint)
+                .ToList();
+            Dependencies = GetDependencies(EntryPoint)
+                .ToList();
 
             Name = EntryPoint.Name;
         }
 
-        /// <summary>
-        ///     Builds the constructor from the provided <see cref="IServiceProvider"/>.
-        /// </summary>
-        /// <param name="provider">The services to build this constructor with.</param>
-        /// <returns>An object representing the built object instance.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object Construct(IServiceProvider provider)
-        {
-            var services = new List<object>();
-            foreach (var dependency in Dependencies)
-            {
-                if (dependency.Type == typeof(IServiceProvider))
-                    services.Add(provider);
-                else
-                {
-                    var t = provider.GetService(dependency.Type);
-
-                    if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
-                        return null;
-
-                    services.Add(t);
-                }
-            }
-
-            var obj = EntryPoint.Invoke(services.ToArray());
-
-            return obj;
-        }
-
-        /// <summary>
-        ///     Builds the constructor from the provided parameters.
-        /// </summary>
-        /// <param name="parameters">The parameters to build this object from.</param>
-        /// <returns>An object representing the built object instance.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object Construct(List<object> parameters)
-        {
-            var obj = EntryPoint.Invoke(parameters.ToArray());
-
-            return obj;
-        }
-
-        private System.Reflection.ConstructorInfo GetEntryConstructor(Type type)
+        private ConstructorInfo GetEntryConstructor(Type type)
         {
             var constructors = type.GetConstructors();
 

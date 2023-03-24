@@ -20,7 +20,7 @@ namespace CSF
         public ParameterFlags Flags { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <summary>
         ///     The typereader used to populate this parameter.
@@ -38,7 +38,8 @@ namespace CSF
             Type = type;
             TypeReader = GetTypeReader(typeReaders);
 
-            Attributes = GetAttributes(paramInfo).ToList();
+            Attributes = GetAttributes(paramInfo)
+                .ToList();
             Flags = SetFlags(paramInfo);
 
             Name = paramInfo.Name;

@@ -20,7 +20,7 @@ namespace CSF
         public ParameterFlags Flags { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         internal DependencyParameter(ParameterInfo paramInfo)
         {
@@ -32,7 +32,8 @@ namespace CSF
 
             Type = type;
 
-            Attributes = GetAttributes(paramInfo).ToList();
+            Attributes = GetAttributes(paramInfo)
+                .ToList();
             Flags = SetFlags(paramInfo);
 
             Name = paramInfo.Name;

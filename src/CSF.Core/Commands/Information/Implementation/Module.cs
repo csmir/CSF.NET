@@ -17,7 +17,7 @@ namespace CSF
         public string[] Aliases { get; }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<Attribute> Attributes { get; }
+        public IList<Attribute> Attributes { get; }
 
         /// <inheritdoc/>
         public IList<IPrecondition> Preconditions { get; }
@@ -25,7 +25,7 @@ namespace CSF
         /// <summary>
         ///     The components of this module.
         /// </summary>
-        public IReadOnlyCollection<IConditionalComponent> Components { get; }
+        public IList<IConditionalComponent> Components { get; }
 
         /// <summary>
         ///     The type of this module.
@@ -50,8 +50,10 @@ namespace CSF
             Type = type;
             Constructor = new Constructor(type);
 
-            Attributes = (Root?.Attributes.Concat(GetAttributes()) ?? GetAttributes()).ToList();
-            Preconditions = (Root?.Preconditions.Concat(GetPreconditions()) ?? GetPreconditions()).ToList();
+            Attributes = (Root?.Attributes.Concat(GetAttributes()) ?? GetAttributes())
+                .ToList();
+            Preconditions = (Root?.Preconditions.Concat(GetPreconditions()) ?? GetPreconditions())
+                .ToList();
 
             Name = expectedName ?? type.Name;
             Aliases = aliases ?? new string[] { Name };
