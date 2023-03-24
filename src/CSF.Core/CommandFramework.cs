@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Results.Implementation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -114,7 +115,6 @@ namespace CSF
         /// </summary>
         public CommandFramework(IServiceProvider serviceProvider, CommandConfiguration configuration, T conveyor)
         {
-            configuration.Prefixes ??= new PrefixProvider();
             configuration.TypeReaders ??= new TypeReaderProvider();
 
             Configuration = configuration;
@@ -166,7 +166,15 @@ namespace CSF
                 {
                     var input = await Conveyor.GetInputAsync(_globalSource.Token);
 
-                    var context = await Conveyor.BuildContextAsync(Configuration.Parser, input, _globalSource.Token);
+                    var parseResult = Configuration.Parser.Parse(input);
+
+                    if (!parseResult.IsSuccess)
+                    {
+                        Conveyor.Logger.Send(Conveyor.OnInvalidPrefix().AsLog());
+                        continue;
+                    }
+
+                    var context = await Conveyor.BuildContextAsync(parseResult, _globalSource.Token);
 
                     await ExecuteCommandsAsync(context, cancellationToken: _globalSource.Token);
                 }
@@ -312,43 +320,28 @@ namespace CSF
         {
             Conveyor.Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
 
-            // find commands
             var searchResult = await SearchAsync(context, cancellationToken);
 
             if (!searchResult.IsSuccess)
                 return searchResult;
 
-            // check commands for availability.
             var checkResult = await CheckAsync(context, searchResult.Result, provider, cancellationToken);
 
             if (!checkResult.IsSuccess)
                 return checkResult;
 
-            // select commands.
-            var commands = checkResult.Result;
-            if (!Configuration.ExecuteAllValidMatches)
-                commands = new[] { checkResult.Result.First() };
+            var (command, args) = ((CheckYieldResult)checkResult).Result.First();
 
-            foreach (var command in commands)
-            {
-                // build module.
-                var constructResult = await ConstructAsync(context, command, provider, cancellationToken);
+            var constructResult = await ConstructAsync(context, command, provider, cancellationToken);
 
-                if (!constructResult.IsSuccess)
-                    return constructResult;
+            if (!constructResult.IsSuccess)
+                return constructResult;
 
-                // parse types.
-                var readResult = await ReadAsync(context, command, cancellationToken);
+            var result = await ExecuteAsync(context, command, constructResult.Result, args.Result, cancellationToken);
 
-                if (!readResult.IsSuccess)
-                    return readResult;
+            if (result != null && !result.IsSuccess)
+                return result;
 
-                // execute command.
-                var result = await ExecuteAsync(context, command, constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken);
-
-                if (result != null && !result.IsSuccess)
-                    return result;
-            }
             return ExecuteResult.FromSuccess();
         }
 
@@ -429,9 +422,11 @@ namespace CSF
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public virtual async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
+        public virtual async ValueTask<IResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
+            IResult failureResult = null;
+
             var matchResult = await CheckMatchesAsync(context, commands, cancellationToken);
 
             if (!matchResult.IsSuccess)
@@ -439,23 +434,29 @@ namespace CSF
 
             commands = matchResult.Result;
 
-            var matches = new List<Command>();
-            var failureResult = PreconditionResult.FromSuccess();
+            var matches = new List<(Command, ArgsResult)>();
 
             foreach (var command in commands)
             {
-                var result = await CheckPreconditionsAsync(context, command, provider, cancellationToken);
+                var preconResult = await CheckPreconditionsAsync(context, command, provider, cancellationToken);
 
-                if (result.IsSuccess)
-                    matches.Add(command);
+                if (preconResult.IsSuccess)
+                {
+                    var readResult = await ReadAsync(context, command, cancellationToken);
+
+                    if (!readResult.IsSuccess)
+                        failureResult = readResult;
+                    else
+                        matches.Add((command, (ArgsResult)readResult));
+                }
                 else
-                    failureResult = result;
+                    failureResult ??= preconResult;
             }
 
             if (!matches.Any())
                 return CheckResult.FromError(failureResult.ErrorMessage, failureResult.Exception);
 
-            return CheckResult.FromSuccess(matches);
+            return CheckYieldResult.FromSuccess(matches);
         }
 
         /// <inheritdoc/>

@@ -17,6 +17,12 @@ namespace CSF.Tests.Modules
             Success($"Success: {truee}, {falsee}");
         }
 
+        [Command("multiple")]
+        public void Test(int i1, int i2)
+        {
+            Success($"Success: {i1}, {i2}");
+        }
+
         [Command("optional")]
         public void Test(int i = 0, string str = "")
         {

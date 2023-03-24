@@ -19,16 +19,6 @@ namespace CSF
         public bool DoAsynchronousExecution { get; set; } = false;
 
         /// <summary>
-        ///     If enabled, all commands that match the provided input will execute, no matter the priority.
-        /// </summary>
-        /// <remarks>
-        ///     The commands executed will be handled in order. 
-        ///     <br/>
-        ///     Every command will have its module remade transiently because the framework cannot guarantee all commands are from the same module.
-        /// </remarks>
-        public bool ExecuteAllValidMatches { get; set; } = false;
-
-        /// <summary>
         ///     The parser used to parse command input.
         /// </summary>
         /// <remarks>
@@ -48,11 +38,6 @@ namespace CSF
         ///     The assemblies that should be used for registering commands, typereaders and event resolvers.
         /// </summary>
         public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };
-
-        /// <summary>
-        ///     The prefixes that should be used to validate incoming command values.
-        /// </summary>
-        public PrefixProvider Prefixes { get; set; } = new PrefixProvider();
 
         /// <summary>
         ///     The typereaders that should be used to parse command input.

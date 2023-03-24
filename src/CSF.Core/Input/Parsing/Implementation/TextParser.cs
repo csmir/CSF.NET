@@ -8,9 +8,7 @@ namespace CSF
     /// </summary>
     public class TextParser : IParser
     {
-        /// <summary>
-        ///     Represents usable prefixes to parse inputs with.
-        /// </summary>
+        /// <inheritdoc/>
         public PrefixProvider Prefixes { get; }
 
         /// <summary>
@@ -41,21 +39,23 @@ namespace CSF
         /// </summary>
         /// <param name="rawInput"></param>
         /// <returns></returns>
-        public virtual IPrefix GetPrefix(ref string rawInput)
+        public virtual bool TryGetPrefix(ref string rawInput, out IPrefix prefix)
         {
-            if (Prefixes.TryGetPrefix(rawInput, out var prefix))
+            if (Prefixes.TryGetPrefix(rawInput, out prefix))
             {
                 rawInput = rawInput[prefix.Value.Length..].TrimStart();
-                return prefix;
+                return true;
             }
-            return DefaultPrefix;
+            return false;
         }
 
         /// <inheritdoc/>
         public virtual ParseResult Parse(string rawInput)
         {
+            if (!TryGetPrefix(ref rawInput, out var prefix))
+                return ParseResult.FromError("");
+
             var range = rawInput.Split(' ');
-            var prefix = GetPrefix(ref rawInput);
 
             var name = "";
             var args = new List<object>();
@@ -134,7 +134,7 @@ namespace CSF
         {
             if (rawInput is string str)
                 return Parse(str);
-            return ParseResult.FromError("Raw argument type does not match desired input.");
+            return ParseResult.FromError("Raw argument type does not match supported input. Consider creating a new parser for the input type.");
         }
     }
 }

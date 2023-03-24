@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSF.Results.Implementation;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,8 +31,6 @@ namespace CSF
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
         internal async ValueTask RequestToHandleAsync<TContext>(TContext context, ICommandConveyor service, CancellationToken cancellationToken)
             where TContext : IContext
-        {
-            await service.OnResultAsync(context, this, cancellationToken);
-        }
+            => await service.OnResultAsync(context, this, cancellationToken);
     }
 }

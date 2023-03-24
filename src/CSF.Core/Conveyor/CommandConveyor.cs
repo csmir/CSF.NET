@@ -33,11 +33,15 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IContext> BuildContextAsync(IParser parser, string rawInput, CancellationToken cancellationToken)
+        public virtual async ValueTask<IContext> BuildContextAsync(ParseResult parseResult, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
-            return new CommandContext(parser.Parse(rawInput));
+            return new CommandContext(parseResult);
         }
+
+        /// <inheritdoc/>
+        public virtual ParseResult OnInvalidPrefix()
+            => ParseResult.FromError("The provided input does not have a prefix that matches any defined prefix.");
 
         /// <inheritdoc/>
         public virtual async ValueTask OnResultAsync(IContext context, IResult result, CancellationToken cancellationToken)

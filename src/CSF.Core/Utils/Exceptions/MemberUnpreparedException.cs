@@ -11,7 +11,7 @@ namespace CSF
         ///     Creates a new <see cref="MemberUnpreparedException"/> with base values.
         /// </summary>
         public MemberUnpreparedException()
-            : base("Called an unprepared operation in that was not ready to execute.")
+            : base("Called an unprepared operation that was not ready to execute.")
         {
 
         }
@@ -21,7 +21,7 @@ namespace CSF
         /// </summary>
         /// <param name="innerException">The inner exception that led to this exception.</param>
         public MemberUnpreparedException(Exception innerException)
-            : base("Called an unprepared operation in that was not ready to execute.", innerException)
+            : base("Called an unprepared operation that was not ready to execute.", innerException)
         {
 
         }

@@ -6,6 +6,11 @@
     public interface IParser
     {
         /// <summary>
+        ///     Represents usable prefixes to parse inputs with.
+        /// </summary>
+        public PrefixProvider Prefixes { get; }
+
+        /// <summary>
         ///     Parses the command input into a new <see cref="ParserOutput"/>.
         /// </summary>
         /// <param name="rawInput">The command input.</param>

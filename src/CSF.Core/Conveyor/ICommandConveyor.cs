@@ -36,7 +36,14 @@ namespace CSF
         /// <param name="rawInput">The raw input.</param>
         /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
         /// <returns>The built command context.</returns>
-        ValueTask<IContext> BuildContextAsync(IParser parser, string rawInput, CancellationToken cancellationToken);
+        ValueTask<IContext> BuildContextAsync(ParseResult parseResult, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Returns the error message when no prefix matches the provided input.
+        /// </summary>
+        /// <returns>A <see cref="ParseResult"/> holding the returned error.</returns>
+        public virtual ParseResult OnInvalidPrefix()
+            => ParseResult.FromError("The provided input does not have a prefix that matches any defined prefix.");
 
         /// <summary>
         ///     Called when a command succesfully (or unsuccesfully) executed.
