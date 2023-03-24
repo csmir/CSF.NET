@@ -42,14 +42,14 @@ namespace CSF
 
             Type = type;
 
+            Constructor = new Constructor(Type);
+
             Attributes = GetAttributes(parameterInfo)
                 .ToList();
             Parameters = GetParameters(typeReaders)
                 .ToList();
 
             Flags = SetFlags(parameterInfo);
-
-            Constructor = new Constructor(Type);
 
             (int min, int max) = GetLength();
 

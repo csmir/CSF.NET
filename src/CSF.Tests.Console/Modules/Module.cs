@@ -13,7 +13,7 @@ namespace CSF.Tests.Modules
         [Command("test")]
         public IResult Test([Complex] ComplexType complex)
         {
-            return Success($"{complex.X}{complex.Y}{complex.Z}{complex.Complexer}");
+            return Success($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
         }
     }
 }
