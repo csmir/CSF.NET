@@ -3,7 +3,7 @@
 
 # 🏗️ CSF.NET - Command Standardization Framework for .NET
 
-CSF is an attribute based framework that makes creating and processing text based commands easy for any platform. It implements a modular, easy to implement pipeline for registering and executing commands, as well as a large number of extensions to make development on different platforms as easy as possible.
+CSF is an attribute based framework that makes creating and processing any input based commands easy for all platforms. It introduces a modular, easy to implement pipeline for registering and executing commands, as well as a large number of extensions to make development on different platforms as easy as possible.
 
 ## 📍 Features
 
@@ -18,7 +18,7 @@ public IResult Handle(int param1, DateTime param2)
     return Respond("{0}, {1}", param1, param2);
 }
 ```
-> This will automatically parse `int` by using the default `int.TryParse` implementation, and will do the same for the `DateTime`.
+> This will automatically parse `int` by using the default `int.TryParse` implementation, and will do the same for `DateTime`.
 
 Outside of this, implementing and adding your own `TypeReader`'s is also supported to handle implementing commands with your own types. Nullability is automatically resolved by the library.
 
@@ -48,23 +48,9 @@ public async Task Handle()
 }
 ```
 
-### 📖 Exposed command info & responsive errors:
-
-CSF.NET will return results for building the command map and executing commands. If you want to run your commands asynchronously, you will have to handle the result process differently:
-
-```cs
-_csf.CommandExecuted += async (context, result) => 
-{
-    await Task.CompletedTask;
-    if (result.IsSuccess)
-        return;
-    // handle failure.
-}
-```
-
 ### 🔗 Virtual base class to support freely overriding all results:
 
-Every single method inside the `CommandFramework` is virtual and can be overwritten if desired to change results or rewrite certain steps inside the pipeline.
+Every single method inside the `CommandFramework` is virtual and can be overwritten if desired to change results or rewrite certain steps inside the pipeline. In addition to this, the `CommandConveyor` that attaches to this process behaves the same way.
 
 ### 💡 Support for overriding context, module & framework:
 
@@ -76,7 +62,7 @@ You can provide an `IServiceProvider` at execution to inject modules with depend
 
 ## 🗺️ Roadmap
 
-- [x] Add complex parameters.
+Currently completed.
 
 ## 🤖 Samples
 
@@ -86,8 +72,6 @@ Samples are available to learn how to implement CSF in your own programs.
   - Shows how to implement CSF in an IHost design console application.
 - [CSF.Samples.Console](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.Console)
   - Shows how to implement CSF on a basic console application.
-- [CSF.Samples.TShock4](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.TShock4)
-  - Shows how to implement CSF.NET.TShock into an OTAPI2 TShock plugin.
 - [CSF.Samples.TShock5](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.TShock5)
   - Shows how to implement CSF.NET.TShock into an OTAPI3 TShock plugin.
 
