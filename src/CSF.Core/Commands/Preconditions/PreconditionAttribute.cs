@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CSF
 {
     /// <summary>
-    ///     Defines a precondition 
+    ///     Defines a precondition attribute.
     /// </summary>
-    public abstract class PreconditionAttribute : Attribute
+    public abstract class PreconditionAttribute : Attribute, IPrecondition
     {
-        public abstract Task<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider);
+        /// <inheritdoc/>
+        public abstract ValueTask<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken);
     }
 }

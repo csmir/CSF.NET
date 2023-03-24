@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -14,9 +15,9 @@ namespace CSF
         public string ErrorMessage { get; }
 
         /// <summary>
-        ///     The result object of this reader.
+        ///     The result object of this read operation.
         /// </summary>
-        internal object Result { get; }
+        public object Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
@@ -28,6 +29,9 @@ namespace CSF
             Exception = exception;
             Result = result;
         }
+
+        public static implicit operator ValueTask<TypeReaderResult>(TypeReaderResult result)
+            => result.AsValueTask();
 
         /// <summary>
         ///     Creates a failed result with provided parameters.

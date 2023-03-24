@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -16,18 +17,21 @@ namespace CSF
         /// <summary>
         ///     The result object of this reader.
         /// </summary>
-        internal IModuleBase Result { get; }
+        public ModuleBase Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private ConstructionResult(bool success, IModuleBase result = null, string msg = null, Exception exception = null)
+        private ConstructionResult(bool success, ModuleBase result = null, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             ErrorMessage = msg;
             Exception = exception;
             Result = result;
         }
+
+        public static implicit operator ValueTask<ConstructionResult>(ConstructionResult result)
+            => result.AsValueTask();
 
         /// <summary>
         ///     Creates a failed result with provided parameters.
@@ -42,7 +46,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        internal static ConstructionResult FromSuccess(IModuleBase value)
+        public static ConstructionResult FromSuccess(ModuleBase value)
             => new ConstructionResult(true, value);
     }
 }

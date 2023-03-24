@@ -1,9 +1,12 @@
 ﻿namespace CSF
 {
+    /// <summary>
+    ///     The log level used to log messages to the console.
+    /// </summary>
     public enum LogLevel : byte
     {
         /// <summary>
-        ///     Defines that the <see cref="ILog"/> should not be logged.
+        ///     Defines that the <see cref="Log"/> should not be logged.
         /// </summary>
         None = 6,
 
