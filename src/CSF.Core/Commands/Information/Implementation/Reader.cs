@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -26,7 +27,7 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
-        internal Reader(Type type)
+        public Reader(Type type)
         {
             Type = type;
             Name = type.Name;
@@ -35,7 +36,6 @@ namespace CSF
                 .ToList();
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Reader Build(Type type)
         {
             if (type == typeof(ITypeReader))
@@ -55,5 +55,7 @@ namespace CSF
                 if (attr is Attribute attribute)
                     yield return attribute;
         }
+        public override string ToString()
+            => $"{Name}({Type.Name} {char.ToLower(Type.Name[0])}{Type.Name[1..]})";
     }
 }

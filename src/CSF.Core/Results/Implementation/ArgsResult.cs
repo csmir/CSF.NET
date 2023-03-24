@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -17,7 +18,7 @@ namespace CSF
         /// <summary>
         ///     The result objects of the read handle.
         /// </summary>
-        internal object[] Result { get; }
+        public IEnumerable<object> Result { get; }
 
         /// <summary>
         ///     The current index placement for the read handle.
@@ -27,7 +28,7 @@ namespace CSF
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private ArgsResult(bool success, object[] result = null, int index = -1, string msg = null, Exception exception = null)
+        private ArgsResult(bool success, IEnumerable<object> result = null, int index = -1, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             ErrorMessage = msg;
@@ -52,7 +53,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ArgsResult FromSuccess(object[] value, int index)
+        public static ArgsResult FromSuccess(IEnumerable<object> value, int index)
             => new ArgsResult(true, value, index);
     }
 }

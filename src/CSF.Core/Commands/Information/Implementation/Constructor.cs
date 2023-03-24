@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -27,7 +28,7 @@ namespace CSF
         /// </summary>
         public ConstructorInfo EntryPoint { get; }
 
-        internal Constructor(Type type)
+        public Constructor(Type type)
         {
             EntryPoint = GetEntryConstructor(type);
 
@@ -59,17 +60,20 @@ namespace CSF
             return constructor;
         }
 
-        private IEnumerable<Attribute> GetAttributes(System.Reflection.ConstructorInfo ctorInfo)
+        private IEnumerable<Attribute> GetAttributes(ConstructorInfo ctorInfo)
         {
             foreach (var obj in ctorInfo.GetCustomAttributes(false))
                 if (obj is Attribute attribute)
                     yield return attribute;
         }
 
-        private IEnumerable<DependencyParameter> GetDependencies(System.Reflection.ConstructorInfo ctorInfo)
+        private IEnumerable<DependencyParameter> GetDependencies(ConstructorInfo ctorInfo)
         {
             foreach (var param in ctorInfo.GetParameters())
                 yield return new DependencyParameter(param);
         }
+
+        public override string ToString()
+            => $"{Name}({string.Join(", ", Dependencies)})";
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -42,7 +43,7 @@ namespace CSF
         /// </summary>
         public Module Root { get; }
 
-        internal Module(TypeReaderProvider typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
+        public Module(TypeReaderProvider typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
             if (rootModule != null)
                 Root = rootModule;
@@ -61,7 +62,6 @@ namespace CSF
             Components = GetComponents(typeReaders).ToList();
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Module Build(TypeReaderProvider typeReaders, Type type)
         {
             var module = new Module(typeReaders, type);
@@ -95,7 +95,7 @@ namespace CSF
                 foreach (var attribute in group.GetCustomAttributes(true))
                 {
                     if (attribute is GroupAttribute gattribute)
-                        yield return new Module(typeReaders, group, Root, gattribute.Name, gattribute.Aliases);
+                        yield return new Module(typeReaders, group, this, gattribute.Name, gattribute.Aliases);
                 }
             }
         }
@@ -113,5 +113,8 @@ namespace CSF
                 if (attr is PreconditionAttribute precondition)
                     yield return precondition;
         }
+
+        public override string ToString()
+            => $"{(Root != null ? $"{Root}." : "")}{(Type.Name != Name ? $"{Type.Name}['{Name}']" : $"{Name}")}";
     }
 }

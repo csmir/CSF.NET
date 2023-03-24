@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace CSF
 {
@@ -48,7 +49,7 @@ namespace CSF
         /// </summary>
         public bool IsErrorOverload { get; }
 
-        internal Command(TypeReaderProvider typeReaders, Module module, MethodInfo method, string[] aliases)
+        public Command(TypeReaderProvider typeReaders, Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
             Module = module;
@@ -60,13 +61,13 @@ namespace CSF
             Parameters = GetParameters(typeReaders)
                 .ToList();
 
-            var remainderParameters = Parameters.Where(x => x.Flags.HasFlag(ParameterFlags.IsRemainder));
+            var remainderParameters = Parameters.Where(x => x.Flags.HasFlag(ParameterFlags.Remainder));
             if (remainderParameters.Any())
             {
                 if (remainderParameters.Count() > 1)
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} cannot exist on multiple parameters at once.");
 
-                if (!Parameters.Last().Flags.HasFlag(ParameterFlags.IsRemainder))
+                if (!Parameters.Last().Flags.HasFlag(ParameterFlags.Remainder))
                     throw new InvalidOperationException($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
             }
 
@@ -103,7 +104,7 @@ namespace CSF
                 if (parameter is BaseParameter defaultParam)
                 {
                     maxLength++;
-                    if (!defaultParam.Flags.HasFlag(ParameterFlags.IsOptional))
+                    if (!defaultParam.Flags.HasFlag(ParameterFlags.Optional))
                         minLength++;
                 }
             }
@@ -136,5 +137,8 @@ namespace CSF
                 if (attribute is Attribute attr)
                     yield return attr;
         }
+
+        public override string ToString()
+            => $"{Module}.{Method.Name}['{Name}']({string.Join(", ", Parameters)})";
     }
 }

@@ -16,7 +16,7 @@ namespace CSF
     {
         public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
-            if (Enum.TryParse<T>(value.ToString(), out var result))
+            if (Enum.TryParse<T>(value.ToString(), true, out var result))
                 return TypeReaderResult.FromSuccess(result);
 
             return TypeReaderResult.FromError(

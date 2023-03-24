@@ -17,7 +17,7 @@ namespace CSF
         /// <summary>
         ///     The result object of this read operation.
         /// </summary>
-        internal object Result { get; }
+        public object Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }

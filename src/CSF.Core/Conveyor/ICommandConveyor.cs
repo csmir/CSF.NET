@@ -78,7 +78,7 @@ namespace CSF
         /// <typeparam name="TContext">The <see cref="IContext"/> used to run the command.</typeparam>
         /// <param name="context">The <see cref="IContext"/> used to run the command.</param>
         /// <returns>A <see cref="SearchResult"/> holding the returned error.</returns>
-        SearchResult OnBestOverloadUnavailable<TContext>(TContext context)
+        CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
             where TContext : IContext;
 
         /// <summary>

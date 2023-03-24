@@ -17,7 +17,7 @@ namespace CSF
         /// <summary>
         ///     The result object of this reader.
         /// </summary>
-        internal ModuleBase Result { get; }
+        public ModuleBase Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }

@@ -11,45 +11,54 @@ namespace CSF
         /// <summary>
         ///     Defines a default value.
         /// </summary>
-        Default = 1,
+        None = 1,
 
         /// <summary>
         ///     Defines if a parameter is nullable.
         /// </summary>
-        IsNullable = 2,
+        Nullable = 2,
 
         /// <summary>
         ///     Defines if a parameter is optional.
         /// </summary>
-        IsOptional = 4,
+        Optional = 4,
 
         /// <summary>
         ///     Defines if a parameter is remainder.
         /// </summary>
-        IsRemainder = 8,
+        Remainder = 8,
     }
 
-    internal static class ParameterFlagsExtensions
+    public static class ParameterFlagsExtensions
     {
         public static ParameterFlags WithNullable(this ParameterFlags flags, bool isNullable = true)
         {
             if (isNullable)
-                flags |= ParameterFlags.IsNullable;
+                flags |= ParameterFlags.Nullable;
             return flags;
         }
+
+        public static bool HasNullable(this ParameterFlags flags)
+            => flags.HasFlag(ParameterFlags.Nullable);
 
         public static ParameterFlags WithOptional(this ParameterFlags flags, bool isOptional = true)
         {
             if (isOptional)
-                flags |= ParameterFlags.IsOptional;
+                flags |= ParameterFlags.Optional;
             return flags;
         }
+
+        public static bool HasOptional(this ParameterFlags flags)
+            => flags.HasFlag(ParameterFlags.Optional);
 
         public static ParameterFlags WithRemainder(this ParameterFlags flags, bool isRemainder = true)
         {
             if (isRemainder)
-                flags |= ParameterFlags.IsRemainder;
+                flags |= ParameterFlags.Remainder;
             return flags;
         }
+
+        public static bool HasRemainder(this ParameterFlags flags)
+            => flags.HasFlag(ParameterFlags.Remainder);
     }
 }

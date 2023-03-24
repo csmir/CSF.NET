@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -17,12 +18,12 @@ namespace CSF
         /// <summary>
         ///     The commands that matched the search best, and will be used for continuing the pipeline.
         /// </summary>
-        internal Command[] Result { get; }
+        public IEnumerable<Command> Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private SearchResult(bool success, Command[] matches = null, string msg = null, Exception exception = null)
+        private SearchResult(bool success, IEnumerable<Command> matches = null, string msg = null, Exception exception = null)
         {
             Result = matches;
             IsSuccess = success;
@@ -46,7 +47,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static SearchResult FromSuccess(Command[] matches)
+        public static SearchResult FromSuccess(IEnumerable<Command> matches)
             => new SearchResult(true, matches);
     }
 }

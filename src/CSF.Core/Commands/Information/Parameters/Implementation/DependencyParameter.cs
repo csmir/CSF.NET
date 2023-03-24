@@ -22,9 +22,9 @@ namespace CSF
         /// <inheritdoc/>
         public IList<Attribute> Attributes { get; }
 
-        internal DependencyParameter(ParameterInfo paramInfo)
+        public DependencyParameter(ParameterInfo parameterInfo)
         {
-            var type = paramInfo.ParameterType;
+            var type = parameterInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
 
             if (nullableType != null)
@@ -32,11 +32,11 @@ namespace CSF
 
             Type = type;
 
-            Attributes = GetAttributes(paramInfo)
+            Attributes = GetAttributes(parameterInfo)
                 .ToList();
-            Flags = SetFlags(paramInfo);
+            Flags = SetFlags(parameterInfo);
 
-            Name = paramInfo.Name;
+            Name = parameterInfo.Name;
         }
 
         private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
@@ -51,11 +51,14 @@ namespace CSF
             var type = paramInfo.ParameterType;
             var isNullable = Nullable.GetUnderlyingType(type) != null;
 
-            var flags = ParameterFlags.Default
+            var flags = ParameterFlags.None
                 .WithNullable(isNullable)
                 .WithOptional(paramInfo.IsOptional);
 
             return flags;
         }
+
+        public override string ToString()
+            => $"{Type.Name} {Name}";
     }
 }

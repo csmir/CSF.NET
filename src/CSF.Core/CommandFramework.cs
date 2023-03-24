@@ -216,7 +216,7 @@ namespace CSF
             foreach (var component in module.Components)
             {
                 Commands.Add(component);
-                await component.RequestToHandleAsync(Conveyor, cancellationToken).ConfigureAwait(false);
+                await component.RequestToHandleAsync(Conveyor, cancellationToken);
             }
         }
 
@@ -250,11 +250,13 @@ namespace CSF
                 {
                     if (dependency.Type == typeof(IServiceProvider))
                         yield return Services;
+                    if (dependency.Type == typeof(ICommandFramework))
+                        yield return this;
                     else
                     {
                         var t = Services.GetService(dependency.Type);
 
-                        if (t is null && dependency.Flags.HasFlag(ParameterFlags.IsNullable))
+                        if (t is null && dependency.Flags.HasFlag(ParameterFlags.Nullable))
                             yield return Type.Missing;
                         else if (t is null)
                             throw new ArgumentNullException(nameof(t), $"Service of type {dependency.Type.Name} is not available in the {nameof(IServiceProvider)}.");
@@ -264,15 +266,13 @@ namespace CSF
                 }
             }
 
-            var obj = reader.Constructor.EntryPoint.Invoke(GetServices().ToArray());
-
-            if (obj is null)
-                throw new ArgumentNullException(nameof(type), "The provided type caused an invalid return type.");
+            var obj = reader.Constructor.EntryPoint.Invoke(GetServices().ToArray()) 
+                ?? throw new ArgumentNullException(nameof(type), "The provided type caused an invalid return type.");
 
             if (obj is ITypeReader typeReader)
             {
                 Configuration.TypeReaders.Include(typeReader);
-                await typeReader.RequestToHandleAsync(Conveyor, cancellationToken).ConfigureAwait(false);
+                await typeReader.RequestToHandleAsync(Conveyor, cancellationToken);
             }
 
             throw new InvalidOperationException($"Could not box {type.Name} as {nameof(ITypeReader)}.");
@@ -288,48 +288,38 @@ namespace CSF
             {
                 _ = Task.Run(async () =>
                 {
-                    var result = await RunPipelineAsync(context, services, cancellationToken).ConfigureAwait(false);
+                    var result = await RunPipelineAsync(context, services, cancellationToken);
 
-                    await result.RequestToHandleAsync(context, Conveyor, cancellationToken).ConfigureAwait(false);
+                    await result.RequestToHandleAsync(context, Conveyor, cancellationToken);
                 });
                 return ExecuteResult.FromSuccess();
             }
 
             else
             {
-                var result = await RunPipelineAsync(context, services, cancellationToken).ConfigureAwait(false);
+                var result = await RunPipelineAsync(context, services, cancellationToken);
 
-                await result.RequestToHandleAsync(context, Conveyor, cancellationToken).ConfigureAwait(false);
+                await result.RequestToHandleAsync(context, Conveyor, cancellationToken);
 
                 return result;
             }
         }
 
-        /// <summary>
-        ///     Invokes the pipeline for provided context.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="provider">The services for this transient execution.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
+        public virtual async ValueTask<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             Conveyor.Logger.Debug($"Starting command pipeline for name: '{context.Name}'");
 
             // find commands
-            var searchResult = await SearchAsync(context, cancellationToken).ConfigureAwait(false);
+            var searchResult = await SearchAsync(context, cancellationToken);
 
             if (!searchResult.IsSuccess)
                 return searchResult;
 
             // check commands for availability.
-            var checkResult = await CheckAsync(context, searchResult.Result, provider, cancellationToken).ConfigureAwait(false);
+            var checkResult = await CheckAsync(context, searchResult.Result, provider, cancellationToken);
 
             if (!checkResult.IsSuccess)
                 return checkResult;
@@ -337,24 +327,24 @@ namespace CSF
             // select commands.
             var commands = checkResult.Result;
             if (!Configuration.ExecuteAllValidMatches)
-                commands = new[] { checkResult.Result[0] };
+                commands = new[] { checkResult.Result.First() };
 
             foreach (var command in commands)
             {
                 // build module.
-                var constructResult = await ConstructAsync(context, command, provider, cancellationToken).ConfigureAwait(false);
+                var constructResult = await ConstructAsync(context, command, provider, cancellationToken);
 
                 if (!constructResult.IsSuccess)
                     return constructResult;
 
                 // parse types.
-                var readResult = await ReadAsync(context, command, cancellationToken).ConfigureAwait(false);
+                var readResult = await ReadAsync(context, command, cancellationToken);
 
                 if (!readResult.IsSuccess)
                     return readResult;
 
                 // execute command.
-                var result = await ExecuteAsync(context, command, constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken).ConfigureAwait(false);
+                var result = await ExecuteAsync(context, command, constructResult.Result, ((ArgsResult)readResult).Result, cancellationToken);
 
                 if (result != null && !result.IsSuccess)
                     return result;
@@ -362,18 +352,9 @@ namespace CSF
             return ExecuteResult.FromSuccess();
         }
 
-        /// <summary>
-        ///     Searches through the command list to find the best matches.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<SearchResult> SearchAsync<TContext>(TContext context, CancellationToken cancellationToken)
+        public virtual async ValueTask<SearchResult> SearchAsync<TContext>(TContext context, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var matches = Commands
@@ -397,7 +378,7 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    var result = await SearchModuleAsync(context, groups[0], cancellationToken).ConfigureAwait(false);
+                    var result = await SearchModuleAsync(context, groups[0], cancellationToken);
 
                     if (result.IsSuccess)
                         return result;
@@ -408,24 +389,14 @@ namespace CSF
             }
 
             if (commands.Any())
-                return await SearchCommandsAsync(context, commands, cancellationToken).ConfigureAwait(false);
+                return SearchResult.FromSuccess(commands);
 
             return Conveyor.OnCommandNotFound(context);
         }
 
-        /// <summary>
-        ///     Searches through a single module to find the best matches.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="module">The module to search commands in.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, Module module, CancellationToken cancellationToken)
+        public virtual async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, Module module, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var matches = module.Components
@@ -446,29 +417,50 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    return await SearchModuleAsync(context, groups[0], cancellationToken).ConfigureAwait(false);
+                    return await SearchModuleAsync(context, groups[0], cancellationToken);
                 }
 
                 else
                     return Conveyor.OnCommandNotFound(context);
             }
 
-            return await SearchCommandsAsync(context, commands, cancellationToken).ConfigureAwait(false);
+            return SearchResult.FromSuccess(commands);
         }
 
-        /// <summary>
-        ///     Searches a single component for the its best matches.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="commands">The commands to be searched through</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual ValueTask<SearchResult> SearchCommandsAsync<TContext>(TContext context, IEnumerable<Command> commands, CancellationToken cancellationToken)
+        public virtual async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
+            where TContext : IContext
+        {
+            var matchResult = await CheckMatchesAsync(context, commands, cancellationToken);
+
+            if (!matchResult.IsSuccess)
+                return matchResult;
+
+            commands = matchResult.Result;
+
+            var matches = new List<Command>();
+            var failureResult = PreconditionResult.FromSuccess();
+
+            foreach (var command in commands)
+            {
+                var result = await CheckPreconditionsAsync(context, command, provider, cancellationToken);
+
+                if (result.IsSuccess)
+                    matches.Add(command);
+                else
+                    failureResult = result;
+            }
+
+            if (!matches.Any())
+                return CheckResult.FromError(failureResult.ErrorMessage, failureResult.Exception);
+
+            return CheckResult.FromSuccess(matches);
+        }
+
+        /// <inheritdoc/>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public virtual ValueTask<CheckResult> CheckMatchesAsync<TContext>(TContext context, IEnumerable<Command> commands, CancellationToken cancellationToken)
             where TContext : IContext
         {
             Command overload = null;
@@ -490,7 +482,7 @@ namespace CSF
                     // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
                     if (command.MaxLength <= contextLength)
                         foreach (var parameter in command.Parameters)
-                            if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
+                            if (parameter.Flags.HasFlag(ParameterFlags.Remainder))
                                 yield return command;
 
                     // If context length is lower than command length, return the command with least optionals.
@@ -509,68 +501,22 @@ namespace CSF
                 if (overload is null)
                     return Conveyor.OnBestOverloadUnavailable(context);
                 else
-                    return SearchResult.FromSuccess(new[] { overload });
+                    return CheckResult.FromSuccess(new[] { overload });
             }
 
             Conveyor.Logger.Trace($"Found matches for name: '{context.Name}': {string.Join(", ", matches)}");
 
-            return SearchResult.FromSuccess(matches.ToArray());
+            return CheckResult.FromSuccess(matches);
         }
 
-        /// <summary>
-        ///     Checks the preconditions of all resolved commands.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="matches">The command matches to be used for executing commands.</param>
-        /// <param name="provider">The services to be used for handling the preconditions.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<CheckResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> matches, IServiceProvider provider, CancellationToken cancellationToken)
-            where TContext : IContext
-        {
-            var commands = new List<Command>();
-            var failureResult = PreconditionResult.FromSuccess();
-
-            foreach (var match in matches)
-            {
-                var result = await CheckPreconditionsAsync(context, match, provider, cancellationToken);
-
-                if (result.IsSuccess)
-                    commands.Add(match);
-                else
-                    failureResult = result;
-            }
-
-            if (!commands.Any())
-                return CheckResult.FromError(failureResult.ErrorMessage, failureResult.Exception);
-
-            return CheckResult.FromSuccess(commands.ToArray());
-        }
-
-        /// <summary>
-        ///     Checks the preconditions of a single command.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="command">The command to be used for execution.</param>
-        /// <param name="provider">The services used to handle the precondition.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
+        public virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             foreach (var precon in command.Preconditions)
             {
-                var result = await precon.CheckAsync(context, command, provider, cancellationToken).ConfigureAwait(false);
+                var result = await precon.CheckAsync(context, command, provider, cancellationToken);
 
                 if (!result.IsSuccess)
                     return result;
@@ -581,20 +527,9 @@ namespace CSF
             return PreconditionResult.FromSuccess();
         }
 
-        /// <summary>
-        ///     Constructs the module to be used for command execution.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="command">The command to be used for execution.</param>
-        /// <param name="provider">The services used to create the module.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
+        public virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where TContext : IContext
         {
             IEnumerable<object> GetServices()
@@ -603,11 +538,13 @@ namespace CSF
                 {
                     if (dependency.Type == typeof(IServiceProvider))
                         yield return provider;
+                    if (dependency.Type == typeof(ICommandFramework))
+                        yield return this;
                     else
                     {
                         var t = provider.GetService(dependency.Type);
 
-                        if (t is null && !dependency.Flags.HasFlag(ParameterFlags.IsNullable))
+                        if (t is null && !dependency.Flags.HasFlag(ParameterFlags.Nullable))
                             yield return Conveyor.OnServiceNotFound(context, dependency);
 
                         yield return t;
@@ -631,22 +568,12 @@ namespace CSF
             return Conveyor.OnInvalidModule(context, command.Module);
         }
 
-        /// <summary>
-        ///     Parses the types found in the command parameters from the provided context.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, Command command, CancellationToken cancellationToken)
+        public virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, Command command, CancellationToken cancellationToken)
             where TContext : IContext
         {
-            var result = await ReadContainerAsync(context, 0, command, cancellationToken).ConfigureAwait(false);
+            var result = await ReadContainerAsync(context, 0, command, cancellationToken);
 
             if (!result.IsSuccess)
                 return result;
@@ -654,32 +581,22 @@ namespace CSF
             return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
         }
 
-        /// <summary>
-        ///     Parses the types found in the container parameters from the provided context.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="command">The command to be used for execution.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ReadContainerAsync<TContext>(TContext context, int index, IParameterContainer container, CancellationToken cancellationToken)
+        public virtual async ValueTask<IResult> ReadContainerAsync<TContext>(TContext context, int index, IParameterContainer container, CancellationToken cancellationToken)
             where TContext : IContext
         {
             var parameters = new List<object>();
 
             foreach (var parameter in container.Parameters)
             {
-                if (parameter.Flags.HasFlag(ParameterFlags.IsRemainder))
+                if (parameter.Flags.HasRemainder())
                 {
                     parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
                     break;
                 }
 
-                if (parameter.Flags.HasFlag(ParameterFlags.IsOptional) && context.Parameters.Count <= index)
+                if (parameter.Flags.HasOptional() && context.Parameters.Count <= index)
                 {
                     var missingResult = Conveyor.OnMissingValue(context, parameter);
 
@@ -704,9 +621,16 @@ namespace CSF
                     continue;
                 }
 
+                if (parameter.Flags.HasNullable() && context.Parameters[index] is string str && (str == "null" || str == "nothing"))
+                {
+                    parameters.Add(null);
+                    index++;
+                    continue;
+                }
+
                 if (parameter is ComplexParameter complexParam)
                 {
-                    var result = await ReadContainerAsync(context, index, complexParam, cancellationToken).ConfigureAwait(false);
+                    var result = await ReadContainerAsync(context, index, complexParam, cancellationToken);
 
                     if (!result.IsSuccess)
                         return result;
@@ -720,7 +644,7 @@ namespace CSF
 
                 else if (parameter is BaseParameter normal)
                 {
-                    var result = await normal.TypeReader.ReadAsync(context, normal, context.Parameters[index], cancellationToken).ConfigureAwait(false);
+                    var result = await normal.TypeReader.ReadAsync(context, normal, context.Parameters[index], cancellationToken);
 
                     if (!result.IsSuccess)
                         return result;
@@ -732,24 +656,12 @@ namespace CSF
 
             Conveyor.Logger.Trace($"Succesfully populated parameters. Count: {parameters.Count}");
 
-            return ArgsResult.FromSuccess(parameters.ToArray(), index);
+            return ArgsResult.FromSuccess(parameters, index);
         }
 
-        /// <summary>
-        ///     Executes the provided command.
-        /// </summary>
-        /// <remarks>
-        ///     This method can be overridden to modify the execution flow.
-        /// </remarks>
-        /// <typeparam name="TContext">The context to execute the pipeline for.</typeparam>
-        /// <param name="context">The context to execute the pipeline for.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="module">The module to use for command execution.</param>
-        /// <param name="parameters">The parsed parameters to be used when executing the method.</param>
-        /// <param name="cancellationToken">The cancellation token that can be used to cancel this handle.</param>
-        /// <returns>An asynchronous <see cref="ValueTask"/> with the <see cref="IResult"/> returned by this handle.</returns>
+        /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        protected virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase module, object[] parameters, CancellationToken cancellationToken)
+        public virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase module, IEnumerable<object> parameters, CancellationToken cancellationToken)
             where TContext : IContext
         {
             try
@@ -757,11 +669,11 @@ namespace CSF
                 Conveyor.Logger.Debug($"Starting execution of {module.CommandInfo.Name}.");
                 var sw = Stopwatch.StartNew();
 
-                await module.BeforeExecuteAsync(command, cancellationToken).ConfigureAwait(false);
+                await module.BeforeExecuteAsync(command, cancellationToken);
 
-                var returnValue = command.Method.Invoke(module, parameters);
+                var returnValue = command.Method.Invoke(module, parameters.ToArray());
 
-                await module.AfterExecuteAsync(command, cancellationToken).ConfigureAwait(false);
+                await module.AfterExecuteAsync(command, cancellationToken);
 
                 sw.Stop();
                 Conveyor.Logger.Debug($"Finished execution of {module.CommandInfo.Name} in {sw.ElapsedMilliseconds} ms.");

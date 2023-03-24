@@ -65,9 +65,9 @@ namespace CSF
             => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
 
         /// <inheritdoc/>
-        public virtual SearchResult OnBestOverloadUnavailable<TContext>(TContext context)
+        public virtual CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
             where TContext : IContext
-            => SearchResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
+            => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
 
         /// <inheritdoc/>
         public virtual ConstructionResult OnServiceNotFound<TContext>(TContext context, DependencyParameter dependency)

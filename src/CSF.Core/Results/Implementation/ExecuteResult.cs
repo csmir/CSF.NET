@@ -6,7 +6,7 @@ namespace CSF
     /// <summary>
     ///     Represents internal failures in commands.
     /// </summary>
-    public struct ExecuteResult : IResult
+    public readonly struct ExecuteResult : IResult
     {
         /// <inheritdoc/>
         public bool IsSuccess { get; }

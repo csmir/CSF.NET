@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    internal static class TypeReader
+    /// <summary>
+    ///     Represents the access to creating a dictionary of default typereaders.
+    /// </summary>
+    public static class TypeReader
     {
         public static Dictionary<Type, ITypeReader> CreateDefaultReaders()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CSF
@@ -14,12 +15,12 @@ namespace CSF
         /// <summary>
         ///     The commands that passed through the preconditions, the first of which will be selected for execution.
         /// </summary>
-        internal Command[] Result { get; }
+        public IEnumerable<Command> Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private CheckResult(bool success, Command[] matches, string msg = null, Exception exception = null)
+        private CheckResult(bool success, IEnumerable<Command> matches, string msg = null, Exception exception = null)
         {
             Result = matches;
             IsSuccess = success;
@@ -43,7 +44,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static CheckResult FromSuccess(Command[] matches)
+        public static CheckResult FromSuccess(IEnumerable<Command> matches)
             => new CheckResult(true, matches);
     }
 }

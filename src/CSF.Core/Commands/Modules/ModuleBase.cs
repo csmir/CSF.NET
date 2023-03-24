@@ -31,10 +31,10 @@ namespace CSF
         ///     Formats and sends an error response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public virtual ExecuteResult Error(string message, params object[] values)
+        public virtual ExecuteResult Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(string.Format(message, values));
+            Console.WriteLine(message);
             Console.ResetColor();
 
             return ExecuteResult.FromSuccess();
@@ -45,17 +45,17 @@ namespace CSF
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task<ExecuteResult> ErrorAsync(string message, params object[] values)
-            => Task.FromResult(Error(message, values));
+        public virtual Task<ExecuteResult> ErrorAsync(string message)
+            => Task.FromResult(Error(message));
 
         /// <summary>
         ///     Formats and sends a successful response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public virtual ExecuteResult Success(string message, params object[] values)
+        public virtual ExecuteResult Success(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(string.Format(message, values));
+            Console.WriteLine(message);
             Console.ResetColor();
 
             return ExecuteResult.FromSuccess();
@@ -66,17 +66,17 @@ namespace CSF
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task<ExecuteResult> SuccessAsync(string message, params object[] values)
-            => Task.FromResult(Success(message, values));
+        public virtual Task<ExecuteResult> SuccessAsync(string message)
+            => Task.FromResult(Success(message));
 
         /// <summary>
         ///     Formats and sends an informational response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public virtual ExecuteResult Info(string message, params object[] values)
+        public virtual ExecuteResult Info(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(string.Format(message, values));
+            Console.WriteLine(message);
             Console.ResetColor();
 
             return ExecuteResult.FromSuccess();
@@ -87,16 +87,16 @@ namespace CSF
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task<ExecuteResult> InfoAsync(string message, params object[] values)
-            => Task.FromResult(Info(message, values));
+        public virtual Task<ExecuteResult> InfoAsync(string message)
+            => Task.FromResult(Info(message));
 
         /// <summary>
         ///     Formats and sends a plain response.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public virtual ExecuteResult Respond(string message, params object[] values)
+        public virtual ExecuteResult Respond(string message)
         {
-            Console.WriteLine(string.Format(message, values));
+            Console.WriteLine(message);
 
             return ExecuteResult.FromSuccess();
         }
@@ -106,8 +106,8 @@ namespace CSF
         /// </summary>
         /// <param name="message">The message to send.</param>
         /// <returns>An asynchronous <see cref="Task"/> with no return type.</returns>
-        public virtual Task<ExecuteResult> RespondAsync(string message, params object[] values)
-            => Task.FromResult(Respond(message, values));
+        public virtual Task<ExecuteResult> RespondAsync(string message)
+            => Task.FromResult(Respond(message));
 
         /// <summary>
         ///     Invoked right before a command is executed.

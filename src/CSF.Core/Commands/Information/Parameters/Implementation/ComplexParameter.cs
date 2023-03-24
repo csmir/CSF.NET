@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CSF
 {
@@ -36,7 +39,7 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
-        internal ComplexParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
+        public ComplexParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
         {
             var type = parameterInfo.ParameterType;
 
@@ -55,6 +58,8 @@ namespace CSF
 
             MinLength = min;
             MaxLength = max;
+
+            Name = parameterInfo.Name;
         }
 
         private (int, int) GetLength()
@@ -73,7 +78,7 @@ namespace CSF
                 if (parameter is BaseParameter defaultParam)
                 {
                     maxLength++;
-                    if (!defaultParam.Flags.HasFlag(ParameterFlags.IsOptional))
+                    if (!defaultParam.Flags.HasFlag(ParameterFlags.Optional))
                         minLength++;
                 }
             }
@@ -86,7 +91,7 @@ namespace CSF
             var type = paramInfo.ParameterType;
             var isNullable = Nullable.GetUnderlyingType(type) != null;
 
-            var flags = ParameterFlags.Default
+            var flags = ParameterFlags.None
                 .WithNullable(isNullable)
                 .WithOptional(paramInfo.IsOptional);
 
@@ -118,5 +123,8 @@ namespace CSF
                 if (attribute is Attribute attr)
                     yield return attr;
         }
+
+        public override string ToString()
+            => $"{Type.Name} ({string.Join(", ", Parameters)}) {Name}";
     }
 }
