@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace CSF
 {
@@ -49,7 +48,7 @@ namespace CSF
         /// </summary>
         public bool IsErrorOverload { get; }
 
-        public Command(TypeReaderProvider typeReaders, Module module, MethodInfo method, string[] aliases)
+        public Command(TypeReaderContainer typeReaders, Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
             Module = module;
@@ -113,7 +112,7 @@ namespace CSF
             return (minLength, maxLength);
         }
 
-        private IEnumerable<IParameterComponent> GetParameters(TypeReaderProvider typeReaders)
+        private IEnumerable<IParameterComponent> GetParameters(TypeReaderContainer typeReaders)
         {
             foreach (var parameter in Method.GetParameters())
             {

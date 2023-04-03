@@ -1,12 +1,10 @@
-﻿namespace CSF
-{
-    internal static class LoggingExtensions
-    {
-        public static Log AsLog(this IResult result, LogLevel? overrideSeverity = null)
-        {
-            var severity = overrideSeverity ?? (result.IsSuccess ? LogLevel.Information : LogLevel.Error);
+﻿using Microsoft.Extensions.Logging;
 
-            return new Log(severity, result.ErrorMessage, result.Exception);
-        }
+namespace CSF
+{
+    public static class LoggingExtensions
+    {
+        public static void LogResult(this ILogger logger, IResult result, LogLevel logLevel)
+            => logger.Log(logLevel, result.Exception, "{}", result.ErrorMessage);
     }
 }

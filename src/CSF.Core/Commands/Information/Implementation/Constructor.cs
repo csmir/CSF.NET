@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -19,11 +17,6 @@ namespace CSF
         public IList<Attribute> Attributes { get; }
 
         /// <summary>
-        ///     The parameters of this module.
-        /// </summary>
-        public IList<DependencyParameter> Dependencies { get; }
-
-        /// <summary>
         ///     The constructor entry point.
         /// </summary>
         public ConstructorInfo EntryPoint { get; }
@@ -33,8 +26,6 @@ namespace CSF
             EntryPoint = GetEntryConstructor(type);
 
             Attributes = GetAttributes(EntryPoint)
-                .ToList();
-            Dependencies = GetDependencies(EntryPoint)
                 .ToList();
 
             Name = EntryPoint.Name;
@@ -67,13 +58,7 @@ namespace CSF
                     yield return attribute;
         }
 
-        private IEnumerable<DependencyParameter> GetDependencies(ConstructorInfo ctorInfo)
-        {
-            foreach (var param in ctorInfo.GetParameters())
-                yield return new DependencyParameter(param);
-        }
-
         public override string ToString()
-            => $"{Name}({string.Join(", ", Dependencies)})";
+            => $"{Name}";
     }
 }

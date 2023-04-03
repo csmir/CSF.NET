@@ -14,12 +14,12 @@ namespace CSF.Hosting
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
-        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<HostBuilderContext, CommandConfiguration> action)
+        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<HostBuilderContext, FrameworkBuilderContext> action)
             where T : CommandConveyor where THost : HostedCommandService<T>
         {
             hostBuilder.ConfigureServices((context, services) =>
             {
-                var config = new CommandConfiguration();
+                var config = new FrameworkBuilderContext();
 
                 action(context, config);
 
@@ -37,12 +37,12 @@ namespace CSF.Hosting
         /// <param name="hostBuilder"></param>
         /// <param name="action">An action that configures the necessary hosting necessities.</param>
         /// <returns>The same <see cref="IHostBuilder"/> for chaining calls.</returns>
-        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<CommandConfiguration> action)
+        public static IHostBuilder ConfigureCommands<T, THost>(this IHostBuilder hostBuilder, Action<FrameworkBuilderContext> action)
             where T : CommandConveyor where THost : HostedCommandService<T>
         {
             hostBuilder.ConfigureServices(services =>
             {
-                var config = new CommandConfiguration();
+                var config = new FrameworkBuilderContext();
 
                 action(config);
 
@@ -64,7 +64,7 @@ namespace CSF.Hosting
         {
             hostBuilder.ConfigureServices(services =>
             {
-                services.ConfigureCommands<T, THost>(new CommandConfiguration());
+                services.ConfigureCommands<T, THost>(new FrameworkBuilderContext());
             });
             return hostBuilder;
         }
@@ -77,7 +77,7 @@ namespace CSF.Hosting
         /// <param name="services"></param>
         /// <returns>The same <see cref="IServiceCollection"/> for chaining calls.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IServiceCollection ConfigureCommands<T, THost>(this IServiceCollection services, CommandConfiguration configuration)
+        public static IServiceCollection ConfigureCommands<T, THost>(this IServiceCollection services, FrameworkBuilderContext configuration)
             where T : CommandConveyor where THost : HostedCommandService<T>
         {
             services.AddSingleton(configuration);

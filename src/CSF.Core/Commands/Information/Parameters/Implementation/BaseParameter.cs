@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -28,7 +27,7 @@ namespace CSF
         /// </summary>
         public ITypeReader TypeReader { get; }
 
-        public BaseParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
+        public BaseParameter(ParameterInfo parameterInfo, TypeReaderContainer typeReaders)
         {
             var type = parameterInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
@@ -37,21 +36,13 @@ namespace CSF
                 type = nullableType;
 
             Type = type;
-            TypeReader = GetTypeReader(typeReaders);
+            TypeReader = typeReaders[type];
 
             Attributes = GetAttributes(parameterInfo)
                 .ToList();
             Flags = SetFlags(parameterInfo);
 
             Name = parameterInfo.Name;
-        }
-
-        private ITypeReader GetTypeReader(TypeReaderProvider typeReaders)
-        {
-            if (typeReaders.TryGetReader(Type, out var reader))
-                return reader;
-
-            throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {Type.Name}.");
         }
 
         private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)

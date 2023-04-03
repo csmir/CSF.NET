@@ -21,13 +21,6 @@ namespace CSF
             => CommandInfo = info;
 
         /// <summary>
-        ///     The logger of the framework being used.
-        /// </summary>
-        public ILogger Logger { get; private set; }
-        internal void SetLogger(ILogger logger)
-            => Logger = logger;
-
-        /// <summary>
         ///     Formats and sends an error response.
         /// </summary>
         /// <param name="message">The message to send.</param>

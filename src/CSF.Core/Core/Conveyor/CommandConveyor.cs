@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
 
 namespace CSF
 {
@@ -12,57 +10,6 @@ namespace CSF
     /// </summary>
     public class CommandConveyor : ICommandConveyor
     {
-        /// <summary>
-        ///     The logger used to 
-        /// </summary>
-        public ILogger Logger { get; private set; }
-        internal void SetLogger(CommandConfiguration configuration, IServiceProvider services)
-            => Logger = GetLogger(configuration, services);
-
-        /// <inheritdoc/>
-        public virtual ILogger GetLogger(CommandConfiguration configuration, IServiceProvider services)
-        {
-            return DefaultLogger.Create(configuration.DefaultLogLevel);
-        }
-
-        /// <inheritdoc/>
-        public virtual async ValueTask<string> GetInputAsync(CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-            return Console.ReadLine();
-        }
-
-        /// <inheritdoc/>
-        public virtual async ValueTask<IContext> BuildContextAsync(ParseResult parseResult, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-            return new CommandContext(parseResult);
-        }
-
-        /// <inheritdoc/>
-        public virtual ParseResult OnInvalidPrefix()
-            => ParseResult.FromError("The provided input does not have a prefix that matches any defined prefix.");
-
-        /// <inheritdoc/>
-        public virtual async ValueTask OnResultAsync(IContext context, IResult result, CancellationToken cancellationToken)
-        {
-            if (!result.IsSuccess)
-                Logger.Send(result.AsLog());
-            await Task.CompletedTask;
-        }
-
-        /// <inheritdoc/>
-        public virtual async ValueTask OnRegisteredAsync(IConditionalComponent component, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
-
-        /// <inheritdoc/>
-        public virtual async ValueTask OnRegisteredAsync(ITypeReader typeReader, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
-
         /// <inheritdoc/>
         public virtual SearchResult OnCommandNotFound<TContext>(TContext context)
             where TContext : IContext
@@ -112,5 +59,9 @@ namespace CSF
         public virtual ExecuteResult OnUnhandledException<TContext>(TContext context, Command command, Exception ex)
             where TContext : IContext
             => ExecuteResult.FromError(ex.Message, ex);
+
+        public virtual ValueTask OnCommandExecuted<TContext>(TContext context, IServiceProvider services, IResult result)
+            where TContext : IContext
+            => new ValueTask(Task.CompletedTask);
     }
 }

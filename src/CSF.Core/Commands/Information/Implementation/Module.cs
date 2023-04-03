@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace CSF
 {
@@ -34,22 +32,16 @@ namespace CSF
         public Type Type { get; }
 
         /// <summary>
-        ///     The constructor used to create an instance of the command type.
-        /// </summary>
-        public Constructor Constructor { get; }
-
-        /// <summary>
         ///     The root module. <see langword="null"/> if not available.
         /// </summary>
         public Module Root { get; }
 
-        public Module(TypeReaderProvider typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
+        public Module(TypeReaderContainer typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
             if (rootModule != null)
                 Root = rootModule;
 
             Type = type;
-            Constructor = new Constructor(type);
 
             Attributes = (Root?.Attributes.Concat(GetAttributes()) ?? GetAttributes())
                 .ToList();
@@ -62,14 +54,7 @@ namespace CSF
             Components = GetComponents(typeReaders).ToList();
         }
 
-        public static Module Build(TypeReaderProvider typeReaders, Type type)
-        {
-            var module = new Module(typeReaders, type);
-
-            return module;
-        }
-
-        private IEnumerable<IConditionalComponent> GetComponents(TypeReaderProvider typeReaders)
+        private IEnumerable<IConditionalComponent> GetComponents(TypeReaderContainer typeReaders)
         {
             foreach (var method in Type.GetMethods())
             {

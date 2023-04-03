@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CSF
 {
@@ -39,7 +36,7 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
-        public ComplexParameter(ParameterInfo parameterInfo, TypeReaderProvider typeReaders)
+        public ComplexParameter(ParameterInfo parameterInfo, TypeReaderContainer typeReaders)
         {
             var type = parameterInfo.ParameterType;
 
@@ -101,7 +98,7 @@ namespace CSF
             return flags;
         }
 
-        private IEnumerable<IParameterComponent> GetParameters(TypeReaderProvider typeReaders)
+        private IEnumerable<IParameterComponent> GetParameters(TypeReaderContainer typeReaders)
         {
             var parameters = Constructor.EntryPoint.GetParameters();
 

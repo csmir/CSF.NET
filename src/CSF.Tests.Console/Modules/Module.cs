@@ -4,11 +4,13 @@ namespace CSF.Tests.Modules
 {
     public class Module : ModuleBase<CommandContext>
     {
+        private readonly IParser _parser;
         private readonly ICommandFramework _framework;
 
-        public Module(ICommandFramework framework)
+        public Module(IParser parser, ICommandFramework framework)
         {
-            _framework = framework;    
+            _framework = framework;
+            _parser = parser;
         }
 
         [Command("multiple")]
@@ -47,17 +49,10 @@ namespace CSF.Tests.Modules
             return Success($"({complex?.X}, {complex?.Y}, {complex?.Z})");
         }
 
-        [Command("loglevel")]
-        public IResult SetLogLevel(LogLevel level)
-        {
-            Logger.LogLevel = level;
-            return Success($"Set logging level to: {level}");
-        }
-
         [Command("findcommand", "commandinfo", "getcommand", "matches")]
         public async Task<IResult> GetCommandInfo([Remainder] string command)
         {
-            var parseResult = _framework.Configuration.Parser.Parse(command);
+            var parseResult = _parser.Parse(command);
 
             if (!parseResult.IsSuccess)
                 return Error("Failed to parse the input as valid command input.");

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace CSF.Results.Implementation
+namespace CSF
 {
     public readonly struct CheckYieldResult : IResult
     {

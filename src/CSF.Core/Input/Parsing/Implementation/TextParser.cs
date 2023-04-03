@@ -8,8 +8,10 @@ namespace CSF
     /// </summary>
     public class TextParser : IParser
     {
+        private readonly bool _parseNecessary;
+
         /// <inheritdoc/>
-        public PrefixProvider Prefixes { get; }
+        public IEnumerable<IPrefix> Prefixes { get; }
 
         /// <summary>
         ///     Gets the default prefix used when no prefix matches the provided type.
@@ -17,21 +19,14 @@ namespace CSF
         public IPrefix DefaultPrefix { get; } = EmptyPrefix.Create();
 
         /// <summary>
-        ///     Creates a new <see cref="TextParser"/> without any defined prefixes.
-        /// </summary>
-        public TextParser()
-            : this(new PrefixProvider())
-        {
-
-        }
-
-        /// <summary>
         ///     Creates a new <see cref="TextParser"/> with provided prefixes.
         /// </summary>
         /// <param name="prefixes">The prefixes to define.</param>
-        public TextParser(PrefixProvider prefixes)
+        public TextParser(FrameworkBuilderContext configuration)
         {
-            Prefixes = prefixes;
+            Prefixes = configuration.Prefixes;
+
+            _parseNecessary = Prefixes.Any();
         }
 
         /// <summary>
@@ -41,11 +36,19 @@ namespace CSF
         /// <returns></returns>
         public virtual bool TryGetPrefix(ref string rawInput, out IPrefix prefix)
         {
-            if (Prefixes.TryGetPrefix(rawInput, out prefix))
+            if (_parseNecessary)
             {
-                rawInput = rawInput[prefix.Value.Length..].TrimStart();
-                return true;
+                foreach (var value in Prefixes)
+                {
+                    if (rawInput.StartsWith(value.Value))
+                    {
+                        rawInput = rawInput[value.Value.Length..].TrimStart();
+                        prefix = value;
+                        return true;
+                    }
+                }
             }
+            prefix = EmptyPrefix.Create();
             return false;
         }
 
