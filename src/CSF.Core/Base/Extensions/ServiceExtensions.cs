@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace CSF
 {
@@ -16,7 +13,7 @@ namespace CSF
         }
 
         public static IServiceCollection AddCommandFramework<T>(this IServiceCollection collection, Action<FrameworkBuilderContext> action = null)
-            where T : class, ICommandFramework
+            where T : CommandFramework
         {
             var context = new FrameworkBuilderContext();
 
@@ -28,13 +25,13 @@ namespace CSF
         }
 
         public static IServiceCollection AddCommandFramework<T>(this IServiceCollection collection, FrameworkBuilderContext context)
-            where T : class, ICommandFramework
+            where T : CommandFramework
         {
             collection.AddPrefixes(context);
             collection.AddComponents(context);
             collection.AddTypeReaders(context);
 
-            collection.AddSingleton<ICommandFramework, T>();
+            collection.AddSingleton<T>();
 
             return collection;
         }

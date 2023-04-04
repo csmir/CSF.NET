@@ -5,9 +5,9 @@ namespace CSF.Tests.Modules
     public class Module : ModuleBase<CommandContext>
     {
         private readonly IParser _parser;
-        private readonly ICommandFramework _framework;
+        private readonly CommandFramework _framework;
 
-        public Module(IParser parser, ICommandFramework framework)
+        public Module(IParser parser, CommandFramework framework)
         {
             _framework = framework;
             _parser = parser;

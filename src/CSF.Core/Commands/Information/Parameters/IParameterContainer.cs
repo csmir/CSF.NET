@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -18,5 +23,67 @@ namespace CSF
         ///     The optimal length to use a command. If remainder is specified, the count will be set to infinity.
         /// </summary>
         public int MaxLength { get; }
+
+        public async ValueTask<IResult> ReadAsync<T>(T context, int index, TypeReaderContainer typeReaders, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            var parameters = new List<object>();
+
+            foreach (var parameter in Parameters)
+            {
+                if (parameter.Flags.HasRemainder())
+                {
+                    parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
+                    break;
+                }
+
+                if (parameter.Flags.HasOptional() && context.Parameters.Count <= index)
+                {
+                    parameters.Add(Type.Missing);
+                    continue;
+                }
+
+                if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
+                {
+                    parameters.Add(context.Parameters[index]);
+                    index++;
+                    continue;
+                }
+
+                if (parameter.Flags.HasNullable() && context.Parameters[index] is string str && (str == "null" || str == "nothing"))
+                {
+                    parameters.Add(null);
+                    index++;
+                    continue;
+                }
+
+                if (parameter is ComplexParameter complexParam)
+                {
+                    var result = await ReadAsync(context, index, typeReaders, cancellationToken);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    if (result is ArgsResult argsResult)
+                    {
+                        index = argsResult.Placement;
+                        parameters.Add(complexParam.Constructor.EntryPoint.Invoke(argsResult.Result.ToArray()));
+                    }
+                }
+
+                else if (parameter is BaseParameter normal)
+                {
+                    var result = await typeReaders.Values[normal.Type].ReadAsync(context, normal, context.Parameters[index], cancellationToken);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    index++;
+                    parameters.Add(result.Result);
+                }
+            }
+
+            return ArgsResult.FromSuccess(parameters, index);
+        }
     }
 }

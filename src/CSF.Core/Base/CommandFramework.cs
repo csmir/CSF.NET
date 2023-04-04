@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 [assembly: CLSCompliant(true)]
 namespace CSF
 {
-    public class CommandFramework : ICommandFramework
+    public class CommandFramework
     {
         private readonly bool _asyncExec;
 
@@ -32,13 +32,12 @@ namespace CSF
             _services = serviceProvider;
 
             _components = serviceProvider.GetRequiredService<ComponentContainer>();
-            _typeReaders = serviceProvider.GetRequiredService<TypeReaderContainer>();   
+            _typeReaders = serviceProvider.GetRequiredService<TypeReaderContainer>();
 
             _asyncExec = serviceProvider.GetRequiredService<FrameworkBuilderContext>()
                 .DoAsynchronousExecution;
         }
 
-        /// <inheritdoc/>
         public virtual async Task<IResult> TryExecuteAsync<T>(T context, IServiceScope scope = null, CancellationToken cancellationToken = default)
             where T : IContext
         {
@@ -55,7 +54,7 @@ namespace CSF
 
             _ = Task.Run(async () =>
             {
-                var result = await  RunPipelineAsync(context, services, cancellationToken);
+                var result = await RunPipelineAsync(context, services, cancellationToken);
 
                 await AfterExecuteAsync(context, services, result);
             });
@@ -63,12 +62,9 @@ namespace CSF
             return ExecuteResult.FromSuccess();
         }
 
-        /// <inheritdoc/>
         public virtual async ValueTask<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
-            _logger.LogDebug($"Starting command pipeline for name: '{context.Name}'");
-
             var searchResult = await SearchAsync(context, cancellationToken);
 
             if (!searchResult.IsSuccess)
@@ -94,7 +90,6 @@ namespace CSF
             return ExecuteResult.FromSuccess();
         }
 
-        /// <inheritdoc/>
         public virtual async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -119,7 +114,7 @@ namespace CSF
                     context.Name = context.Parameters[0].ToString();
                     context.Parameters = context.Parameters.GetRange(1);
 
-                    var result = await SearchModuleAsync(context, groups[0], cancellationToken);
+                    var result = await groups[0].SearchAsync(context, cancellationToken);
 
                     if (result.IsSuccess)
                         return result;
@@ -135,39 +130,10 @@ namespace CSF
             return OnCommandNotFound(context);
         }
 
-        /// <inheritdoc/>
-        public virtual async ValueTask<SearchResult> SearchModuleAsync<T>(T context, Module module, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            var matches = module.Components
-                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
+        protected virtual SearchResult OnCommandNotFound<TContext>(TContext context)
+            where TContext : IContext
+            => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
 
-            var commands = matches.CastWhere<Command>()
-                .OrderBy(x => x.Parameters.Count)
-                .ToList();
-
-            if (commands.Count < 1)
-            {
-                var groups = matches.CastWhere<Module>()
-                    .OrderBy(x => x.Components.Count)
-                    .ToList();
-
-                if (groups.Any())
-                {
-                    context.Name = context.Parameters[0].ToString();
-                    context.Parameters = context.Parameters.GetRange(1);
-
-                    return await SearchModuleAsync(context, groups[0], cancellationToken);
-                }
-
-                else
-                    return OnCommandNotFound(context);
-            }
-
-            return SearchResult.FromSuccess(commands);
-        }
-
-        /// <inheritdoc/>
         public virtual async ValueTask<IResult> CheckAsync<T>(T context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -205,7 +171,6 @@ namespace CSF
             return CheckYieldResult.FromSuccess(matches);
         }
 
-        /// <inheritdoc/>
         public virtual ValueTask<CheckResult> CheckMatchesAsync<T>(T context, IEnumerable<Command> commands, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -220,18 +185,14 @@ namespace CSF
                     var min = command.MaxLength;
                     var contextLength = context.Parameters.Count;
 
-                    // If parameter & input length is equal, prefer it over all matches.
                     if (command.MaxLength == contextLength)
                         yield return command;
 
-                    // If command length is lower than context length, look for a remainder attribute.
-                    // Due to sorting upwards, it will continue the loop and prefer the remainder attr with most parameters.
                     if (command.MaxLength <= contextLength)
                         foreach (var parameter in command.Parameters)
                             if (parameter.Flags.HasFlag(ParameterFlags.Remainder))
                                 yield return command;
 
-                    // If context length is lower than command length, return the command with least optionals.
                     if (command.MaxLength > contextLength)
                     {
                         if (command.MinLength <= contextLength)
@@ -255,7 +216,10 @@ namespace CSF
             return CheckResult.FromSuccess(matches);
         }
 
-        /// <inheritdoc/>
+        protected virtual CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
+            where TContext : IContext
+            => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
+
         public virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -267,12 +231,20 @@ namespace CSF
                     return result;
             }
 
-            _logger.LogTrace("Succesfully ran precondition checks for {}.", command.Name);
-
             return PreconditionResult.FromSuccess();
         }
 
-        /// <inheritdoc/>
+        public virtual async ValueTask<IResult> ReadAsync<T>(T context, IParameterContainer command, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            var result = await command.ReadAsync(context, 0, _typeReaders, cancellationToken);
+
+            if (!result.IsSuccess)
+                return result;
+
+            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
+        }
+
         public virtual ValueTask<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -281,89 +253,9 @@ namespace CSF
             module.SetContext(context);
             module.SetInformation(command);
 
-            _logger.LogTrace("Succesfully constructed module for {}", command.Name);
-
             return ConstructionResult.FromSuccess(module);
         }
 
-        /// <inheritdoc/>
-        public virtual async ValueTask<IResult> ReadAsync<T>(T context, Command command, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            var result = await ReadContainerAsync(context, 0, command, cancellationToken);
-
-            if (!result.IsSuccess)
-                return result;
-
-            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
-        }
-
-        /// <inheritdoc/>
-        public virtual async ValueTask<IResult> ReadContainerAsync<T>(T context, int index, IParameterContainer container, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            var parameters = new List<object>();
-
-            foreach (var parameter in container.Parameters)
-            {
-                if (parameter.Flags.HasRemainder())
-                {
-                    parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
-                    break;
-                }
-
-                if (parameter.Flags.HasOptional() && context.Parameters.Count <= index)
-                {
-                    parameters.Add(Type.Missing);
-                    continue;
-                }
-
-                if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
-                {
-                    parameters.Add(context.Parameters[index]);
-                    index++;
-                    continue;
-                }
-
-                if (parameter.Flags.HasNullable() && context.Parameters[index] is string str && (str == "null" || str == "nothing"))
-                {
-                    parameters.Add(null);
-                    index++;
-                    continue;
-                }
-
-                if (parameter is ComplexParameter complexParam)
-                {
-                    var result = await ReadContainerAsync(context, index, complexParam, cancellationToken);
-
-                    if (!result.IsSuccess)
-                        return result;
-
-                    if (result is ArgsResult argsResult)
-                    {
-                        index = argsResult.Placement;
-                        parameters.Add(complexParam.Constructor.EntryPoint.Invoke(argsResult.Result.ToArray()));
-                    }
-                }
-
-                else if (parameter is BaseParameter normal)
-                {
-                    var result = await _typeReaders.Values[normal.Type].ReadAsync(context, normal, context.Parameters[index], cancellationToken);
-
-                    if (!result.IsSuccess)
-                        return result;
-
-                    index++;
-                    parameters.Add(result.Result);
-                }
-            }
-
-            _logger.LogTrace("Succesfully populated parameters. Count: {}", parameters.Count);
-
-            return ArgsResult.FromSuccess(parameters, index);
-        }
-
-        /// <inheritdoc/>
         public virtual async ValueTask<IResult> ExecuteAsync<T>(T context, Command command, ModuleBase module, IEnumerable<object> parameters, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -410,18 +302,10 @@ namespace CSF
             }
         }
 
-        /// <inheritdoc/>
-        public virtual SearchResult OnCommandNotFound<TContext>(TContext context)
-            where TContext : IContext
-            => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
-
-        /// <inheritdoc/>
-        public virtual CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
-            where TContext : IContext
-            => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
-
         public virtual ValueTask AfterExecuteAsync<TContext>(TContext context, IServiceProvider services, IResult result)
             where TContext : IContext
-            => new ValueTask(Task.CompletedTask);
+        {
+            return new ValueTask(Task.CompletedTask);
+        }
     }
 }

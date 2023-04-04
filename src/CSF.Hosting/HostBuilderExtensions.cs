@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.ComponentModel;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace CSF.Hosting
 {
@@ -14,7 +12,7 @@ namespace CSF.Hosting
         }
 
         public static IHostBuilder WithCommandFramework<T>(this IHostBuilder hostBuilder, Action<HostBuilderContext, FrameworkBuilderContext> action = null)
-            where T : class, ICommandFramework
+            where T : CommandFramework
         {
             hostBuilder.ConfigureServices((hostContext, services) =>
             {

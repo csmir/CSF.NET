@@ -7,7 +7,7 @@ var collection = new ServiceCollection()
 
 var services = collection.BuildServiceProvider();
 
-var framework = services.GetRequiredService<ICommandFramework>();
+var framework = services.GetRequiredService<CommandFramework>();
 var parser = services.GetRequiredService<TextParser>();
 
 while (true)
@@ -21,5 +21,5 @@ while (true)
 
     var context = new CommandContext(parseResult);
 
-    framework.TryExecuteAsync(context);
+    await framework.TryExecuteAsync(context);
 }

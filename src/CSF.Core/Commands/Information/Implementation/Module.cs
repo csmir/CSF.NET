@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CSF
 {
@@ -53,6 +55,37 @@ namespace CSF
 
             Components = GetComponents()
                 .ToList();
+        }
+
+        public async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            var matches = Components
+                .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
+
+            var commands = matches.CastWhere<Command>()
+                .OrderBy(x => x.Parameters.Count)
+                .ToList();
+
+            if (commands.Count < 1)
+            {
+                var groups = matches.CastWhere<Module>()
+                    .OrderBy(x => x.Components.Count)
+                    .ToList();
+
+                if (groups.Any())
+                {
+                    context.Name = context.Parameters[0].ToString();
+                    context.Parameters = context.Parameters.GetRange(1);
+
+                    return await groups[0].SearchAsync(context, cancellationToken);
+                }
+
+                else
+                    return SearchResult.FromError("No command found!");
+            }
+
+            return SearchResult.FromSuccess(commands);
         }
 
         private IEnumerable<IConditionalComponent> GetComponents()

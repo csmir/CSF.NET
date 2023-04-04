@@ -9,7 +9,7 @@ namespace CSF.Hosting
     /// </summary>
     public abstract class HostedCommandService : CommandFramework, IHostedService
     {
-        protected HostedCommandService(IServiceProvider serviceProvider, ILogger<HostedCommandService> logger) 
+        protected HostedCommandService(IServiceProvider serviceProvider, ILogger<HostedCommandService> logger)
             : base(serviceProvider, logger)
         {
         }
