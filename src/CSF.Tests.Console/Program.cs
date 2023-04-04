@@ -2,13 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
-    .AddSingleton<TextParser>()
-    .AddCommandManager();
+    .AddCommandManager()
+    .AddTypeReader<EnumTypeReader<ServiceLifetime>>();
 
 var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<CommandManager>();
-var parser = services.GetRequiredService<TextParser>();
+var parser = new TextParser();
 
 while (true)
 {
@@ -18,6 +18,9 @@ while (true)
     {
         var context = new CommandContext(output);
 
-        await framework.TryExecuteAsync(context);
+        var result = await framework.TryExecuteAsync(context);
+
+        if (!result.IsSuccess)
+            Console.WriteLine(result.ErrorMessage);
     }
 }

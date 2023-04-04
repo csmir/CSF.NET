@@ -22,22 +22,20 @@ namespace CSF
         {
             var rootType = typeof(IModuleBase);
 
-            IEnumerable<Type> YieldModules()
+            var modules = new List<Type>();
+            foreach (var assembly in context.RegistrationAssemblies)
             {
-                foreach (var assembly in context.RegistrationAssemblies)
+                foreach (var type in assembly.GetTypes())
                 {
-                    foreach (var type in assembly.GetTypes())
+                    if (rootType.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
                     {
-                        if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic && !type.ContainsGenericParameters)
-                        {
-                            collection.TryAddTransient(rootType, type);
-                            yield return type;
-                        }
+                        modules.Add(type);
+                        collection.TryAddTransient(type);
                     }
                 }
             }
 
-            var container = new ComponentContainer(YieldModules());
+            var container = new ComponentContainer(modules);
 
             collection.TryAddSingleton(container);
 

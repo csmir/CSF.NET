@@ -9,9 +9,12 @@ namespace CSF.Hosting
     /// </summary>
     public abstract class HostedCommandService : CommandManager, IHostedService
     {
+        protected ILogger Logger { get; }
+
         protected HostedCommandService(IServiceProvider serviceProvider, ILogger<HostedCommandService> logger)
-            : base(serviceProvider, logger)
+            : base(serviceProvider)
         {
+            Logger = logger;
         }
 
         public abstract Task StartAsync(CancellationToken cancellationToken);

@@ -1,6 +1,6 @@
-﻿using CSF.Tests.Console.Complex;
+﻿using CSF.Tests.Complex;
 
-namespace CSF.Tests.Modules
+namespace CSF.Tests
 {
     public class Module : ModuleBase<CommandContext>
     {

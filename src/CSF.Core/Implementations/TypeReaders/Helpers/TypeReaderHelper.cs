@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Collections.Generic;
 
 namespace CSF
@@ -23,16 +24,46 @@ namespace CSF
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic && !type.ContainsGenericParameters)
-                        collection.TryAddSingleton(rootType, type);
+                    if (rootType.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
+                        collection.AddSingleton(rootType, type);
                 }
             }
 
             foreach (var reader in CreateDefaultReaders())
-                collection.TryAddSingleton(rootType, reader.Type);
+                collection.AddSingleton(rootType, reader.GetType());
 
             collection.TryAddSingleton<TypeReaderContainer>();
 
+            return collection;
+        }
+
+        /// <summary>
+        ///     Adds an <see cref="ITypeReader"/> to the <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="ITypeReader"/> implementation to register.</typeparam>
+        /// <param name="collection"></param>
+        /// <returns>The same <see cref="IServiceCollection"/> for chaining calls.</returns>
+        public static IServiceCollection AddTypeReader<T>(this IServiceCollection collection)
+            where T : class, ITypeReader
+        {
+            collection.AddSingleton<ITypeReader, T>();
+
+            return collection;
+        }
+
+        /// <summary>
+        ///     Adds an <see cref="ITypeReader"/> to the <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="readerType">The <see cref="ITypeReader"/> implementation to register.</param>
+        /// <returns>The same <see cref="IServiceCollection"/> for chaining calls.</returns>
+        public static IServiceCollection AddTypeReader(this IServiceCollection collection, Type readerType)
+        {
+            var rootType = typeof(ITypeReader);
+
+            if (rootType.IsAssignableFrom(readerType) && !readerType.IsAbstract)
+                collection.AddSingleton(rootType, readerType); 
+            
             return collection;
         }
 

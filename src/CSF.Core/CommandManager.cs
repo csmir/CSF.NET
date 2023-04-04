@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,6 @@ namespace CSF
         private readonly ComponentContainer _components;
         private readonly TypeReaderContainer _typeReaders;
 
-        private readonly ILogger _logger;
         private readonly IServiceProvider _services;
 
         /// <summary>
@@ -25,19 +23,7 @@ namespace CSF
         /// </summary>
         /// <param name="serviceProvider">The serviceprovider used to request registered services.</param>
         public CommandManager(IServiceProvider serviceProvider)
-            : this(serviceProvider, serviceProvider.GetRequiredService<ILogger<CommandManager>>())
         {
-
-        }
-
-        /// <summary>
-        ///     Creates a new <see cref="CommandManager"/>.
-        /// </summary>
-        /// <param name="serviceProvider">The serviceprovider used to request registered services.</param>
-        /// <param name="logger">The logger to report the execution process.</param>
-        public CommandManager(IServiceProvider serviceProvider, ILogger logger)
-        {
-            _logger = logger;
             _services = serviceProvider;
 
             _components = serviceProvider.GetRequiredService<ComponentContainer>();
@@ -210,8 +196,6 @@ namespace CSF
 
                 return CheckResult.FromSuccess(new[] { overload });
             }
-
-            _logger.LogTrace("Found matches for name: '{}': {}", context.Name, string.Join(", ", matches));
 
             return CheckResult.FromSuccess(matches);
         }

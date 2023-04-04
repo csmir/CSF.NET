@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -241,11 +242,9 @@ namespace CSF
                         break;
                     case Task task:
                         await task;
-                        result = ExecuteResult.FromSuccess();
                         break;
                     case IResult syncResult:
-                        if (!syncResult.IsSuccess)
-                            return syncResult;
+                        result = syncResult;
                         break;
                     default:
                         if (returnValue is null)
@@ -253,7 +252,7 @@ namespace CSF
                         throw new NotSupportedException("Specified return type is not supported.");
                 }
 
-                return result;
+                return result ??= ExecuteResult.FromSuccess();
             }
             catch (Exception ex)
             {
