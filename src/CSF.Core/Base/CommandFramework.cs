@@ -44,17 +44,25 @@ namespace CSF
             {
                 var result = await RunPipelineAsync(context, services, cancellationToken);
 
-                await _conveyor.OnCommandExecuted(context, services, result);
+                await _conveyor.OnExecuted(context, services, result);
 
                 return result;
             }
 
-            _ = Task.Run(async () =>
+            ThreadPool.QueueUserWorkItem(async state =>
             {
-                var result = await RunPipelineAsync(context, services, cancellationToken);
+                try
+                {
+                    var result = await RunPipelineAsync(context, services, cancellationToken);
 
-                await _conveyor.OnCommandExecuted(context, services, result);
+                    await _conveyor.OnExecuted(context, services, result);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex, "{}", ex.Message);
+                }
             });
+
             return ExecuteResult.FromSuccess();
         }
 

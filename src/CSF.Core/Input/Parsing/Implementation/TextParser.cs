@@ -11,22 +11,17 @@ namespace CSF
         private readonly bool _parseNecessary;
 
         /// <inheritdoc/>
-        public IEnumerable<IPrefix> Prefixes { get; }
-
-        /// <summary>
-        ///     Gets the default prefix used when no prefix matches the provided type.
-        /// </summary>
-        public IPrefix DefaultPrefix { get; } = EmptyPrefix.Create();
+        public PrefixContainer Prefixes { get; }
 
         /// <summary>
         ///     Creates a new <see cref="TextParser"/> with provided prefixes.
         /// </summary>
         /// <param name="prefixes">The prefixes to define.</param>
-        public TextParser(FrameworkBuilderContext configuration)
+        public TextParser(PrefixContainer prefixes)
         {
-            Prefixes = configuration.Prefixes;
+            Prefixes = prefixes;
 
-            _parseNecessary = Prefixes.Any();
+            _parseNecessary = Prefixes.Values.Any();
         }
 
         /// <summary>
@@ -38,7 +33,7 @@ namespace CSF
         {
             if (_parseNecessary)
             {
-                foreach (var value in Prefixes)
+                foreach (var value in Prefixes.Values)
                 {
                     if (rawInput.StartsWith(value.Value))
                     {

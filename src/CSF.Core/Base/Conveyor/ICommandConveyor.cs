@@ -111,7 +111,7 @@ namespace CSF
         public ExecuteResult OnUnhandledException<TContext>(TContext context, Command command, Exception ex)
             where TContext : IContext;
 
-        public ValueTask OnCommandExecuted<TContext>(TContext context, IServiceProvider services, IResult result)
+        public ValueTask OnExecuted<TContext>(TContext context, IServiceProvider services, IResult result)
             where TContext : IContext;
     }
 }

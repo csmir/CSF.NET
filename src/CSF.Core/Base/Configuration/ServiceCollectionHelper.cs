@@ -88,6 +88,7 @@ namespace CSF
             where T : class, ICommandFramework
         {
             collection.AddPrefixes(context.Prefixes);
+            collection.AddParser(context.ParserType);
 
             foreach (var assembly in context.RegistrationAssemblies)
             {

@@ -21,6 +21,8 @@ namespace CSF
 
         public IEnumerable<IPrefix> Prefixes { get; set; } = Array.Empty<IPrefix>();
 
+        public Type ParserType { get; set; } = typeof(TextParser);
+
         /// <summary>
         ///     The assemblies that should be used for registering commands, typereaders and event resolvers.
         /// </summary>

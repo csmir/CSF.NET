@@ -60,7 +60,7 @@ namespace CSF
             where TContext : IContext
             => ExecuteResult.FromError(ex.Message, ex);
 
-        public virtual ValueTask OnCommandExecuted<TContext>(TContext context, IServiceProvider services, IResult result)
+        public virtual ValueTask OnExecuted<TContext>(TContext context, IServiceProvider services, IResult result)
             where TContext : IContext
             => new ValueTask(Task.CompletedTask);
     }
