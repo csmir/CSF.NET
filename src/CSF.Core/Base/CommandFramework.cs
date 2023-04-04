@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -77,17 +76,9 @@ namespace CSF
 
             var (command, args) = ((CheckYieldResult)checkResult).Result.First();
 
-            var constructResult = await ConstructAsync(context, command, provider, cancellationToken);
+            var result = await command.ExecuteAsync(context, args.Result, provider, cancellationToken);
 
-            if (!constructResult.IsSuccess)
-                return constructResult;
-
-            var result = await ExecuteAsync(context, command, constructResult.Result, args.Result, cancellationToken);
-
-            if (result != null && !result.IsSuccess)
-                return result;
-
-            return ExecuteResult.FromSuccess();
+            return result;
         }
 
         public virtual async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
@@ -150,11 +141,11 @@ namespace CSF
 
             foreach (var command in commands)
             {
-                var preconResult = await CheckPreconditionsAsync(context, command, provider, cancellationToken);
+                var preconResult = await command.CheckAsync(context, provider, cancellationToken);
 
                 if (preconResult.IsSuccess)
                 {
-                    var readResult = await ReadAsync(context, command, cancellationToken);
+                    var readResult = await command.ReadAsync(context, _typeReaders, cancellationToken);
 
                     if (!readResult.IsSuccess)
                         failureResult = readResult;
@@ -220,31 +211,6 @@ namespace CSF
             where TContext : IContext
             => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
 
-        public virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            foreach (var precon in command.Preconditions)
-            {
-                var result = await precon.CheckAsync(context, command, provider, cancellationToken);
-
-                if (!result.IsSuccess)
-                    return result;
-            }
-
-            return PreconditionResult.FromSuccess();
-        }
-
-        public virtual async ValueTask<IResult> ReadAsync<T>(T context, IParameterContainer command, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            var result = await command.ReadAsync(context, 0, _typeReaders, cancellationToken);
-
-            if (!result.IsSuccess)
-                return result;
-
-            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
-        }
-
         public virtual ValueTask<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -254,52 +220,6 @@ namespace CSF
             module.SetInformation(command);
 
             return ConstructionResult.FromSuccess(module);
-        }
-
-        public virtual async ValueTask<IResult> ExecuteAsync<T>(T context, Command command, ModuleBase module, IEnumerable<object> parameters, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            try
-            {
-                _logger.LogDebug("Starting execution of {}.", module.CommandInfo.Name);
-                var sw = Stopwatch.StartNew();
-
-                await module.BeforeExecuteAsync(command, cancellationToken);
-
-                var returnValue = command.Method.Invoke(module, parameters.ToArray());
-
-                await module.AfterExecuteAsync(command, cancellationToken);
-
-                sw.Stop();
-                _logger.LogDebug("Finished execution of {} in {} ms.", module.CommandInfo.Name, sw.ElapsedMilliseconds);
-
-                var result = default(IResult);
-
-                switch (returnValue)
-                {
-                    case Task<IResult> execTask:
-                        result = await execTask;
-                        break;
-                    case Task task:
-                        await task;
-                        result = ExecuteResult.FromSuccess();
-                        break;
-                    case IResult syncResult:
-                        if (!syncResult.IsSuccess)
-                            return syncResult;
-                        break;
-                    default:
-                        if (returnValue is null)
-                            break;
-                        throw new NotSupportedException("Specified return type is not supported.");
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return ExecuteResult.FromError(ex.Message, ex);
-            }
         }
 
         public virtual ValueTask AfterExecuteAsync<TContext>(TContext context, IServiceProvider services, IResult result)

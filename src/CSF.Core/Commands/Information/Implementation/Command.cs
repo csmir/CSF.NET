@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 namespace CSF
 {
@@ -85,6 +88,76 @@ namespace CSF
 
             MinLength = min;
             MaxLength = max;
+        }
+
+        public async ValueTask<PreconditionResult> CheckAsync<T>(T context, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            foreach (var precon in Preconditions)
+            {
+                var result = await precon.CheckAsync(context, this, provider, cancellationToken);
+
+                if (!result.IsSuccess)
+                    return result;
+            }
+
+            return PreconditionResult.FromSuccess();
+        }
+
+        public async ValueTask<IResult> ReadAsync<T>(T context, TypeReaderContainer typeReaders, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            var result = await ((IParameterContainer)this).ReadAsync(context, 0, typeReaders, cancellationToken);
+
+            if (!result.IsSuccess)
+                return result;
+
+            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
+        }
+
+        public async ValueTask<IResult> ExecuteAsync<T>(T context, IEnumerable<object> parameters, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            try
+            {
+                var module = provider.GetService(Module.Type) as ModuleBase;
+
+                module.SetContext(context);
+                module.SetInformation(this);
+
+                await module.BeforeExecuteAsync(this, cancellationToken);
+
+                var returnValue = Method.Invoke(module, parameters.ToArray());
+
+                await module.AfterExecuteAsync(this, cancellationToken);
+
+                var result = default(IResult);
+
+                switch (returnValue)
+                {
+                    case Task<IResult> execTask:
+                        result = await execTask;
+                        break;
+                    case Task task:
+                        await task;
+                        result = ExecuteResult.FromSuccess();
+                        break;
+                    case IResult syncResult:
+                        if (!syncResult.IsSuccess)
+                            return syncResult;
+                        break;
+                    default:
+                        if (returnValue is null)
+                            break;
+                        throw new NotSupportedException("Specified return type is not supported.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ExecuteResult.FromError(ex.Message, ex);
+            }
         }
 
         private (int, int) GetLength()
