@@ -22,6 +22,10 @@ namespace CSF
         /// <inheritdoc/>
         public IList<Attribute> Attributes { get; }
 
+        /// <summary>
+        ///     Creates a new <see cref="BaseParameter"/>.
+        /// </summary>
+        /// <param name="parameterInfo">The parameter info to create from.</param>
         public BaseParameter(ParameterInfo parameterInfo)
         {
             var type = parameterInfo.ParameterType;
@@ -65,6 +69,11 @@ namespace CSF
 
             return flags;
         }
+
+        /// <summary>
+        ///     Formats the type into a readable signature.
+        /// </summary>
+        /// <returns>A string containing a readable signature.</returns>
         public override string ToString()
             => $"{Type.Name} {Name}";
     }

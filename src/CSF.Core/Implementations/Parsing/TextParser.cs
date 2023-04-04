@@ -4,21 +4,28 @@ using System.Linq;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a parser for text command input.
+    /// </summary>
     public class TextParser : IParser
     {
         private readonly string[] _prefixes;
 
-        public TextParser(ManagerBuilderContext context)
+        /// <summary>
+        ///     Creates a new <see cref="TextParser"/> with provided prefixes. None if no prefix is applicable.
+        /// </summary>
+        /// <param name="prefixes"></param>
+        public TextParser(params string[] prefixes)
         {
-            _prefixes = context.Prefixes;
+            _prefixes = prefixes;
         }
 
         /// <summary>
-        ///     
+        ///     Attempts to get a prefix from the raw text input.
         /// </summary>
-        /// <param name="rawInput"></param>
-        /// <param name="prefix"></param>
-        /// <returns></returns>
+        /// <param name="rawInput">The raw input to find a prefix for.</param>
+        /// <param name="prefix">The prefix if found, otherwise null.</param>
+        /// <returns>True if a prefix was found or no prefix is applicable to this input. False if neither is true.</returns>
         public virtual bool TryGetPrefix(ref string rawInput, out string prefix)
         {
             prefix = null;
@@ -41,13 +48,8 @@ namespace CSF
             return true;
         }
 
-        /// <summary>
-        ///     
-        /// </summary>
-        /// <param name="rawInput"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public bool TryParse(object rawInput, [NotNullWhen(true)] out ParseInformation result)
+        /// <inheritdoc/>
+        public virtual bool TryParse(object rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;
 
@@ -59,11 +61,11 @@ namespace CSF
         }
 
         /// <summary>
-        ///     
+        ///     Tries to parse raw input into a valid command input.
         /// </summary>
-        /// <param name="rawInput"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
+        /// <param name="rawInput">The raw text to parse.</param>
+        /// <param name="result">The information received from parsing the input.</param>
+        /// <returns>True if the parse succeeded. False if not.</returns>
         public virtual bool TryParse(string rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;

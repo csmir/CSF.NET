@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a result returned by checking a range of commands.
+    /// </summary>
     public readonly struct CheckResult : IResult
     {
         /// <inheritdoc/>

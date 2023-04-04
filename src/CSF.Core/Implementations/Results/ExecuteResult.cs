@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a result returned by command execution.
+    /// </summary>
     public readonly struct ExecuteResult : IResult
     {
         /// <inheritdoc/>

@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    public readonly struct ArgsResult : IResult
+    /// <summary>
+    ///     Represents a result returned by parsing a command.
+    /// </summary>
+    public readonly struct ParseResult : IResult
     {
         /// <inheritdoc/>
         public bool IsSuccess { get; }
@@ -25,7 +28,7 @@ namespace CSF
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private ArgsResult(bool success, IEnumerable<object> result = null, int index = -1, string msg = null, Exception exception = null)
+        private ParseResult(bool success, IEnumerable<object> result = null, int index = -1, string msg = null, Exception exception = null)
         {
             IsSuccess = success;
             ErrorMessage = msg;
@@ -34,7 +37,7 @@ namespace CSF
             Placement = index;
         }
 
-        public static implicit operator ValueTask<ArgsResult>(ArgsResult result)
+        public static implicit operator ValueTask<ParseResult>(ParseResult result)
             => result.AsValueTask();
 
         /// <summary>
@@ -43,14 +46,14 @@ namespace CSF
         /// <param name="errorMessage"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public static ArgsResult FromError(string errorMessage, Exception exception = null)
-            => new ArgsResult(false, null, -1, errorMessage, exception);
+        public static ParseResult FromError(string errorMessage, Exception exception = null)
+            => new ParseResult(false, null, -1, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static ArgsResult FromSuccess(IEnumerable<object> value, int index)
-            => new ArgsResult(true, value, index);
+        public static ParseResult FromSuccess(IEnumerable<object> value, int index)
+            => new ParseResult(true, value, index);
     }
 }

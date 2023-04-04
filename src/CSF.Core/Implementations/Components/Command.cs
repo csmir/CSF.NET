@@ -50,6 +50,12 @@ namespace CSF
         /// </summary>
         public bool IsErrorOverload { get; }
 
+        /// <summary>
+        ///     Creates a new <see cref="Command"/>.
+        /// </summary>
+        /// <param name="module">The root module of this command.</param>
+        /// <param name="method">The method information of this command.</param>
+        /// <param name="aliases">The aliases of this command.</param>
         public Command(Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
@@ -89,12 +95,20 @@ namespace CSF
             MaxLength = max;
         }
 
-        public async ValueTask<PreconditionResult> CheckAsync<T>(T context, IServiceProvider provider, CancellationToken cancellationToken)
+        /// <summary>
+        ///     Checks the preconditions of this command and returns the result.
+        /// </summary>
+        /// <typeparam name="T">The context containing information necessary to search and match the command.</typeparam>
+        /// <param name="context">The context containing information necessary to search and match the command.</param>
+        /// <param name="services">The services used to execute the command.</param>
+        /// <param name="cancellationToken">Token to be used to signal the code to break.</param>
+        /// <returns>An asynchronous <see cref="ValueTask"/> holding the result of the executed command.</returns>
+        public async ValueTask<PreconditionResult> CheckAsync<T>(T context, IServiceProvider services, CancellationToken cancellationToken)
             where T : IContext
         {
             foreach (var precon in Preconditions)
             {
-                var result = await precon.CheckAsync(context, this, provider, cancellationToken);
+                var result = await precon.CheckAsync(context, this, services, cancellationToken);
 
                 if (!result.IsSuccess)
                     return result;
@@ -103,23 +117,111 @@ namespace CSF
             return PreconditionResult.FromSuccess();
         }
 
+        /// <summary>
+        ///     Reads the parameters of this command and returns the result.
+        /// </summary>
+        /// <typeparam name="T">The context containing information necessary to search and match the command.</typeparam>
+        /// <param name="context">The context containing information necessary to search and match the command.</param>
+        /// <param name="typeReaders">The typereaders used to read the command.</param>
+        /// <param name="cancellationToken">Token to be used to signal the code to break.</param>
+        /// <returns>An asynchronous <see cref="ValueTask"/> holding the result of the executed command.</returns>
         public async ValueTask<IResult> ReadAsync<T>(T context, TypeReaderContainer typeReaders, CancellationToken cancellationToken)
             where T : IContext
         {
-            var result = await ((IParameterContainer)this).ReadAsync(context, 0, typeReaders, cancellationToken);
+            var result = await ReadAsync(context, 0, typeReaders, cancellationToken);
 
             if (!result.IsSuccess)
                 return result;
 
-            return ArgsResult.FromSuccess(((ArgsResult)result).Result, -1);
+            return ParseResult.FromSuccess(((ParseResult)result).Result, -1);
         }
 
-        public async ValueTask<IResult> ExecuteAsync<T>(T context, IEnumerable<object> parameters, IServiceProvider provider, CancellationToken cancellationToken)
+        /// <summary>
+        ///     Reads the containers of the parameter and returns the result.
+        /// </summary>
+        /// <typeparam name="T">The context containing information necessary to search and match the command.</typeparam>
+        /// <param name="context">The context containing information necessary to search and match the command.</param>
+        /// <param name="index">The index used to increment reader position.</param>
+        /// <param name="typeReaders">The typereaders used to read the command.</param>
+        /// <param name="cancellationToken">Token to be used to signal the code to break.</param>
+        /// <returns>An asynchronous <see cref="ValueTask"/> holding the result of the executed command.</returns>
+        public async ValueTask<IResult> ReadAsync<T>(T context, int index, TypeReaderContainer typeReaders, CancellationToken cancellationToken)
+            where T : IContext
+        {
+            var parameters = new List<object>();
+
+            foreach (var parameter in Parameters)
+            {
+                if (parameter.Flags.HasRemainder())
+                {
+                    parameters.Add(string.Join(" ", context.Parameters.Skip(index)));
+                    break;
+                }
+
+                if (parameter.Flags.HasOptional() && context.Parameters.Count <= index)
+                {
+                    parameters.Add(Type.Missing);
+                    continue;
+                }
+
+                if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
+                {
+                    parameters.Add(context.Parameters[index]);
+                    index++;
+                    continue;
+                }
+
+                if (parameter.Flags.HasNullable() && context.Parameters[index] is string str && (str == "null" || str == "nothing"))
+                {
+                    parameters.Add(null);
+                    index++;
+                    continue;
+                }
+
+                if (parameter is ComplexParameter complexParam)
+                {
+                    var result = await ReadAsync(context, index, typeReaders, cancellationToken);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    if (result is ParseResult argsResult)
+                    {
+                        index = argsResult.Placement;
+                        parameters.Add(complexParam.Constructor.EntryPoint.Invoke(argsResult.Result.ToArray()));
+                    }
+                }
+
+                else if (parameter is BaseParameter normal)
+                {
+                    var result = await typeReaders.Values[normal.Type].ReadAsync(context, normal, context.Parameters[index], cancellationToken);
+
+                    if (!result.IsSuccess)
+                        return result;
+
+                    index++;
+                    parameters.Add(result.Result);
+                }
+            }
+
+            return ParseResult.FromSuccess(parameters, index);
+        }
+
+        /// <summary>
+        ///     Fetches the execution context and executes the command logic.
+        /// </summary>
+        /// <typeparam name="T">The context containing information necessary to search and match the command.</typeparam>
+        /// <param name="context">The context containing information necessary to search and match the command.</param>
+        /// <param name="parameters">The parameters to populate the method with.</param>
+        /// <param name="services">The services used to execute the command.</param>
+        /// <param name="cancellationToken">Token to be used to signal the code to break.</param>
+        /// <returns>An asynchronous <see cref="ValueTask"/> holding the result of the executed command.</returns>
+        public async ValueTask<IResult> ExecuteAsync<T>(T context, IEnumerable<object> parameters, IServiceProvider services, CancellationToken cancellationToken)
             where T : IContext
         {
             try
             {
-                var module = provider.GetService(Module.Type) as ModuleBase;
+                var module = services.GetService(Module.Type) as ModuleBase;
 
                 module.SetContext(context);
                 module.SetCommand(this);
@@ -209,6 +311,10 @@ namespace CSF
                     yield return attr;
         }
 
+        /// <summary>
+        ///     Formats the type into a readable signature.
+        /// </summary>
+        /// <returns>A string containing a readable signature.</returns>
         public override string ToString()
             => $"{Module}.{Method.Name}['{Name}']({string.Join(", ", Parameters)})";
     }

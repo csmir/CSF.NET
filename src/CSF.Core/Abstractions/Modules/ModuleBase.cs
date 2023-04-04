@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents a generic command base to implement commands with.
+    ///     Represents a generic <see cref="IModuleBase"/> to implement commands with.
     /// </summary>
     /// <typeparam name="T">The <see cref="IContext"/> expected to use for this command.</typeparam>
     public abstract class ModuleBase<T> : ModuleBase
@@ -23,47 +23,34 @@ namespace CSF
         }
     }
 
+    /// <summary>
+    ///     Represents a <see cref="IModuleBase"/> to implement commands with.
+    /// </summary>
     public abstract class ModuleBase : IModuleBase
     {
-        /// <summary>
-        ///     Gets the command's context.
-        /// </summary>
+        /// <inheritdoc/>
         public IContext Context { get; private set; }
         internal void SetContext(IContext context)
             => Context = context;
 
-        /// <summary>
-        ///     Displays all information about the command thats currently in scope.
-        /// </summary>
+        /// <inheritdoc/>
         public Command Command { get; private set; }
         internal void SetCommand(Command info)
             => Command = info;
 
-        /// <summary>
-        ///     
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public virtual ValueTask BeforeExecuteAsync(CancellationToken cancellationToken)
         {
             return new ValueTask(Task.CompletedTask);
         }
 
-        /// <summary>
-        ///     
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public virtual ValueTask AfterExecuteAsync(CancellationToken cancellationToken)
         {
             return new ValueTask(Task.CompletedTask);
         }
 
-        /// <summary>
-        ///     
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public virtual IResult Respond(string message)
         {
             Console.WriteLine(message);

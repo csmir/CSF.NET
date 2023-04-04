@@ -58,6 +58,10 @@ namespace CSF
                     yield return attribute;
         }
 
+        /// <summary>
+        ///     Formats the type into a readable signature.
+        /// </summary>
+        /// <returns>A string containing a readable signature.</returns>
         public override string ToString()
             => $"{Name}";
     }

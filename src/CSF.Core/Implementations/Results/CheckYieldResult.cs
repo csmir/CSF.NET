@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a result returned by grading a range of commands.
+    /// </summary>
     public readonly struct CheckYieldResult : IResult
     {
         /// <inheritdoc/>
@@ -15,12 +18,12 @@ namespace CSF
         /// <summary>
         ///     The commands that passed through the preconditions, the first of which will be selected for execution.
         /// </summary>
-        public IEnumerable<(Command, ArgsResult)> Result { get; }
+        public IEnumerable<(Command, ParseResult)> Result { get; }
 
         /// <inheritdoc/>
         public Exception Exception { get; }
 
-        private CheckYieldResult(bool success, IEnumerable<(Command, ArgsResult)> matches, string msg = null, Exception exception = null)
+        private CheckYieldResult(bool success, IEnumerable<(Command, ParseResult)> matches, string msg = null, Exception exception = null)
         {
             Result = matches;
             IsSuccess = success;
@@ -44,7 +47,7 @@ namespace CSF
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
-        public static CheckYieldResult FromSuccess(IEnumerable<(Command, ArgsResult)> matches)
+        public static CheckYieldResult FromSuccess(IEnumerable<(Command, ParseResult)> matches)
             => new CheckYieldResult(true, matches);
     }
 }

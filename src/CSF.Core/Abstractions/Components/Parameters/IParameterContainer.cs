@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a container that holds and handles parameters.
+    /// </summary>
     public interface IParameterContainer
     {
         /// <summary>
@@ -23,6 +26,15 @@ namespace CSF
         /// </summary>
         public int MaxLength { get; }
 
+        /// <summary>
+        ///     Attempts to parse a container into a result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="index">The index used to increment reader position.</param>
+        /// <param name="typeReaders">The typereaders used to read the command.</param>
+        /// <param name="cancellationToken">Used to signal the command execution to stop.</param>
+        /// <returns>An as</returns>
         public async ValueTask<IResult> ReadAsync<T>(T context, int index, TypeReaderContainer typeReaders, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -63,7 +75,7 @@ namespace CSF
                     if (!result.IsSuccess)
                         return result;
 
-                    if (result is ArgsResult argsResult)
+                    if (result is ParseResult argsResult)
                     {
                         index = argsResult.Placement;
                         parameters.Add(complexParam.Constructor.EntryPoint.Invoke(argsResult.Result.ToArray()));
@@ -82,7 +94,7 @@ namespace CSF
                 }
             }
 
-            return ArgsResult.FromSuccess(parameters, index);
+            return ParseResult.FromSuccess(parameters, index);
         }
     }
 }

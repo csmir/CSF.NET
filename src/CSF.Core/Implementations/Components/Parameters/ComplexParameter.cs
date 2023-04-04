@@ -36,6 +36,10 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
+        /// <summary>
+        ///     Creates a new <see cref="ComplexParameter"/>.
+        /// </summary>
+        /// <param name="parameterInfo">The parameter info to create from.</param>
         public ComplexParameter(ParameterInfo parameterInfo)
         {
             var type = parameterInfo.ParameterType;
@@ -121,6 +125,10 @@ namespace CSF
                     yield return attr;
         }
 
+        /// <summary>
+        ///     Formats the type into a readable signature.
+        /// </summary>
+        /// <returns>A string containing a readable signature.</returns>
         public override string ToString()
             => $"{Type.Name} ({string.Join(", ", Parameters)}) {Name}";
     }

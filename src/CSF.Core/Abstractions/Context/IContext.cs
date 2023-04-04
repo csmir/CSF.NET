@@ -10,11 +10,11 @@ namespace CSF
         /// <summary>
         ///     The command name.
         /// </summary>
-        string Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         ///     The command parameters.
         /// </summary>
-        IReadOnlyList<object> Parameters { get; set; }
+        public IReadOnlyList<object> Parameters { get; set; }
     }
 }

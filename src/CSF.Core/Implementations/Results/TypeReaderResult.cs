@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents a result returned by executing a <see cref="ITypeReader"/>.
+    /// </summary>
     public readonly struct TypeReaderResult : IResult
     {
         /// <inheritdoc/>

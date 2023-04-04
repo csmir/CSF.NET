@@ -25,8 +25,7 @@ namespace CSF
         /// <summary>
         ///     Creates a new <see cref="CommandContext"/> from the provided raw input.
         /// </summary>
-        /// <param name="rawInput">The raw input, modified in length if the prefix is populated.</param>
-        /// <param name="prefix">The prefix of the command.</param>
+        /// <param name="parseInfo">The information returned by an <see cref="IParser"/> to use in context creation.</param>
         public CommandContext(ParseInformation parseInfo)
         {
             Prefix = parseInfo.Prefix;

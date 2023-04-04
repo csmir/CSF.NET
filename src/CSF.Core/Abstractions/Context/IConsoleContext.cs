@@ -10,12 +10,12 @@ namespace CSF
         /// <remarks>
         ///     The raw input of the command.
         /// </remarks>
-        string RawInput { get; set; }
+        public string RawInput { get; set; }
 
         /// <summary>
         ///     The flags present on the command input.
         /// </summary>
-        IReadOnlyDictionary<string, object> NamedParameters { get; }
+        public IReadOnlyDictionary<string, object> NamedParameters { get; }
 
         /// <summary>
         ///     The prefix for the command.
@@ -23,6 +23,6 @@ namespace CSF
         /// <remarks>
         ///     <see langword="null"/> if not set.
         /// </remarks>
-        string Prefix { get; }
+        public string Prefix { get; }
     }
 }

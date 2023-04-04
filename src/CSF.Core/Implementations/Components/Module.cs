@@ -38,6 +38,13 @@ namespace CSF
         /// </summary>
         public Module Root { get; }
 
+        /// <summary>
+        ///     Creates a new <see cref="Module"/>.
+        /// </summary>
+        /// <param name="type">The type to create a module for.</param>
+        /// <param name="rootModule">The root module of this module. Top level modules don't have this.</param>
+        /// <param name="expectedName">The expected name of this module. Top level modules don't have this.</param>
+        /// <param name="aliases">The aliases of this module. Top level modules don't have this.</param>
         public Module(Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
             if (rootModule != null)
@@ -57,6 +64,13 @@ namespace CSF
                 .ToList();
         }
 
+        /// <summary>
+        ///     Searches the components inside this module to find the best match.
+        /// </summary>
+        /// <typeparam name="T">The context containing information necessary to search and match the command.</typeparam>
+        /// <param name="context">The context containing information necessary to search and match the command.</param>
+        /// <param name="cancellationToken">Token to be used to signal the code to break.</param>
+        /// <returns>An asynchronous <see cref="ValueTask"/> holding the result of the executed command.</returns>
         public async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -133,6 +147,10 @@ namespace CSF
                     yield return precondition;
         }
 
+        /// <summary>
+        ///     Formats the type into a readable signature.
+        /// </summary>
+        /// <returns>A string containing a readable signature.</returns>
         public override string ToString()
             => $"{(Root != null ? $"{Root}." : "")}{(Type.Name != Name ? $"{Type.Name}['{Name}']" : $"{Name}")}";
     }
