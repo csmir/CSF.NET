@@ -17,15 +17,4 @@ namespace CSF
         /// <returns></returns>
         public bool TryParse(object rawInput, [NotNullWhen(true)] out ParseInformation result);
     }
-
-    public static class ParserExtensions
-    {
-        public static IServiceCollection AddParser<T>(this IServiceCollection collection)
-            where T : class, IParser
-        {
-            collection.TryAddSingleton<T>();
-
-            return collection;
-        }
-    }
 }

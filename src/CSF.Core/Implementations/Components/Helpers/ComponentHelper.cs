@@ -2,28 +2,11 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace CSF
 {
-    /// <summary>
-    ///     
-    /// </summary>
-    public sealed class ComponentContainer
-    {
-        /// <summary>
-        ///     
-        /// </summary>
-        public IEnumerable<IConditionalComponent> Values { get; }
-
-        public ComponentContainer(IEnumerable<Type> types)
-            => Values = types.SelectMany(x => new Module(x).Components);
-    }
-    
-    /// <summary>
-    ///     
-    /// </summary>
-    public static class ComponentContainerExtensions
+    public static class ComponentHelper
     {
         /// <summary>
         ///     

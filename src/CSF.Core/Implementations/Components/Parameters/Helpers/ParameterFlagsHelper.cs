@@ -1,36 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents certain flags about a parameter.
-    /// </summary>
-    [Flags]
-    public enum ParameterFlags : byte
+    public static class ParameterFlagsHelper
     {
         /// <summary>
-        ///     Defines a default value.
+        ///     
         /// </summary>
-        None = 1,
-
-        /// <summary>
-        ///     Defines if a parameter is nullable.
-        /// </summary>
-        Nullable = 2,
-
-        /// <summary>
-        ///     Defines if a parameter is optional.
-        /// </summary>
-        Optional = 4,
-
-        /// <summary>
-        ///     Defines if a parameter is remainder.
-        /// </summary>
-        Remainder = 8,
-    }
-
-    public static class ParameterFlagsExtensions
-    {
+        /// <param name="flags"></param>
+        /// <param name="isNullable"></param>
+        /// <returns></returns>
         public static ParameterFlags WithNullable(this ParameterFlags flags, bool isNullable = true)
         {
             if (isNullable)
@@ -38,9 +19,20 @@ namespace CSF
             return flags;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         public static bool HasNullable(this ParameterFlags flags)
             => flags.HasFlag(ParameterFlags.Nullable);
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <param name="isOptional"></param>
+        /// <returns></returns>
         public static ParameterFlags WithOptional(this ParameterFlags flags, bool isOptional = true)
         {
             if (isOptional)
@@ -48,9 +40,20 @@ namespace CSF
             return flags;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         public static bool HasOptional(this ParameterFlags flags)
             => flags.HasFlag(ParameterFlags.Optional);
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <param name="isRemainder"></param>
+        /// <returns></returns>
         public static ParameterFlags WithRemainder(this ParameterFlags flags, bool isRemainder = true)
         {
             if (isRemainder)
@@ -58,6 +61,11 @@ namespace CSF
             return flags;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         public static bool HasRemainder(this ParameterFlags flags)
             => flags.HasFlag(ParameterFlags.Remainder);
     }

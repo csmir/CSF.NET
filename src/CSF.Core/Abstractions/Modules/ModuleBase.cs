@@ -23,7 +23,7 @@ namespace CSF
         }
     }
 
-    public abstract class ModuleBase
+    public abstract class ModuleBase : IModuleBase
     {
         /// <summary>
         ///     Gets the command's context.

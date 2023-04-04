@@ -2,28 +2,11 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace CSF
 {
-    /// <summary>
-    ///     
-    /// </summary>
-    public sealed class TypeReaderContainer
-    {
-        /// <summary>
-        ///     
-        /// </summary>
-        public IDictionary<Type, ITypeReader> Values { get; }
-
-        public TypeReaderContainer(IEnumerable<ITypeReader> typeReaders)
-            => Values = typeReaders.ToDictionary(x => x.Type, x => x);
-    }
-
-    /// <summary>
-    ///     
-    /// </summary>
-    public static class TypeReaderContainerExtensions
+    public static class TypeReaderHelper
     {
         /// <summary>
         ///     
@@ -44,12 +27,26 @@ namespace CSF
                 }
             }
 
-            foreach (var reader in TypeReader.CreateDefaultReaders())
+            foreach (var reader in CreateDefaultReaders())
                 collection.TryAddSingleton(rootType, reader.Type);
 
             collection.TryAddSingleton<TypeReaderContainer>();
 
             return collection;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<ITypeReader> CreateDefaultReaders()
+        {
+            var range = BaseTypeReader.CreateBaseReaders();
+
+            range.Add(new TimeSpanTypeReader());
+            range.Add(new ColorTypeReader());
+
+            return range;
         }
     }
 }

@@ -6,22 +6,6 @@ using System.Threading.Tasks;
 namespace CSF
 {
     /// <summary>
-    ///     Represents the access to creating a dictionary of default typereaders.
-    /// </summary>
-    public static class TypeReader
-    {
-        public static IEnumerable<ITypeReader> CreateDefaultReaders()
-        {
-            var dictionary = BaseTypeReader.CreateBaseReaders();
-
-            dictionary.Add(new TimeSpanTypeReader());
-            dictionary.Add(new ColorTypeReader());
-
-            return dictionary;
-        }
-    }
-
-    /// <summary>
     ///     Represents a generic <see cref="TypeReader{T}"/> to use for parsing provided types into the targetted type.
     /// </summary>
     /// <typeparam name="T">The targetted type for this typereader.</typeparam>
