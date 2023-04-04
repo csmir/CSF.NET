@@ -40,18 +40,7 @@ namespace CSF
         {
             var services = scope?.ServiceProvider ?? _services;
 
-            if (_asyncExec)
-            {
-                _ = Task.Run(async () =>
-                {
-                    var result = await RunPipelineAsync(context, services, cancellationToken);
-
-                    await _conveyor.OnCommandExecuted(context, services, result);
-                });
-                return ExecuteResult.FromSuccess();
-            }
-
-            else
+            if (!_asyncExec)
             {
                 var result = await RunPipelineAsync(context, services, cancellationToken);
 
@@ -59,6 +48,14 @@ namespace CSF
 
                 return result;
             }
+
+            _ = Task.Run(async () =>
+            {
+                var result = await RunPipelineAsync(context, services, cancellationToken);
+
+                await _conveyor.OnCommandExecuted(context, services, result);
+            });
+            return ExecuteResult.FromSuccess();
         }
 
         /// <inheritdoc/>
