@@ -1,18 +1,22 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 [assembly: CLSCompliant(true)]
 namespace CSF.Hosting
 {
     /// <summary>
-    ///     Represents a hosted <see cref="CommandFramework{T}"/>. Provides the necessary extensions to set up a hosted environment for CSF.
+    ///     Represents a hosted <see cref="CommandFramework"/>. Provides the necessary extensions to set up a hosted environment for CSF.
     /// </summary>
-    /// <remarks>
-    ///     Use <see cref="HostBuilderExtensions.ConfigureCommands{T, THost}(IHostBuilder)"/> to configure the command pipeline for hosting.
-    /// </remarks>
-    /// <typeparam name="T">The </typeparam>
-    public abstract class HostedCommandService<T> : CommandFramework<T>, IHostedService
-        where T : CommandConveyor
+    public abstract class HostedCommandService : CommandFramework, IHostedService
     {
+        public HostedCommandService(ComponentContainer components, FrameworkBuilderContext context, IServiceProvider serviceProvider, ILogger<CommandFramework> logger, ICommandConveyor conveyor) 
+            : base(components, context, serviceProvider, logger, conveyor)
+        {
 
+        }
+
+        public abstract Task StartAsync(CancellationToken cancellationToken);
+
+        public abstract Task StopAsync(CancellationToken cancellationToken);
     }
 }

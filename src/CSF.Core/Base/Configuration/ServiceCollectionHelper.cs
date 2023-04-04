@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -7,19 +8,19 @@ namespace CSF
 {
     public static class ServiceCollectionHelper
     {
-        public static IServiceCollection AddTypeReaders(this IServiceCollection services, Assembly targetAssembly)
+        public static IServiceCollection AddTypeReaders(this IServiceCollection collection, Assembly targetAssembly)
         {
-            services.AddSingleton<TypeReaderContainer>();
+            collection.AddSingleton<TypeReaderContainer>();
 
             var rootType = typeof(ITypeReader);
 
             foreach (var type in targetAssembly.GetTypes())
             {
                 if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
-                    services.AddSingleton(rootType, type);
+                    collection.TryAddSingleton(rootType, type);
             }
 
-            return services;
+            return collection;
         }
 
         public static IServiceCollection AddComponents(this IServiceCollection collection, Assembly targetAssembly)
@@ -31,7 +32,7 @@ namespace CSF
             foreach (var type in targetAssembly.GetTypes())
             {
                 if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
-                    collection.AddTransient(rootType, type);
+                    collection.TryAddTransient(rootType, type);
             }
 
             return collection;
@@ -40,26 +41,39 @@ namespace CSF
         public static IServiceCollection AddPrefixes(this IServiceCollection collection, IEnumerable<IPrefix> prefixes)
         {
             var container = new PrefixContainer(prefixes);
-            collection.AddSingleton(container);
+            collection.TryAddSingleton(container);
 
             return collection;
         }
 
         public static IServiceCollection AddParser(this IServiceCollection collection, Type parserType)
         {
-            collection.AddSingleton(typeof(IParser), parserType);
+            collection.TryAddSingleton(typeof(IParser), parserType);
+            return collection;
+        }
+
+        public static IServiceCollection AddConveyor(this IServiceCollection collection, Assembly targetAssembly)
+        {
+            var rootType = typeof(ICommandConveyor);
+
+            foreach (var type in targetAssembly.GetTypes())
+            {
+                if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
+                    collection.TryAddSingleton(rootType, type);
+            }
+
             return collection;
         }
 
         public static IServiceCollection AddCommandFramework(this IServiceCollection collection, Action<FrameworkBuilderContext> action = null)
         {
-            collection.AddCommandFramework<CommandConveyor>(action);
+            collection.AddCommandFramework<CommandFramework>(action);
 
             return collection;
         }
 
         public static IServiceCollection AddCommandFramework<T>(this IServiceCollection collection, Action<FrameworkBuilderContext> action = null)
-            where T : class, ICommandConveyor
+            where T : class, ICommandFramework
         {
             var context = new FrameworkBuilderContext();
 
@@ -71,7 +85,7 @@ namespace CSF
         }
 
         public static IServiceCollection AddCommandFramework<T>(this IServiceCollection collection, FrameworkBuilderContext context)
-            where T : class, ICommandConveyor
+            where T : class, ICommandFramework
         {
             collection.AddPrefixes(context.Prefixes);
 
@@ -79,10 +93,10 @@ namespace CSF
             {
                 collection.AddComponents(assembly);
                 collection.AddTypeReaders(assembly);
+                collection.AddConveyor(assembly);
             }
 
-            collection.AddSingleton<ICommandConveyor, T>();
-            collection.AddSingleton<ICommandFramework, CommandFramework<T>>();
+            collection.AddSingleton<ICommandFramework, T>();
 
             return collection;
         }

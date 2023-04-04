@@ -10,22 +10,21 @@ using System.Threading.Tasks;
 [assembly: CLSCompliant(true)]
 namespace CSF
 {
-    public class CommandFramework<T> : ICommandFramework
-        where T : ICommandConveyor
+    public class CommandFramework : ICommandFramework
     {
         private readonly bool _asyncExec;
 
-        private readonly T _conveyor;
+        private readonly ICommandConveyor _conveyor;
         private readonly ComponentContainer _components;
-        private readonly ILogger<CommandFramework<T>> _logger;
+        private readonly ILogger<CommandFramework> _logger;
         private readonly IServiceProvider _services;
 
         public CommandFramework(
             ComponentContainer components,
             FrameworkBuilderContext context,
             IServiceProvider serviceProvider,
-            ILogger<CommandFramework<T>> logger,
-            T conveyor)
+            ILogger<CommandFramework> logger,
+            ICommandConveyor conveyor)
         {
             _logger = logger;
             _conveyor = conveyor;
@@ -36,8 +35,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IResult> ExecuteAsync<TContext>(TContext context, IServiceScope scope = null, CancellationToken cancellationToken = default)
-            where TContext : IContext
+        public virtual async Task<IResult> ExecuteAsync<T>(T context, IServiceScope scope = null, CancellationToken cancellationToken = default)
+            where T : IContext
         {
             var services = scope?.ServiceProvider ?? _services;
 
@@ -63,8 +62,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IResult> RunPipelineAsync<TContext>(TContext context, IServiceProvider provider, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
         {
             _logger.LogDebug($"Starting command pipeline for name: '{context.Name}'");
 
@@ -94,8 +93,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<SearchResult> SearchAsync<TContext>(TContext context, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
+            where T : IContext
         {
             var matches = _components.Values
                 .Where(component => component.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
@@ -135,8 +134,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<SearchResult> SearchModuleAsync<TContext>(TContext context, Module module, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<SearchResult> SearchModuleAsync<T>(T context, Module module, CancellationToken cancellationToken)
+            where T : IContext
         {
             var matches = module.Components
                 .Where(command => command.Aliases.Any(alias => string.Equals(alias, context.Name, StringComparison.OrdinalIgnoreCase)));
@@ -167,8 +166,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IResult> CheckAsync<TContext>(TContext context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<IResult> CheckAsync<T>(T context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
         {
             IResult failureResult = null;
 
@@ -205,8 +204,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual ValueTask<CheckResult> CheckMatchesAsync<TContext>(TContext context, IEnumerable<Command> commands, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual ValueTask<CheckResult> CheckMatchesAsync<T>(T context, IEnumerable<Command> commands, CancellationToken cancellationToken)
+            where T : IContext
         {
             Command overload = null;
             IEnumerable<Command> SearchMatches()
@@ -255,8 +254,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<PreconditionResult> CheckPreconditionsAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
         {
             foreach (var precon in command.Preconditions)
             {
@@ -272,8 +271,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual ValueTask<ConstructionResult> ConstructAsync<TContext>(TContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual ValueTask<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
+            where T : IContext
         {
             var module = provider.GetService(command.Module.Type);
 
@@ -290,8 +289,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IResult> ReadAsync<TContext>(TContext context, Command command, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<IResult> ReadAsync<T>(T context, Command command, CancellationToken cancellationToken)
+            where T : IContext
         {
             var result = await ReadContainerAsync(context, 0, command, cancellationToken);
 
@@ -302,8 +301,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IResult> ReadContainerAsync<TContext>(TContext context, int index, IParameterContainer container, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<IResult> ReadContainerAsync<T>(T context, int index, IParameterContainer container, CancellationToken cancellationToken)
+            where T : IContext
         {
             var parameters = new List<object>();
 
@@ -379,8 +378,8 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IResult> ExecuteAsync<TContext>(TContext context, Command command, ModuleBase module, IEnumerable<object> parameters, CancellationToken cancellationToken)
-            where TContext : IContext
+        public virtual async ValueTask<IResult> ExecuteAsync<T>(T context, Command command, ModuleBase module, IEnumerable<object> parameters, CancellationToken cancellationToken)
+            where T : IContext
         {
             try
             {
