@@ -27,12 +27,12 @@ namespace CSF
         /// </summary>
         /// <param name="rawInput">The raw input, modified in length if the prefix is populated.</param>
         /// <param name="prefix">The prefix of the command.</param>
-        public CommandContext(ParserOutput result)
+        public CommandContext(ParseInformation parseInfo)
         {
-            Prefix = result.Prefix;
-            Parameters = result.Parameters;
-            NamedParameters = result.NamedParameters;
-            Name = result.Name;
+            Prefix = parseInfo.Prefix;
+            Parameters = parseInfo.Parameters;
+            NamedParameters = parseInfo.NamedParameters;
+            Name = parseInfo.Name;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace CSF
             return true;
         }
 
-        public bool TryParse(object rawInput, [NotNullWhen(true)] out ParserOutput result)
+        public bool TryParse(object rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;
 
@@ -46,7 +46,7 @@ namespace CSF
             return false;
         }
 
-        public virtual bool TryParse(string rawInput, [NotNullWhen(true)] out ParserOutput result)
+        public virtual bool TryParse(string rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;
 
@@ -124,7 +124,7 @@ namespace CSF
                 param.Add(part);
             }
 
-            result = new ParserOutput(name, param, namedParam, prefix);
+            result = new ParseInformation(name, param, namedParam, prefix);
 
             return true;
         }

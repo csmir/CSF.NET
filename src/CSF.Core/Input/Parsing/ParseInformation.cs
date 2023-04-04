@@ -2,7 +2,7 @@
 
 namespace CSF
 {
-    public readonly struct ParserOutput
+    public readonly struct ParseInformation
     {
         public IReadOnlyList<object> Parameters { get; }
 
@@ -12,7 +12,7 @@ namespace CSF
 
         public string Name { get; }
 
-        public ParserOutput(string name, IReadOnlyList<object> param, IReadOnlyDictionary<string, object> namedParam, string prefix = null)
+        public ParseInformation(string name, IReadOnlyList<object> param, IReadOnlyDictionary<string, object> namedParam, string prefix = null)
         {
             Name = name;
             Parameters = param;
