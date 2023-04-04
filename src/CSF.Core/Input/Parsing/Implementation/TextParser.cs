@@ -7,7 +7,7 @@ namespace CSF
     public class TextParser : IParser
     {
         private readonly string[] _prefixes;
-        
+
         public TextParser(string[] prefixes)
         {
             _prefixes = prefixes;
