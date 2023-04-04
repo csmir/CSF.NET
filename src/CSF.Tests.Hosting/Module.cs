@@ -13,6 +13,6 @@
 
         [Command("help")]
         public void Help()
-            => Success("Helped");
+            => Respond("Helped");
     }
 }

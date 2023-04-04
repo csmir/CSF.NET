@@ -10,53 +10,53 @@ namespace CSF.Spectre
         where T : IContext
     {
         /// <inheritdoc/>
-        public override ExecuteResult Error(string message)
+        public IResult Error(string message)
         {
             AnsiConsole.MarkupLineInterpolated($"[red]{message}[/]");
             return ExecuteResult.FromSuccess();
         }
 
         /// <inheritdoc/>
-        public override Task<ExecuteResult> ErrorAsync(string message)
+        public Task<IResult> ErrorAsync(string message)
         {
             return Task.FromResult(Error(message));
         }
 
         /// <inheritdoc/>
-        public override ExecuteResult Info(string message)
+        public IResult Info(string message)
         {
             AnsiConsole.MarkupLineInterpolated($"[yellow]{message}[/]");
             return ExecuteResult.FromSuccess();
         }
 
         /// <inheritdoc/>
-        public override Task<ExecuteResult> InfoAsync(string message)
+        public Task<IResult> InfoAsync(string message)
         {
             return Task.FromResult(Info(message));
         }
 
         /// <inheritdoc/>
-        public override ExecuteResult Success(string message)
+        public IResult Success(string message)
         {
             AnsiConsole.MarkupLineInterpolated($"[green]{message}[/]");
             return ExecuteResult.FromSuccess();
         }
 
         /// <inheritdoc/>
-        public override Task<ExecuteResult> SuccessAsync(string message)
+        public Task<IResult> SuccessAsync(string message)
         {
             return Task.FromResult(Success(message));
         }
 
         /// <inheritdoc/>
-        public override ExecuteResult Respond(string message)
+        public override IResult Respond(string message)
         {
             AnsiConsole.MarkupLine($"{message}");
             return ExecuteResult.FromSuccess();
         }
 
         /// <inheritdoc/>
-        public override Task<ExecuteResult> RespondAsync(string message)
+        public Task<IResult> RespondAsync(string message)
         {
             return Task.FromResult(Respond(message));
         }

@@ -1,12 +1,26 @@
 ﻿using CSF;
+using Microsoft.Extensions.DependencyInjection;
 
-await CommandFramework.CreateDefaultBuilder()
-    .ConfigureCommands(configure =>
+var collection = new ServiceCollection()
+    .AddCommandManager()
+    .AddTypeReader<EnumTypeReader<ServiceLifetime>>();
+
+var services = collection.BuildServiceProvider();
+
+var framework = services.GetRequiredService<CommandManager>();
+var parser = new TextParser();
+
+while (true)
+{
+    var input = Console.ReadLine()!;
+
+    if (parser.TryParse(input, out var output))
     {
-        configure.TypeReaders
-            .Include(new EnumTypeReader<LogLevel>());
-        configure.DefaultLogLevel = LogLevel.Trace;
-        configure.Parser.Prefixes
-            .Include(new StringPrefix("!"));
-    })
-    .BuildAndRunAsync();
+        var context = new CommandContext(output);
+
+        var result = await framework.TryExecuteAsync(context);
+
+        if (!result.IsSuccess)
+            Console.WriteLine(result.ErrorMessage);
+    }
+}

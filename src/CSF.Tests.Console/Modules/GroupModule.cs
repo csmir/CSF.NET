@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CSF.Tests.Console.Modules
+namespace CSF.Tests
 {
     public class GroupModule : ModuleBase<CommandContext>
     {
@@ -14,9 +10,9 @@ namespace CSF.Tests.Console.Modules
         }
 
         [Command("command")]
-        public void Command()
+        public void MyCommand()
         {
-            Info("Wow, this is working!");
+            Respond("Wow, this is working!");
         }
 
         [Group("subcommand")]
@@ -24,15 +20,15 @@ namespace CSF.Tests.Console.Modules
         {
             [Command("command")]
             [ErrorOverload]
-            public void Command()
+            public void MyCommand()
             {
-                Success("Success (overload)");
+                Respond("Success (overload)");
             }
 
             [Command("command")]
-            public void Command(int i)
+            public void MyCommand(int i)
             {
-                Success($"Success: {i}");
+                Respond($"Success: {i}");
             }
 
             [Group("subsubcommand")]
@@ -40,15 +36,15 @@ namespace CSF.Tests.Console.Modules
             {
                 [Command("command")]
                 [ErrorOverload]
-                public void Command()
+                public void MyCommand()
                 {
-                    Success("Success (overload)");
+                    Respond("Success (overload)");
                 }
 
                 [Command("command")]
-                public void Command(int i)
+                public void MyCommand(int i)
                 {
-                    Success($"Success: {i}");
+                    Respond($"Success: {i}");
                 }
             }
         }
