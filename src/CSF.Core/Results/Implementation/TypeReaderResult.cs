@@ -3,9 +3,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents type reader results.
-    /// </summary>
     public readonly struct TypeReaderResult : IResult
     {
         /// <inheritdoc/>

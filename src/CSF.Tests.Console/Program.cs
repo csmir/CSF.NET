@@ -2,23 +2,24 @@
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
+    .AddSingleton<TextParser>()
     .AddCommandFramework();
 
 var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<ICommandFramework>();
-var parser = services.GetRequiredService<IParser>();
+var parser = services.GetRequiredService<TextParser>();
 
 while (true)
 {
-    var line = Console.ReadLine()!;
+    var input = Console.ReadLine()!;
 
-    var parseResult = parser.Parse(line);
+    var parseResult = parser.Parse(input);
 
     if (!parseResult.IsSuccess)
         continue;
 
     var context = new CommandContext(parseResult);
 
-    framework.ExecuteAsync(context);
+    framework.TryExecuteAsync(context);
 }

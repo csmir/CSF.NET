@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents search results.
-    /// </summary>
     public readonly struct SearchResult : IResult
     {
         /// <inheritdoc/>

@@ -3,9 +3,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents constructor results.
-    /// </summary>
     public readonly struct ConstructionResult : IResult
     {
         /// <inheritdoc/>

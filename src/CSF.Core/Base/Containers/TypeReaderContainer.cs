@@ -22,9 +22,13 @@ namespace CSF
             var rootType = typeof(ITypeReader);
 
             foreach (var assembly in context.RegistrationAssemblies)
+            {
                 foreach (var type in assembly.GetTypes())
+                {
                     if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
                         collection.TryAddSingleton(rootType, type);
+                }
+            }
 
             foreach (var reader in TypeReader.CreateDefaultReaders())
                 collection.TryAddSingleton(rootType, reader.Type);

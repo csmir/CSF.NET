@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents typereader parsing results.
-    /// </summary>
     public readonly struct ArgsResult : IResult
     {
         /// <inheritdoc/>

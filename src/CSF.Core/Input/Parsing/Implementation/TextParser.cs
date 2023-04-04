@@ -3,20 +3,12 @@ using System.Linq;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents a parser for normal strings of text.
-    /// </summary>
     public class TextParser : IParser
     {
         private readonly bool _parseNecessary;
 
-        /// <inheritdoc/>
         public PrefixContainer Prefixes { get; }
 
-        /// <summary>
-        ///     Creates a new <see cref="TextParser"/> with provided prefixes.
-        /// </summary>
-        /// <param name="prefixes">The prefixes to define.</param>
         public TextParser(PrefixContainer prefixes)
         {
             Prefixes = prefixes;
@@ -24,11 +16,6 @@ namespace CSF
             _parseNecessary = Prefixes.Values.Any();
         }
 
-        /// <summary>
-        ///     Fetches the prefix for this parser.
-        /// </summary>
-        /// <param name="rawInput"></param>
-        /// <returns></returns>
         public virtual bool TryGetPrefix(ref string rawInput, out IPrefix prefix)
         {
             if (_parseNecessary)
@@ -47,7 +34,6 @@ namespace CSF
             return false;
         }
 
-        /// <inheritdoc/>
         public virtual ParseResult Parse(string rawInput)
         {
             if (!TryGetPrefix(ref rawInput, out var prefix))
@@ -127,11 +113,11 @@ namespace CSF
             return ParseResult.FromSuccess(name, prefix, args, namedArgs);
         }
 
-        /// <inheritdoc/>
         public virtual ParseResult Parse(object rawInput)
         {
             if (rawInput is string str)
                 return Parse(str);
+
             return ParseResult.FromError("Raw argument type does not match supported input. Consider creating a new parser for the input type.");
         }
     }

@@ -3,9 +3,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents precondition results.
-    /// </summary>
     public readonly struct PreconditionResult : IResult
     {
         /// <inheritdoc/>

@@ -39,7 +39,7 @@ namespace CSF
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IResult> ExecuteAsync<T>(T context, IServiceScope scope = null, CancellationToken cancellationToken = default)
+        public virtual async Task<IResult> TryExecuteAsync<T>(T context, IServiceScope scope = null, CancellationToken cancellationToken = default)
             where T : IContext
         {
             var services = scope?.ServiceProvider ?? _services;

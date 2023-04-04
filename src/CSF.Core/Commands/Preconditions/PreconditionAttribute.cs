@@ -11,5 +11,11 @@ namespace CSF
     {
         /// <inheritdoc/>
         public abstract ValueTask<PreconditionResult> CheckAsync(IContext context, Command command, IServiceProvider provider, CancellationToken cancellationToken);
+
+        public PreconditionResult Error(string errorMessage, Exception exception = null)
+            => PreconditionResult.FromError(errorMessage, exception);
+
+        public PreconditionResult Success()
+            => PreconditionResult.FromSuccess();
     }
 }

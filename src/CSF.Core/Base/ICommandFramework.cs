@@ -11,8 +11,8 @@ namespace CSF
     /// </summary>
     public interface ICommandFramework
     {
-        // exec
-        public Task<IResult> ExecuteAsync<TContext>(TContext context, IServiceScope scope = null, CancellationToken cancellationToken = default)
+        // entry
+        public Task<IResult> TryExecuteAsync<TContext>(TContext context, IServiceScope scope = null, CancellationToken cancellationToken = default)
             where TContext : IContext;
 
         // pipeline

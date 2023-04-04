@@ -3,9 +3,6 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    /// <summary>
-    ///     Represents internal failures in commands.
-    /// </summary>
     public readonly struct ExecuteResult : IResult
     {
         /// <inheritdoc/>

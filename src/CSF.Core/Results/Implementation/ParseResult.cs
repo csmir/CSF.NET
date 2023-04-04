@@ -42,7 +42,7 @@ namespace CSF
             if (IsSuccess)
             {
                 if (string.IsNullOrEmpty(name))
-                    throw new MissingValueException("Found null or empty.", nameof(name));
+                    throw new ArgumentNullException("Found null or empty name.", nameof(name));
 
                 if (args is null)
                     throw new ArgumentNullException(nameof(args));
