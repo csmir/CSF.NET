@@ -77,43 +77,43 @@ namespace CSF
 
     internal static class BaseTypeReader
     {
-        public static Dictionary<Type, ITypeReader> CreateBaseReaders()
+        public static IList<ITypeReader> CreateBaseReaders()
         {
-            var callback = new Dictionary<Type, ITypeReader>
+            var callback = new List<ITypeReader>()
             {
                 // char
-                [typeof(char)] = new BaseTypeReader<char>(),
+                new BaseTypeReader<char>(),
 
                 // bit / boolean
-                [typeof(bool)] = new BaseTypeReader<bool>(),
+                new BaseTypeReader<bool>(),
 
                 // 8 bit int
-                [typeof(byte)] = new BaseTypeReader<byte>(),
-                [typeof(sbyte)] = new BaseTypeReader<sbyte>(),
+                new BaseTypeReader<byte>(),
+                new BaseTypeReader<sbyte>(),
 
                 // 16 bit int
-                [typeof(short)] = new BaseTypeReader<short>(),
-                [typeof(ushort)] = new BaseTypeReader<ushort>(),
+                new BaseTypeReader<short>(),
+                new BaseTypeReader<ushort>(),
 
                 // 32 bit int
-                [typeof(int)] = new BaseTypeReader<int>(),
-                [typeof(uint)] = new BaseTypeReader<uint>(),
+                new BaseTypeReader<int>(),
+                new BaseTypeReader<uint>(),
 
                 // 64 bit int
-                [typeof(long)] = new BaseTypeReader<long>(),
-                [typeof(ulong)] = new BaseTypeReader<ulong>(),
+                new BaseTypeReader<long>(),
+                new BaseTypeReader<ulong>(),
 
                 // floating point int
-                [typeof(float)] = new BaseTypeReader<float>(),
-                [typeof(double)] = new BaseTypeReader<double>(),
-                [typeof(decimal)] = new BaseTypeReader<decimal>(),
+                new BaseTypeReader<float>(),
+                new BaseTypeReader<double>(),
+                new BaseTypeReader<decimal>(),
 
                 // time
-                [typeof(DateTime)] = new BaseTypeReader<DateTime>(),
-                [typeof(DateTimeOffset)] = new BaseTypeReader<DateTimeOffset>(),
+                new BaseTypeReader<DateTime>(),
+                new BaseTypeReader<DateTimeOffset>(),
 
                 // guid
-                [typeof(Guid)] = new BaseTypeReader<Guid>()
+                new BaseTypeReader<Guid>()
             };
 
             return callback;

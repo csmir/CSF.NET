@@ -9,10 +9,9 @@ namespace CSF.Hosting
     /// </summary>
     public abstract class HostedCommandService : CommandFramework, IHostedService
     {
-        public HostedCommandService(ComponentContainer components, FrameworkBuilderContext context, IServiceProvider serviceProvider, ILogger<CommandFramework> logger, ICommandConveyor conveyor) 
-            : base(components, context, serviceProvider, logger, conveyor)
+        protected HostedCommandService(IServiceProvider serviceProvider, ILogger<HostedCommandService> logger) 
+            : base(serviceProvider, logger)
         {
-
         }
 
         public abstract Task StartAsync(CancellationToken cancellationToken);

@@ -36,7 +36,7 @@ namespace CSF
         /// </summary>
         public Constructor Constructor { get; }
 
-        public ComplexParameter(ParameterInfo parameterInfo, TypeReaderContainer typeReaders)
+        public ComplexParameter(ParameterInfo parameterInfo)
         {
             var type = parameterInfo.ParameterType;
 
@@ -46,7 +46,7 @@ namespace CSF
 
             Attributes = GetAttributes(parameterInfo)
                 .ToList();
-            Parameters = GetParameters(typeReaders)
+            Parameters = GetParameters()
                 .ToList();
 
             Flags = SetFlags(parameterInfo);
@@ -98,7 +98,7 @@ namespace CSF
             return flags;
         }
 
-        private IEnumerable<IParameterComponent> GetParameters(TypeReaderContainer typeReaders)
+        private IEnumerable<IParameterComponent> GetParameters()
         {
             var parameters = Constructor.EntryPoint.GetParameters();
 
@@ -108,9 +108,9 @@ namespace CSF
             foreach (var parameter in Constructor.EntryPoint.GetParameters())
             {
                 if (parameter.GetCustomAttributes().Any(x => x is ComplexAttribute))
-                    yield return new ComplexParameter(parameter, typeReaders);
+                    yield return new ComplexParameter(parameter);
                 else
-                    yield return new BaseParameter(parameter, typeReaders);
+                    yield return new BaseParameter(parameter);
             }
         }
 

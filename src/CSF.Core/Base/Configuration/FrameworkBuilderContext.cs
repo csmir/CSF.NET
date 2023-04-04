@@ -19,13 +19,13 @@ namespace CSF
         /// </remarks>
         public bool DoAsynchronousExecution { get; set; } = false;
 
-        public IEnumerable<IPrefix> Prefixes { get; set; } = Array.Empty<IPrefix>();
+        public IEnumerable<IPrefix> Prefixes { get; set; } = new IPrefix[] { EmptyPrefix.Create() };
 
         public Type ParserType { get; set; } = typeof(TextParser);
 
         /// <summary>
         ///     The assemblies that should be used for registering commands, typereaders and event resolvers.
         /// </summary>
-        public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };
+        public IEnumerable<Assembly> RegistrationAssemblies { get; set; } = new Assembly[] { Assembly.GetEntryAssembly() };
     }
 }

@@ -36,7 +36,7 @@ namespace CSF
         /// </summary>
         public Module Root { get; }
 
-        public Module(TypeReaderContainer typeReaders, Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
+        public Module(Type type, Module rootModule = null, string expectedName = null, string[] aliases = null)
         {
             if (rootModule != null)
                 Root = rootModule;
@@ -51,10 +51,11 @@ namespace CSF
             Name = expectedName ?? type.Name;
             Aliases = aliases ?? new string[] { Name };
 
-            Components = GetComponents(typeReaders).ToList();
+            Components = GetComponents()
+                .ToList();
         }
 
-        private IEnumerable<IConditionalComponent> GetComponents(TypeReaderContainer typeReaders)
+        private IEnumerable<IConditionalComponent> GetComponents()
         {
             foreach (var method in Type.GetMethods())
             {
@@ -72,7 +73,7 @@ namespace CSF
                 if (!aliases.Any())
                     continue;
 
-                yield return new Command(typeReaders, this, method, aliases);
+                yield return new Command(this, method, aliases);
             }
 
             foreach (var group in Type.GetNestedTypes())
@@ -80,7 +81,7 @@ namespace CSF
                 foreach (var attribute in group.GetCustomAttributes(true))
                 {
                     if (attribute is GroupAttribute gattribute)
-                        yield return new Module(typeReaders, group, this, gattribute.Name, gattribute.Aliases);
+                        yield return new Module(group, this, gattribute.Name, gattribute.Aliases);
                 }
             }
         }

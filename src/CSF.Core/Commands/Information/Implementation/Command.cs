@@ -48,7 +48,7 @@ namespace CSF
         /// </summary>
         public bool IsErrorOverload { get; }
 
-        public Command(TypeReaderContainer typeReaders, Module module, MethodInfo method, string[] aliases)
+        public Command(Module module, MethodInfo method, string[] aliases)
         {
             Method = method;
             Module = module;
@@ -57,7 +57,7 @@ namespace CSF
                 .ToList();
             Preconditions = module.Preconditions.Concat(GetPreconditions())
                 .ToList();
-            Parameters = GetParameters(typeReaders)
+            Parameters = GetParameters()
                 .ToList();
 
             var remainderParameters = Parameters.Where(x => x.Flags.HasFlag(ParameterFlags.Remainder));
@@ -112,14 +112,14 @@ namespace CSF
             return (minLength, maxLength);
         }
 
-        private IEnumerable<IParameterComponent> GetParameters(TypeReaderContainer typeReaders)
+        private IEnumerable<IParameterComponent> GetParameters()
         {
             foreach (var parameter in Method.GetParameters())
             {
                 if (parameter.GetCustomAttributes().Any(x => x is ComplexAttribute))
-                    yield return new ComplexParameter(parameter, typeReaders);
+                    yield return new ComplexParameter(parameter);
                 else
-                    yield return new BaseParameter(parameter, typeReaders);
+                    yield return new BaseParameter(parameter);
             }
         }
 

@@ -11,12 +11,12 @@ namespace CSF
     /// </summary>
     public static class TypeReader
     {
-        public static Dictionary<Type, ITypeReader> CreateDefaultReaders()
+        public static IEnumerable<ITypeReader> CreateDefaultReaders()
         {
             var dictionary = BaseTypeReader.CreateBaseReaders();
 
-            dictionary.Add(typeof(TimeSpan), new TimeSpanTypeReader());
-            dictionary.Add(typeof(Color), new ColorTypeReader());
+            dictionary.Add(new TimeSpanTypeReader());
+            dictionary.Add(new ColorTypeReader());
 
             return dictionary;
         }

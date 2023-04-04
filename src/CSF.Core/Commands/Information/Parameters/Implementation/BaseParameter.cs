@@ -22,12 +22,7 @@ namespace CSF
         /// <inheritdoc/>
         public IList<Attribute> Attributes { get; }
 
-        /// <summary>
-        ///     The typereader used to populate this parameter.
-        /// </summary>
-        public ITypeReader TypeReader { get; }
-
-        public BaseParameter(ParameterInfo parameterInfo, TypeReaderContainer typeReaders)
+        public BaseParameter(ParameterInfo parameterInfo)
         {
             var type = parameterInfo.ParameterType;
             var nullableType = Nullable.GetUnderlyingType(type);
@@ -36,7 +31,6 @@ namespace CSF
                 type = nullableType;
 
             Type = type;
-            TypeReader = typeReaders[type];
 
             Attributes = GetAttributes(parameterInfo)
                 .ToList();

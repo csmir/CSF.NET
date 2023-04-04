@@ -1,39 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CSF
 {
     public sealed class ComponentContainer
     {
-        public List<IConditionalComponent> Values { get; }
+        public IEnumerable<IConditionalComponent> Values { get; }
 
-        public ComponentContainer(IEnumerable<ModuleBase> discoveredModules, TypeReaderContainer typeReaders)
+        public ComponentContainer(IEnumerable<Type> types)
+            => Values = types.SelectMany(x => new Module(x).Components);
+    }
+
+    public static class ComponentContainerExtensions
+    {
+        public static IServiceCollection AddComponents(this IServiceCollection collection, FrameworkBuilderContext context)
         {
-            IEnumerable<IConditionalComponent> Yield()
+            var rootType = typeof(ModuleBase);
+
+            IEnumerable<Type> YieldModules()
             {
-                foreach (var module in discoveredModules)
-                    foreach (var component in new Module(typeReaders, module.GetType()).Components)
-                        yield return component;
+                foreach (var assembly in context.RegistrationAssemblies)
+                {
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
+                        {
+                            collection.TryAddTransient(rootType, type);
+                            yield return type;
+                        }
+                    }
+                }
             }
 
-            Values = Yield().ToList();
-        }
+            var container = new ComponentContainer(YieldModules());
 
-        public ComponentContainer Include(Module module)
-        {
-            foreach (var component in module.Components)
-            {
-                if (!Values.Contains(component))
-                    Values.Add(component);
-            }
+            collection.TryAddSingleton(container);
 
-            return this;
-        }
-
-        public ComponentContainer Exclude(IConditionalComponent component)
-        {
-            Values.Remove(component);
-            return this;
+            return collection;
         }
     }
 }

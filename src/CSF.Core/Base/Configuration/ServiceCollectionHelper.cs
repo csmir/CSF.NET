@@ -52,19 +52,6 @@ namespace CSF
             return collection;
         }
 
-        public static IServiceCollection AddConveyor(this IServiceCollection collection, Assembly targetAssembly)
-        {
-            var rootType = typeof(ICommandConveyor);
-
-            foreach (var type in targetAssembly.GetTypes())
-            {
-                if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
-                    collection.TryAddSingleton(rootType, type);
-            }
-
-            return collection;
-        }
-
         public static IServiceCollection AddCommandFramework(this IServiceCollection collection, Action<FrameworkBuilderContext> action = null)
         {
             collection.AddCommandFramework<CommandFramework>(action);
@@ -94,7 +81,6 @@ namespace CSF
             {
                 collection.AddComponents(assembly);
                 collection.AddTypeReaders(assembly);
-                collection.AddConveyor(assembly);
             }
 
             collection.AddSingleton<ICommandFramework, T>();

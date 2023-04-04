@@ -14,24 +14,28 @@ namespace CSF
     {
         private readonly bool _asyncExec;
 
-        private readonly ICommandConveyor _conveyor;
         private readonly ComponentContainer _components;
-        private readonly ILogger<CommandFramework> _logger;
+        private readonly TypeReaderContainer _typeReaders;
+
+        private readonly ILogger _logger;
         private readonly IServiceProvider _services;
 
-        public CommandFramework(
-            ComponentContainer components,
-            FrameworkBuilderContext context,
-            IServiceProvider serviceProvider,
-            ILogger<CommandFramework> logger,
-            ICommandConveyor conveyor)
+        public CommandFramework(IServiceProvider serviceProvider)
+            : this(serviceProvider, serviceProvider.GetRequiredService<ILogger<CommandFramework>>())
+        {
+
+        }
+
+        public CommandFramework(IServiceProvider serviceProvider, ILogger logger)
         {
             _logger = logger;
-            _conveyor = conveyor;
             _services = serviceProvider;
-            _components = components;
 
-            _asyncExec = context.DoAsynchronousExecution;
+            _components = serviceProvider.GetRequiredService<ComponentContainer>();
+            _typeReaders = serviceProvider.GetRequiredService<TypeReaderContainer>();   
+
+            _asyncExec = serviceProvider.GetRequiredService<FrameworkBuilderContext>()
+                .DoAsynchronousExecution;
         }
 
         /// <inheritdoc/>
@@ -44,23 +48,16 @@ namespace CSF
             {
                 var result = await RunPipelineAsync(context, services, cancellationToken);
 
-                await _conveyor.OnExecuted(context, services, result);
+                await AfterExecuteAsync(context, services, result);
 
                 return result;
             }
 
-            ThreadPool.QueueUserWorkItem(async state =>
+            _ = Task.Run(async () =>
             {
-                try
-                {
-                    var result = await RunPipelineAsync(context, services, cancellationToken);
+                var result = await  RunPipelineAsync(context, services, cancellationToken);
 
-                    await _conveyor.OnExecuted(context, services, result);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogCritical(ex, "{}", ex.Message);
-                }
+                await AfterExecuteAsync(context, services, result);
             });
 
             return ExecuteResult.FromSuccess();
@@ -135,7 +132,7 @@ namespace CSF
             if (commands.Any())
                 return SearchResult.FromSuccess(commands);
 
-            return _conveyor.OnCommandNotFound(context);
+            return OnCommandNotFound(context);
         }
 
         /// <inheritdoc/>
@@ -164,7 +161,7 @@ namespace CSF
                 }
 
                 else
-                    return _conveyor.OnCommandNotFound(context);
+                    return OnCommandNotFound(context);
             }
 
             return SearchResult.FromSuccess(commands);
@@ -248,7 +245,7 @@ namespace CSF
             if (!matches.Any())
             {
                 if (overload is null)
-                    return _conveyor.OnBestOverloadUnavailable(context);
+                    return OnBestOverloadUnavailable(context);
                 else
                     return CheckResult.FromSuccess(new[] { overload });
             }
@@ -279,18 +276,14 @@ namespace CSF
         public virtual ValueTask<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
-            var module = provider.GetService(command.Module.Type);
+            var module = provider.GetService(command.Module.Type) as ModuleBase;
 
-            if (module is ModuleBase moduleBase)
-            {
-                moduleBase.SetContext(context);
-                moduleBase.SetInformation(command);
+            module.SetContext(context);
+            module.SetInformation(command);
 
-                _logger.LogTrace("Succesfully constructed module for {}", command.Name);
+            _logger.LogTrace("Succesfully constructed module for {}", command.Name);
 
-                return ConstructionResult.FromSuccess(moduleBase);
-            }
-            return _conveyor.OnInvalidModule(context, command.Module);
+            return ConstructionResult.FromSuccess(module);
         }
 
         /// <inheritdoc/>
@@ -321,20 +314,8 @@ namespace CSF
 
                 if (parameter.Flags.HasOptional() && context.Parameters.Count <= index)
                 {
-                    var missingResult = _conveyor.OnMissingValue(context, parameter);
-
-                    if (!missingResult.IsSuccess)
-                        return _conveyor.OnOptionalNotPopulated(context);
-
-                    var resultType = missingResult.Result.GetType();
-
-                    if (resultType == parameter.Type || missingResult.Result == Type.Missing)
-                    {
-                        parameters.Add(missingResult.Result);
-                        continue;
-                    }
-                    else
-                        return _conveyor.OnMissingReturnedInvalid(context, parameter.Type, resultType);
+                    parameters.Add(Type.Missing);
+                    continue;
                 }
 
                 if (parameter.Type == typeof(string) || parameter.Type == typeof(object))
@@ -367,7 +348,7 @@ namespace CSF
 
                 else if (parameter is BaseParameter normal)
                 {
-                    var result = await normal.TypeReader.ReadAsync(context, normal, context.Parameters[index], cancellationToken);
+                    var result = await _typeReaders.Values[normal.Type].ReadAsync(context, normal, context.Parameters[index], cancellationToken);
 
                     if (!result.IsSuccess)
                         return result;
@@ -418,16 +399,29 @@ namespace CSF
                     default:
                         if (returnValue is null)
                             break;
-                        result = _conveyor.OnUnhandledReturnType(context, returnValue);
-                        break;
+                        throw new NotSupportedException("Specified return type is not supported.");
                 }
 
                 return result;
             }
             catch (Exception ex)
             {
-                return _conveyor.OnUnhandledException(context, command, ex);
+                return ExecuteResult.FromError(ex.Message, ex);
             }
         }
+
+        /// <inheritdoc/>
+        public virtual SearchResult OnCommandNotFound<TContext>(TContext context)
+            where TContext : IContext
+            => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
+
+        /// <inheritdoc/>
+        public virtual CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
+            where TContext : IContext
+            => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
+
+        public virtual ValueTask AfterExecuteAsync<TContext>(TContext context, IServiceProvider services, IResult result)
+            where TContext : IContext
+            => new ValueTask(Task.CompletedTask);
     }
 }

@@ -1,29 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CSF
 {
     public sealed class PrefixContainer
     {
-        public List<IPrefix> Values { get; }
+        public IEnumerable<IPrefix> Values { get; }
 
         public PrefixContainer(IEnumerable<IPrefix> prefixes)
-        {
-            Values = prefixes.ToList();
-        }
+            => Values = prefixes;
+    }
 
-        public PrefixContainer Include(IPrefix prefix)
+    public static class PrefixContainerExtensions
+    {
+        public static IServiceCollection AddPrefixes(this IServiceCollection collection, FrameworkBuilderContext context)
         {
-            if (!Values.Contains(prefix))
-                Values.Add(prefix);
+            var container = new PrefixContainer(context.Prefixes);
 
-            return this;
-        }
+            collection.TryAddSingleton(container);
 
-        public PrefixContainer Exclude(IPrefix prefix)
-        {
-            Values.Remove(prefix);
-            return this;
+            return collection;
         }
     }
 }

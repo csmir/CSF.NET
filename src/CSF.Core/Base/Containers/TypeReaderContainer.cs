@@ -1,43 +1,37 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CSF
 {
     public sealed class TypeReaderContainer
     {
-        public Dictionary<Type, ITypeReader> Values { get; }
+        public IDictionary<Type, ITypeReader> Values { get; }
 
-        public TypeReaderContainer(IEnumerable<ITypeReader> discoveredReaders)
+        public TypeReaderContainer(IEnumerable<ITypeReader> typeReaders)
+            => Values = typeReaders.ToDictionary(x => x.Type, x => x);
+    }
+
+    public static class TypeReaderContainerExtensions
+    {
+        public static IServiceCollection AddTypeReaders(this IServiceCollection collection, FrameworkBuilderContext context)
         {
-            Values = TypeReader.CreateDefaultReaders().Concat(discoveredReaders.ToDictionary(x => x.Type, x => x))
-                .ToDictionary(x => x.Key, x => x.Value);
-        }
+            var rootType = typeof(ITypeReader);
 
-        public ITypeReader this[Type type]
-        {
-            get
-            {
-                if (Values.ContainsKey(type))
-                    return Values[type];
+            foreach (var assembly in context.RegistrationAssemblies)
+                foreach (var type in assembly.GetTypes())
+                    if (rootType.IsAssignableFrom(type) && !type.IsAbstract && type.IsPublic)
+                        collection.TryAddSingleton(rootType, type);
 
-                throw new InvalidOperationException($"No {nameof(ITypeReader)} exists for type {type.Name}.");
-            }
-        }
+            foreach (var reader in TypeReader.CreateDefaultReaders())
+                collection.TryAddSingleton(rootType, reader.Type);
 
-        public TypeReaderContainer Include(ITypeReader reader)
-        {
-            if (Values.ContainsKey(reader.Type))
-                Values[reader.Type] = reader;
-            else
-                Values.Add(reader.Type, reader);
-            return this;
-        }
+            collection.TryAddSingleton<TypeReaderContainer>();
 
-        public TypeReaderContainer Exclude(Type type)
-        {
-            Values.Remove(type);
-            return this;
+            return collection;
         }
     }
 }
