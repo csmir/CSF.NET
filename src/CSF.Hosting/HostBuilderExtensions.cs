@@ -4,23 +4,23 @@ namespace CSF.Hosting
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder WithCommandFramework(this IHostBuilder hostBuilder, Action<HostBuilderContext, FrameworkBuilderContext> action = null)
+        public static IHostBuilder WithCommandFramework(this IHostBuilder hostBuilder, Action<HostBuilderContext, ManagerBuilderContext> action = null)
         {
-            hostBuilder.WithCommandFramework<CommandFramework>(action);
+            hostBuilder.WithCommandFramework<CommandManager>(action);
 
             return hostBuilder;
         }
 
-        public static IHostBuilder WithCommandFramework<T>(this IHostBuilder hostBuilder, Action<HostBuilderContext, FrameworkBuilderContext> action = null)
-            where T : CommandFramework
+        public static IHostBuilder WithCommandFramework<T>(this IHostBuilder hostBuilder, Action<HostBuilderContext, ManagerBuilderContext> action = null)
+            where T : CommandManager
         {
             hostBuilder.ConfigureServices((hostContext, services) =>
             {
-                var fxContext = new FrameworkBuilderContext();
+                var fxContext = new ManagerBuilderContext();
 
                 action?.Invoke(hostContext, fxContext);
 
-                services.AddCommandFramework<T>(fxContext);
+                services.AddCommandManager<T>(fxContext);
             });
 
             return hostBuilder;

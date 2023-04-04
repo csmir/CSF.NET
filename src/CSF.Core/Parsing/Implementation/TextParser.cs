@@ -8,11 +8,17 @@ namespace CSF
     {
         private readonly string[] _prefixes;
 
-        public TextParser(string[] prefixes)
+        public TextParser(ManagerBuilderContext context)
         {
-            _prefixes = prefixes;
+            _prefixes = context.Prefixes;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="rawInput"></param>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
         public virtual bool TryGetPrefix(ref string rawInput, out string prefix)
         {
             prefix = null;
@@ -35,6 +41,12 @@ namespace CSF
             return true;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="rawInput"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public bool TryParse(object rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;
@@ -46,6 +58,12 @@ namespace CSF
             return false;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="rawInput"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public virtual bool TryParse(string rawInput, [NotNullWhen(true)] out ParseInformation result)
         {
             result = default;

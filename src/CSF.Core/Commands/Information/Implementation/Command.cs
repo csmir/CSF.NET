@@ -122,13 +122,13 @@ namespace CSF
                 var module = provider.GetService(Module.Type) as ModuleBase;
 
                 module.SetContext(context);
-                module.SetInformation(this);
+                module.SetCommand(this);
 
-                await module.BeforeExecuteAsync(this, cancellationToken);
+                await module.BeforeExecuteAsync(cancellationToken);
 
                 var returnValue = Method.Invoke(module, parameters.ToArray());
 
-                await module.AfterExecuteAsync(this, cancellationToken);
+                await module.AfterExecuteAsync(cancellationToken);
 
                 var result = default(IResult);
 

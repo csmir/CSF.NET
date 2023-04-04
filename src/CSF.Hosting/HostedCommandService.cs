@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 namespace CSF.Hosting
 {
     /// <summary>
-    ///     Represents a hosted <see cref="CommandFramework"/>. Provides the necessary extensions to set up a hosted environment for CSF.
+    ///     Represents a hosted <see cref="CommandManager"/>. Provides the necessary extensions to set up a hosted environment for CSF.
     /// </summary>
-    public abstract class HostedCommandService : CommandFramework, IHostedService
+    public abstract class HostedCommandService : CommandManager, IHostedService
     {
         protected HostedCommandService(IServiceProvider serviceProvider, ILogger<HostedCommandService> logger)
             : base(serviceProvider, logger)

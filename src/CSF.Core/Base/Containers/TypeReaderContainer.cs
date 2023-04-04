@@ -6,17 +6,32 @@ using System.Linq;
 
 namespace CSF
 {
+    /// <summary>
+    ///     
+    /// </summary>
     public sealed class TypeReaderContainer
     {
+        /// <summary>
+        ///     
+        /// </summary>
         public IDictionary<Type, ITypeReader> Values { get; }
 
         public TypeReaderContainer(IEnumerable<ITypeReader> typeReaders)
             => Values = typeReaders.ToDictionary(x => x.Type, x => x);
     }
 
+    /// <summary>
+    ///     
+    /// </summary>
     public static class TypeReaderContainerExtensions
     {
-        public static IServiceCollection AddTypeReaders(this IServiceCollection collection, FrameworkBuilderContext context)
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddTypeReaders(this IServiceCollection collection, ManagerBuilderContext context)
         {
             var rootType = typeof(ITypeReader);
 

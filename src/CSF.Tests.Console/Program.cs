@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
     .AddSingleton<TextParser>()
-    .AddCommandFramework();
+    .AddCommandManager();
 
 var services = collection.BuildServiceProvider();
 
-var framework = services.GetRequiredService<CommandFramework>();
+var framework = services.GetRequiredService<CommandManager>();
 var parser = services.GetRequiredService<TextParser>();
 
 while (true)

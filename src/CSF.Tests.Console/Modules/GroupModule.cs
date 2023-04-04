@@ -8,9 +8,9 @@
         }
 
         [Command("command")]
-        public void Command()
+        public void MyCommand()
         {
-            Info("Wow, this is working!");
+            Respond("Wow, this is working!");
         }
 
         [Group("subcommand")]
@@ -18,15 +18,15 @@
         {
             [Command("command")]
             [ErrorOverload]
-            public void Command()
+            public void MyCommand()
             {
-                Success("Success (overload)");
+                Respond("Success (overload)");
             }
 
             [Command("command")]
-            public void Command(int i)
+            public void MyCommand(int i)
             {
-                Success($"Success: {i}");
+                Respond($"Success: {i}");
             }
 
             [Group("subsubcommand")]
@@ -34,15 +34,15 @@
             {
                 [Command("command")]
                 [ErrorOverload]
-                public void Command()
+                public void MyCommand()
                 {
-                    Success("Success (overload)");
+                    Respond("Success (overload)");
                 }
 
                 [Command("command")]
-                public void Command(int i)
+                public void MyCommand(int i)
                 {
-                    Success($"Success: {i}");
+                    Respond($"Success: {i}");
                 }
             }
         }

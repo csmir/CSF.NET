@@ -8,7 +8,7 @@ namespace CSF
     ///     Defines the default <see cref="TypeReader{T}"/> for enums.
     /// </summary>
     /// <remarks>
-    ///     To implement this typereader, you must first define it with the associated enum in <see cref="CommandFramework.RegisterTypeReader{T}(TypeReader{T}, bool)"/>.
+    ///     To implement this typereader, you must first define it with the associated enum in <see cref="CommandManager.RegisterTypeReader{T}(TypeReader{T}, bool)"/>.
     /// </remarks>
     /// <typeparam name="T">The enum this parser belongs to.</typeparam>
     public class EnumTypeReader<T> : TypeReader<T>

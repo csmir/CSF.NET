@@ -6,17 +6,32 @@ using System.Linq;
 
 namespace CSF
 {
+    /// <summary>
+    ///     
+    /// </summary>
     public sealed class ComponentContainer
     {
+        /// <summary>
+        ///     
+        /// </summary>
         public IEnumerable<IConditionalComponent> Values { get; }
 
         public ComponentContainer(IEnumerable<Type> types)
             => Values = types.SelectMany(x => new Module(x).Components);
     }
-
+    
+    /// <summary>
+    ///     
+    /// </summary>
     public static class ComponentContainerExtensions
     {
-        public static IServiceCollection AddComponents(this IServiceCollection collection, FrameworkBuilderContext context)
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddComponents(this IServiceCollection collection, ManagerBuilderContext context)
         {
             var rootType = typeof(ModuleBase);
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,7 +11,10 @@ using System.Threading.Tasks;
 [assembly: CLSCompliant(true)]
 namespace CSF
 {
-    public class CommandFramework
+    /// <summary>
+    ///     The root class of CSF, responsible for managing commands and their execution. 
+    /// </summary>
+    public class CommandManager
     {
         private readonly bool _asyncExec;
 
@@ -19,13 +24,13 @@ namespace CSF
         private readonly ILogger _logger;
         private readonly IServiceProvider _services;
 
-        public CommandFramework(IServiceProvider serviceProvider)
-            : this(serviceProvider, serviceProvider.GetRequiredService<ILogger<CommandFramework>>())
+        public CommandManager(IServiceProvider serviceProvider)
+            : this(serviceProvider, serviceProvider.GetRequiredService<ILogger<CommandManager>>())
         {
 
         }
 
-        public CommandFramework(IServiceProvider serviceProvider, ILogger logger)
+        public CommandManager(IServiceProvider serviceProvider, ILogger logger)
         {
             _logger = logger;
             _services = serviceProvider;
@@ -33,10 +38,18 @@ namespace CSF
             _components = serviceProvider.GetRequiredService<ComponentContainer>();
             _typeReaders = serviceProvider.GetRequiredService<TypeReaderContainer>();
 
-            _asyncExec = serviceProvider.GetRequiredService<FrameworkBuilderContext>()
+            _asyncExec = serviceProvider.GetRequiredService<ManagerBuilderContext>()
                 .DoAsynchronousExecution;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="scope"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async Task<IResult> TryExecuteAsync<T>(T context, IServiceScope scope = null, CancellationToken cancellationToken = default)
             where T : IContext
         {
@@ -61,6 +74,24 @@ namespace CSF
             return ExecuteResult.FromSuccess();
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="services"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        protected virtual ValueTask AfterExecuteAsync(IContext context, IServiceProvider services, IResult result)
+            => new ValueTask(Task.CompletedTask);
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="provider"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async ValueTask<IResult> RunPipelineAsync<T>(T context, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -81,6 +112,13 @@ namespace CSF
             return result;
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async ValueTask<SearchResult> SearchAsync<T>(T context, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -121,10 +159,23 @@ namespace CSF
             return OnCommandNotFound(context);
         }
 
-        protected virtual SearchResult OnCommandNotFound<TContext>(TContext context)
-            where TContext : IContext
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual SearchResult OnCommandNotFound(IContext context)
             => SearchResult.FromError($"Failed to find command with name: {context.Name}.");
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="commands"></param>
+        /// <param name="provider"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async ValueTask<IResult> CheckAsync<T>(T context, IEnumerable<Command> commands, IServiceProvider provider, CancellationToken cancellationToken)
             where T : IContext
         {
@@ -162,11 +213,20 @@ namespace CSF
             return CheckYieldResult.FromSuccess(matches);
         }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="commands"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual ValueTask<CheckResult> CheckMatchesAsync<T>(T context, IEnumerable<Command> commands, CancellationToken cancellationToken)
             where T : IContext
         {
             Command overload = null;
-            IEnumerable<Command> SearchMatches()
+
+            IEnumerable<Command> Yield()
             {
                 foreach (var command in commands)
                 {
@@ -192,14 +252,14 @@ namespace CSF
                 }
             }
 
-            var matches = SearchMatches();
+            var matches = Yield();
 
             if (!matches.Any())
             {
                 if (overload is null)
                     return OnBestOverloadUnavailable(context);
-                else
-                    return CheckResult.FromSuccess(new[] { overload });
+
+                return CheckResult.FromSuccess(new[] { overload });
             }
 
             _logger.LogTrace("Found matches for name: '{}': {}", context.Name, string.Join(", ", matches));
@@ -207,14 +267,90 @@ namespace CSF
             return CheckResult.FromSuccess(matches);
         }
 
-        protected virtual CheckResult OnBestOverloadUnavailable<TContext>(TContext context)
-            where TContext : IContext
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual CheckResult OnBestOverloadUnavailable(IContext context)
             => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
+    }
 
-        public virtual ValueTask AfterExecuteAsync<TContext>(TContext context, IServiceProvider services, IResult result)
-            where TContext : IContext
+    /// <summary>
+    ///     
+    /// </summary>
+    public static class CommandManagerExtensions
+    {
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCommandManager(this IServiceCollection collection, Action<ManagerBuilderContext> action = null)
         {
-            return new ValueTask(Task.CompletedTask);
+            collection.AddCommandManager<CommandManager>(action);
+
+            return collection;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, Action<ManagerBuilderContext> action = null)
+            where T : CommandManager
+        {
+            var context = new ManagerBuilderContext();
+
+            action?.Invoke(context);
+
+            collection.AddCommandManager<T>(context);
+
+            return collection;
+        }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, ManagerBuilderContext context)
+            where T : CommandManager
+        {
+            collection.AddComponents(context);
+            collection.AddTypeReaders(context);
+
+            collection.TryAddSingleton<T>();
+
+            return collection;
+        }
+
+        public static IEnumerable<T> CastWhere<T>(this IEnumerable input)
+        {
+            foreach (var @in in input)
+                if (@in is T @out)
+                    yield return @out;
+        }
+
+        public static IReadOnlyList<T> GetRange<T>(this IReadOnlyList<T> input, int startIndex, int? count = null)
+        {
+            IEnumerable<T> InnerGetRange()
+            {
+                count ??= (input.Count - startIndex);
+
+                for (int i = startIndex; i <= count; i++)
+                    yield return input[i];
+            }
+
+            var range = InnerGetRange();
+
+            return range.ToList();
         }
     }
 }

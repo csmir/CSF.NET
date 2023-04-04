@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace CSF
 {
@@ -21,5 +22,13 @@ namespace CSF
         ///     The result's inner exception. <c>null</c> if not applicable.
         /// </summary>
         public Exception Exception { get; }
+    }
+
+    public static class ResultExtensions
+    {
+        public static ValueTask<T> AsValueTask<T>(this T value)
+        {
+            return new ValueTask<T>(value);
+        }
     }
 }
