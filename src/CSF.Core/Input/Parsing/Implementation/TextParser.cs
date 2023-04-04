@@ -1,124 +1,132 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CSF
 {
     public class TextParser : IParser
     {
-        private readonly bool _parseNecessary;
-
-        public PrefixContainer Prefixes { get; }
-
-        public TextParser(PrefixContainer prefixes)
+        private readonly string[] _prefixes;
+        
+        public TextParser(string[] prefixes)
         {
-            Prefixes = prefixes;
-
-            _parseNecessary = Prefixes.Values.Any();
+            _prefixes = prefixes;
         }
 
-        public virtual bool TryGetPrefix(ref string rawInput, out IPrefix prefix)
+        public virtual bool TryGetPrefix(ref string rawInput, out string prefix)
         {
-            if (_parseNecessary)
+            prefix = null;
+
+            if (_prefixes.Any())
             {
-                foreach (var value in Prefixes.Values)
+                foreach (var value in _prefixes)
                 {
-                    if (rawInput.StartsWith(value.Value))
+                    if (rawInput.StartsWith(value))
                     {
-                        rawInput = rawInput[value.Value.Length..].TrimStart();
+                        rawInput = rawInput[value.Length..].TrimStart();
                         prefix = value;
                         return true;
                     }
                 }
+
+                return false;
             }
-            prefix = EmptyPrefix.Create();
+
+            return true;
+        }
+
+        public bool TryParse(object rawInput, [NotNullWhen(true)] out ParserOutput result)
+        {
+            result = default;
+
+            if (rawInput is string str)
+                if (TryParse(str, out result))
+                    return true;
+
             return false;
         }
 
-        public virtual ParseResult Parse(string rawInput)
+        public virtual bool TryParse(string rawInput, [NotNullWhen(true)] out ParserOutput result)
         {
-            if (!TryGetPrefix(ref rawInput, out var prefix))
-                return ParseResult.FromError("");
+            result = default;
 
-            var range = rawInput.Split(' ');
+            if (!TryGetPrefix(ref rawInput, out var prefix))
+                return false;
+
+            var splitInput = rawInput.Split(' ');
 
             var name = "";
-            var args = new List<object>();
-            var partialArgs = new List<string>();
+            var param = new List<object>();
+            var partial = new List<string>();
 
-            var argName = "";
-            var namedArgs = new Dictionary<string, object>();
+            var paramName = "";
+            var namedParam = new Dictionary<string, object>();
 
-            foreach (var entry in range)
+            foreach (var part in splitInput)
             {
                 if (name is "")
                 {
-                    name = entry;
+                    name = part;
                     continue;
                 }
 
-                if (partialArgs.Any())
+                if (partial.Any())
                 {
-                    if (entry.EndsWith("\""))
+                    if (part.EndsWith("\""))
                     {
-                        partialArgs.Add(entry.Replace("\"", ""));
+                        partial.Add(part.Replace("\"", ""));
 
-                        if (argName is "")
-                            args.Add(string.Join(" ", partialArgs));
+                        if (paramName is "")
+                            param.Add(string.Join(" ", partial));
                         else
                         {
-                            namedArgs.Add(argName, string.Join(" ", partialArgs));
-                            argName = "";
+                            namedParam.Add(paramName, string.Join(" ", partial));
+                            paramName = "";
                         }
 
-                        partialArgs.Clear();
+                        partial.Clear();
                         continue;
                     }
-                    partialArgs.Add(entry);
+                    partial.Add(part);
                     continue;
                 }
 
-                if (entry.StartsWith("\""))
+                if (part.StartsWith("\""))
                 {
-                    if (entry.EndsWith("\""))
+                    if (part.EndsWith("\""))
                     {
-                        if (argName is "")
-                            args.Add(entry.Replace("\"", ""));
+                        if (paramName is "")
+                            param.Add(part.Replace("\"", ""));
                         else
                         {
-                            namedArgs.Add(argName, entry.Replace("\"", ""));
-                            argName = "";
+                            namedParam.Add(paramName, part.Replace("\"", ""));
+                            paramName = "";
                         }
                     }
                     else
-                        partialArgs.Add(entry.Replace("\"", ""));
+                        partial.Add(part.Replace("\"", ""));
                     continue;
                 }
 
-                if (entry.StartsWith("-"))
-                    foreach (var c in entry[1..])
-                        namedArgs.Add(c.ToString(), null);
+                if (part.StartsWith("-"))
+                    foreach (var c in part[1..])
+                        namedParam.Add(c.ToString(), null);
 
-                if (entry.StartsWith("--"))
+                if (part.StartsWith("--"))
                 {
-                    if (!entry.EndsWith(":"))
-                        namedArgs.Add(entry[1..], null!);
+                    if (!part.EndsWith(":"))
+                        namedParam.Add(part[1..], null!);
                     else
-                        argName = entry[1..^1];
+                        paramName = part[1..^1];
                     continue;
                 }
 
-                args.Add(entry);
+                param.Add(part);
             }
 
-            return ParseResult.FromSuccess(name, prefix, args, namedArgs);
-        }
+            result = new ParserOutput(name, param, namedParam, prefix);
 
-        public virtual ParseResult Parse(object rawInput)
-        {
-            if (rawInput is string str)
-                return Parse(str);
-
-            return ParseResult.FromError("Raw argument type does not match supported input. Consider creating a new parser for the input type.");
+            return true;
         }
     }
 }

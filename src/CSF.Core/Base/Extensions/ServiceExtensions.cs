@@ -27,7 +27,6 @@ namespace CSF
         public static IServiceCollection AddCommandFramework<T>(this IServiceCollection collection, FrameworkBuilderContext context)
             where T : CommandFramework
         {
-            collection.AddPrefixes(context);
             collection.AddComponents(context);
             collection.AddTypeReaders(context);
 

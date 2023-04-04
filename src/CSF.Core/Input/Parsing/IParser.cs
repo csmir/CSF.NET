@@ -1,7 +1,9 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     public interface IParser
     {
-        public ParseResult Parse(object rawInput);
+        public bool TryParse(object rawInput, [NotNullWhen(true)] out ParserOutput result);
     }
 }

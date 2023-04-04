@@ -52,12 +52,10 @@ namespace CSF.Tests.Modules
         [Command("findcommand", "commandinfo", "getcommand", "matches")]
         public async Task<IResult> GetCommandInfo([Remainder] string command)
         {
-            var parseResult = _parser.Parse(command);
-
-            if (!parseResult.IsSuccess)
+            if (!_parser.TryParse(command, out var output))
                 return Error("Failed to parse the input as valid command input.");
 
-            var context = new CommandContext(parseResult);
+            var context = new CommandContext(output);
 
             var searchResult = await _framework.SearchAsync(context, default);
 

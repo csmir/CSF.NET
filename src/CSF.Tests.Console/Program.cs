@@ -14,12 +14,10 @@ while (true)
 {
     var input = Console.ReadLine()!;
 
-    var parseResult = parser.Parse(input);
+    if (parser.TryParse(input, out var output))
+    {
+        var context = new CommandContext(output);
 
-    if (!parseResult.IsSuccess)
-        continue;
-
-    var context = new CommandContext(parseResult);
-
-    await framework.TryExecuteAsync(context);
+        await framework.TryExecuteAsync(context);
+    }
 }

@@ -7,8 +7,6 @@ namespace CSF
     {
         public bool DoAsynchronousExecution { get; set; } = false;
 
-        public IEnumerable<IPrefix> Prefixes { get; set; } = new IPrefix[] { EmptyPrefix.Create() };
-
         public IEnumerable<Assembly> RegistrationAssemblies { get; set; } = new Assembly[] { Assembly.GetEntryAssembly() };
     }
 }

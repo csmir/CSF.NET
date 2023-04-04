@@ -17,7 +17,7 @@ namespace CSF
         public string RawInput { get; set; }
 
         /// <inheritdoc/>
-        public IPrefix Prefix { get; }
+        public string Prefix { get; }
 
         /// <inheritdoc/>
         public IReadOnlyDictionary<string, object> NamedParameters { get; }
@@ -27,11 +27,11 @@ namespace CSF
         /// </summary>
         /// <param name="rawInput">The raw input, modified in length if the prefix is populated.</param>
         /// <param name="prefix">The prefix of the command.</param>
-        public CommandContext(ParseResult result)
+        public CommandContext(ParserOutput result)
         {
             Prefix = result.Prefix;
-            Parameters = result.Arguments;
-            NamedParameters = result.NamedArguments;
+            Parameters = result.Parameters;
+            NamedParameters = result.NamedParameters;
             Name = result.Name;
         }
     }

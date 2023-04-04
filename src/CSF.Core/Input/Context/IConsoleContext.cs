@@ -23,6 +23,6 @@ namespace CSF
         /// <remarks>
         ///     <see langword="null"/> if not set.
         /// </remarks>
-        IPrefix Prefix { get; }
+        string Prefix { get; }
     }
 }

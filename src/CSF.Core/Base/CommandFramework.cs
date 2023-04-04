@@ -211,17 +211,6 @@ namespace CSF
             where TContext : IContext
             => CheckResult.FromError($"Failed to find overload that best matches input: {context.Name}.");
 
-        public virtual ValueTask<ConstructionResult> ConstructAsync<T>(T context, Command command, IServiceProvider provider, CancellationToken cancellationToken)
-            where T : IContext
-        {
-            var module = provider.GetService(command.Module.Type) as ModuleBase;
-
-            module.SetContext(context);
-            module.SetInformation(command);
-
-            return ConstructionResult.FromSuccess(module);
-        }
-
         public virtual ValueTask AfterExecuteAsync<TContext>(TContext context, IServiceProvider services, IResult result)
             where TContext : IContext
         {
