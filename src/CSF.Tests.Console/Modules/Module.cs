@@ -4,13 +4,11 @@ namespace CSF.Tests
 {
     public class Module : ModuleBase<CommandContext>
     {
-        private readonly IParser _parser;
         private readonly CommandManager _framework;
 
-        public Module(IParser parser, CommandManager framework)
+        public Module(CommandManager framework)
         {
             _framework = framework;
-            _parser = parser;
         }
 
         [Command("multiple")]
@@ -52,7 +50,7 @@ namespace CSF.Tests
         [Command("findcommand", "commandinfo", "getcommand", "matches")]
         public async Task<IResult> GetCommandInfo([Remainder] string command)
         {
-            if (!_parser.TryParse(command, out var output))
+            if (!new TextParser().TryParse(command, out var output))
                 return Respond("Failed to parse the input as valid command input.");
 
             var context = new CommandContext(output);
