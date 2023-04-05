@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using CSF.Hosting;
+using Microsoft.Extensions.Hosting;
 
 await Host.CreateDefaultBuilder(args)
-    .ConfigureCommandFramework<CommandFramework, CommandResolver>()
-    .Build()
-    .RunAsync();
+    .ConfigureCommandManager()
+    .RunConsoleAsync();

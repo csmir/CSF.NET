@@ -66,7 +66,7 @@ namespace CSF.Tests
                     Respond(result.ToString());
             }
 
-            return ExecuteResult.FromSuccess();
+            return ExecuteResult.Success();
         }
     }
 }
