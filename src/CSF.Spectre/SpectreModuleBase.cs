@@ -1,8 +1,8 @@
 ﻿using Spectre.Console;
 using System;
 using System.Threading.Tasks;
-
 [assembly: CLSCompliant(true)]
+
 namespace CSF.Spectre
 {
     /// <inheritdoc/>
@@ -10,55 +10,55 @@ namespace CSF.Spectre
         where T : IContext
     {
         /// <inheritdoc/>
-        public IResult Error(string message)
+        public override ExecuteResult Error(string message, params object[] values)
         {
-            AnsiConsole.MarkupLineInterpolated($"[red]{message}[/]");
-            return ExecuteResult.FromSuccess();
+            AnsiConsole.MarkupLineInterpolated($"[red]{string.Format(message, values)}[/]");
+            return ExecuteResult.Success();
         }
 
         /// <inheritdoc/>
-        public Task<IResult> ErrorAsync(string message)
+        public override Task<ExecuteResult> ErrorAsync(string message, params object[] values)
         {
-            return Task.FromResult(Error(message));
+            return Task.FromResult(Error(message, values));
         }
 
         /// <inheritdoc/>
-        public IResult Info(string message)
+        public override ExecuteResult Info(string message, params object[] values)
         {
-            AnsiConsole.MarkupLineInterpolated($"[yellow]{message}[/]");
-            return ExecuteResult.FromSuccess();
+            AnsiConsole.MarkupLineInterpolated($"[yellow]{string.Format(message, values)}[/]");
+            return ExecuteResult.Success();
         }
 
         /// <inheritdoc/>
-        public Task<IResult> InfoAsync(string message)
+        public override Task<ExecuteResult> InfoAsync(string message, params object[] values)
         {
-            return Task.FromResult(Info(message));
+            return Task.FromResult(Info(message, values));
         }
 
         /// <inheritdoc/>
-        public IResult Success(string message)
+        public override ExecuteResult Success(string message, params object[] values)
         {
-            AnsiConsole.MarkupLineInterpolated($"[green]{message}[/]");
-            return ExecuteResult.FromSuccess();
+            AnsiConsole.MarkupLineInterpolated($"[green]{string.Format(message, values)}[/]");
+            return ExecuteResult.Success();
         }
 
         /// <inheritdoc/>
-        public Task<IResult> SuccessAsync(string message)
+        public override Task<ExecuteResult> SuccessAsync(string message, params object[] values)
         {
-            return Task.FromResult(Success(message));
+            return Task.FromResult(Success(message, values));
         }
 
         /// <inheritdoc/>
-        public override IResult Respond(string message)
+        public override ExecuteResult Respond(string message, params object[] values)
         {
-            AnsiConsole.MarkupLine($"{message}");
-            return ExecuteResult.FromSuccess();
+            AnsiConsole.MarkupLine($"{string.Format(message, values)}");
+            return ExecuteResult.Success();
         }
 
         /// <inheritdoc/>
-        public Task<IResult> RespondAsync(string message)
+        public override Task<ExecuteResult> RespondAsync(string message, params object[] values)
         {
-            return Task.FromResult(Respond(message));
+            return Task.FromResult(Respond(message, values));
         }
 
         /// <summary>

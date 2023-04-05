@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CSF.Tests
+﻿namespace CSF.Tests
 {
     public class GroupModule : ModuleBase<CommandContext>
     {
