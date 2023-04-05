@@ -9,16 +9,16 @@ namespace CSF
     {
         private delegate bool Tpd<TValue>(string str, out TValue value);
 
-        private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new Lazy<IReadOnlyDictionary<Type, Delegate>>(ValueGenerator);
+        private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
         public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
             if (TryGetParser(out var parser))
             {
                 if (parser(value.ToString(), out var result))
-                    return TypeReaderResult.Success(result);
+                    return Success(result);
             }
-            return TypeReaderResult.Error($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
+            return Error($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
         }
 
         private static bool TryGetParser(out Tpd<T> parser)

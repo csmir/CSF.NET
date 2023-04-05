@@ -28,10 +28,10 @@ namespace CSF
             var providedType = context.GetType();
 
             if (providedType != ContextType)
-                return PreconditionResult.Error(
+                return Error(
                         errorMessage: $"Invalid context was passed into the command. Expected: '{ContextType.FullName}', got '{providedType.FullName}'");
 
-            return PreconditionResult.Success();
+            return Success();
         }
     }
 }

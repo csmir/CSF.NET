@@ -19,14 +19,14 @@ namespace CSF
         /// <param name="errorMessage">The error message that occurred.</param>
         /// <param name="exception">The exception that occurred if available.</param>
         /// <returns>A failed precondition result.</returns>
-        public PreconditionResult Error(string errorMessage, Exception exception = null)
+        public virtual PreconditionResult Error(string errorMessage, Exception exception = null)
             => PreconditionResult.Error(errorMessage, exception);
 
         /// <summary>
         ///     Returns the precondition with success.
         /// </summary>
         /// <returns>A successful precondition result.</returns>
-        public PreconditionResult Success()
+        public virtual PreconditionResult Success()
             => PreconditionResult.Success();
     }
 }

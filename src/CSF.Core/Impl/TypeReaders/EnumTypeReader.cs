@@ -18,9 +18,9 @@ namespace CSF
         public override ValueTask<TypeReaderResult> ReadAsync(IContext context, BaseParameter parameter, object value, CancellationToken cancellationToken)
         {
             if (Enum.TryParse<T>(value.ToString(), true, out var result))
-                return TypeReaderResult.Success(result);
+                return Success(result);
 
-            return TypeReaderResult.Error(
+            return Error(
                 errorMessage: $"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{parameter.Name}'");
         }
     }

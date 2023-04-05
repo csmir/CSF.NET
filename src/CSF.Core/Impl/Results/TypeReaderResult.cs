@@ -40,13 +40,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static TypeReaderResult Error(string errorMessage, Exception exception = null)
-            => new TypeReaderResult(false, null, errorMessage, exception);
+            => new(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static TypeReaderResult Success(object value)
-            => new TypeReaderResult(true, value);
+            => new(true, value);
     }
 }

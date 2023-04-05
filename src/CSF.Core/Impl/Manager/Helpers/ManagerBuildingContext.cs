@@ -11,7 +11,7 @@ namespace CSF
         /// <summary>
         ///     The assemblies to be used to register
         /// </summary>
-        public Assembly[] RegistrationAssemblies { get; set; } = new Assembly[] { Assembly.GetEntryAssembly() };
+        public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };
 
         /// <summary>
         ///     Metadata that can be passed around the startup logic for further customization of the creation pattern.

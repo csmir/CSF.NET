@@ -41,13 +41,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static MatchResult Error(string errorMessage, Exception exception = null)
-            => new MatchResult(false, null, errorMessage, exception);
+            => new(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static MatchResult Success(IEnumerable<Command> matches)
-            => new MatchResult(true, matches);
+            => new(true, matches);
     }
 }

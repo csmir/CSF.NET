@@ -15,7 +15,7 @@ namespace CSF
         /// <returns>A <see cref="ValueTask"/> wrapping <typeparamref name="T"/>.</returns>
         public static ValueTask<T> AsValueTask<T>(this T value)
         {
-            return new ValueTask<T>(value);
+            return new(value);
         }
     }
 }

@@ -34,13 +34,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static PreconditionResult Error(string errorMessage, Exception exception = null)
-            => new PreconditionResult(false, errorMessage, exception);
+            => new(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static PreconditionResult Success()
-            => new PreconditionResult(true);
+            => new(true);
     }
 }

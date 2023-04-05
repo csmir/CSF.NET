@@ -91,7 +91,7 @@ namespace CSF
         /// <param name="result">The result returned by the execution.</param>
         /// <returns>An asynchronous <see cref="ValueTask"/>.</returns>
         protected virtual ValueTask AfterExecuteAsync(IContext context, IServiceProvider services, IResult result)
-            => new ValueTask(Task.CompletedTask);
+            => ValueTask.CompletedTask;
 
         /// <summary>
         ///     

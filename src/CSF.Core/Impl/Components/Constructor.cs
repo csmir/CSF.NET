@@ -24,14 +24,12 @@ namespace CSF
         public Constructor(Type type)
         {
             EntryPoint = GetEntryConstructor(type);
-
-            Attributes = GetAttributes(EntryPoint)
+            Attributes = GetAttributes()
                 .ToList();
-
             Name = EntryPoint.Name;
         }
 
-        private ConstructorInfo GetEntryConstructor(Type type)
+        private static ConstructorInfo GetEntryConstructor(Type type)
         {
             var constructors = type.GetConstructors();
 
@@ -51,12 +49,8 @@ namespace CSF
             return constructor;
         }
 
-        private IEnumerable<Attribute> GetAttributes(ConstructorInfo ctorInfo)
-        {
-            foreach (var obj in ctorInfo.GetCustomAttributes(false))
-                if (obj is Attribute attribute)
-                    yield return attribute;
-        }
+        private IEnumerable<Attribute> GetAttributes()
+            => EntryPoint.GetCustomAttributes(true).CastWhere<Attribute>();
 
         /// <summary>
         ///     Formats the type into a readable signature.

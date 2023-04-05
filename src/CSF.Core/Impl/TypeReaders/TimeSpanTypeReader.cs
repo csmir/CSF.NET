@@ -9,7 +9,7 @@ namespace CSF
     internal class TimeSpanTypeReader : TypeReader<TimeSpan>
     {
         private readonly IReadOnlyDictionary<string, Func<string, TimeSpan>> _callback;
-        private readonly Regex _regex = new Regex(@"(\d*)\s*([a-zA-Z]*)\s*(?:and|,)?\s*", RegexOptions.Compiled);
+        private readonly Regex _regex = new(@"(\d*)\s*([a-zA-Z]*)\s*(?:and|,)?\s*", RegexOptions.Compiled);
 
         public TimeSpanTypeReader()
         {
@@ -53,28 +53,28 @@ namespace CSF
 #pragma warning restore IDE0220 // Add explicit cast
                 }
                 else
-                    return TypeReaderResult.Error($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'");
+                    return Error($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'");
             }
 
-            return TypeReaderResult.Success(span);
+            return Success(span);
         }
 
         private static TimeSpan Seconds(string match)
-            => new TimeSpan(0, 0, int.Parse(match));
+            => new(0, 0, int.Parse(match));
 
         private static TimeSpan Minutes(string match)
-            => new TimeSpan(0, int.Parse(match), 0);
+            => new(0, int.Parse(match), 0);
 
         private static TimeSpan Hours(string match)
-            => new TimeSpan(int.Parse(match), 0, 0);
+            => new(int.Parse(match), 0, 0);
 
         private static TimeSpan Days(string match)
-            => new TimeSpan(int.Parse(match), 0, 0, 0);
+            => new(int.Parse(match), 0, 0, 0);
 
         private static TimeSpan Weeks(string match)
-            => new TimeSpan((int.Parse(match) * 7), 0, 0, 0);
+            => new((int.Parse(match) * 7), 0, 0, 0);
 
         private static TimeSpan Months(string match)
-            => new TimeSpan(((int)(int.Parse(match) * 30.437)), 0, 0, 0);
+            => new(((int)(int.Parse(match) * 30.437)), 0, 0, 0);
     }
 }

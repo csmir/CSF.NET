@@ -34,13 +34,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static ExecuteResult Error(string errorMessage, Exception exception = null)
-            => new ExecuteResult(false, errorMessage, exception);
+            => new(false, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static ExecuteResult Success()
-            => new ExecuteResult(true);
+            => new(true);
     }
 }

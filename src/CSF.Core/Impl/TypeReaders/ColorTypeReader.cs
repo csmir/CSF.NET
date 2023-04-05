@@ -53,16 +53,16 @@ namespace CSF
         {
             var str = value.ToString();
             if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
-                return TypeReaderResult.Success(Color.FromArgb(hexNumber));
+                return Success(Color.FromArgb(hexNumber));
 
             var name = str;
 
             _spacedColors.TryGetValue(name, out name);
 
             if (_colors.TryGetValue(name, out var color))
-                return TypeReaderResult.Success(color);
+                return Success(color);
 
-            return TypeReaderResult.Error($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{parameter.Name}'");
+            return Error($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{parameter.Name}'");
         }
     }
 }

@@ -118,12 +118,8 @@ namespace CSF
             }
         }
 
-        private IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
-        {
-            foreach (var attribute in paramInfo.GetCustomAttributes(false))
-                if (attribute is Attribute attr)
-                    yield return attr;
-        }
+        private static IEnumerable<Attribute> GetAttributes(ParameterInfo paramInfo)
+            => paramInfo.GetCustomAttributes(false).CastWhere<Attribute>();
 
         /// <summary>
         ///     Formats the type into a readable signature.

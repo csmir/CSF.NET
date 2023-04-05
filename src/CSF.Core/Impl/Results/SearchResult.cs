@@ -41,13 +41,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static SearchResult Error(string errorMessage, Exception exception = null)
-            => new SearchResult(false, null, errorMessage, exception);
+            => new(false, null, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static SearchResult Success(IEnumerable<Command> matches)
-            => new SearchResult(true, matches);
+            => new(true, matches);
     }
 }

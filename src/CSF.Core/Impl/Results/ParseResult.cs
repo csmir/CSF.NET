@@ -47,13 +47,13 @@ namespace CSF
         /// <param name="exception"></param>
         /// <returns></returns>
         public static ParseResult Error(string errorMessage, Exception exception = null)
-            => new ParseResult(false, null, -1, errorMessage, exception);
+            => new(false, null, -1, errorMessage, exception);
 
         /// <summary>
         ///     Creates a succesful result with provided parameters.
         /// </summary>
         /// <returns></returns>
         public static ParseResult Success(IEnumerable<object> value, int index)
-            => new ParseResult(true, value, index);
+            => new(true, value, index);
     }
 }

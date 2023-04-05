@@ -134,18 +134,10 @@ namespace CSF
         }
 
         private IEnumerable<Attribute> GetAttributes()
-        {
-            foreach (var attr in Type.GetCustomAttributes(true))
-                if (attr is Attribute attribute)
-                    yield return attribute;
-        }
+            => Type.GetCustomAttributes(true).CastWhere<Attribute>();
 
         private IEnumerable<PreconditionAttribute> GetPreconditions()
-        {
-            foreach (var attr in Attributes)
-                if (attr is PreconditionAttribute precondition)
-                    yield return precondition;
-        }
+            => Attributes.CastWhere<PreconditionAttribute>();
 
         /// <summary>
         ///     Formats the type into a readable signature.
