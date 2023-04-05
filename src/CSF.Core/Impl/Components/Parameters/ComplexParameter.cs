@@ -55,15 +55,15 @@ namespace CSF
 
             Flags = SetFlags(parameterInfo);
 
-            (int min, int max) = GetLength();
+            var length = GetLength();
 
-            MinLength = min;
-            MaxLength = max;
+            MinLength = length.Item1;
+            MaxLength = length.Item2;
 
             Name = parameterInfo.Name;
         }
 
-        private (int, int) GetLength()
+        private Tuple<int, int> GetLength()
         {
             var minLength = 0;
             var maxLength = 0;
@@ -84,7 +84,7 @@ namespace CSF
                 }
             }
 
-            return (minLength, maxLength);
+            return new(minLength, maxLength);
         }
 
         private ParameterType SetFlags(ParameterInfo paramInfo)
