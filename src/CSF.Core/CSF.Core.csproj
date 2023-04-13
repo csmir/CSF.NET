@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-
+	<ImplicitUsings>enable</ImplicitUsings>
 	<RootNamespace>CSF</RootNamespace>
 
 	<AssemblyVersion>2.0</AssemblyVersion>

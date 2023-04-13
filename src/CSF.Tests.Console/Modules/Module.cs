@@ -4,13 +4,6 @@ namespace CSF.Tests
 {
     public class Module : ModuleBase<CommandContext>
     {
-        private readonly CommandManager _framework;
-
-        public Module(CommandManager framework)
-        {
-            _framework = framework;
-        }
-
         [Command("multiple")]
         public void Test(bool truee, bool falsee)
         {
@@ -36,37 +29,15 @@ namespace CSF.Tests
         }
 
         [Command("complex")]
-        public IResult Complex([Complex] ComplexType complex)
+        public void Complex([Complex] ComplexType complex)
         {
-            return Respond($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
+            Respond($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
         }
 
         [Command("complexnullable")]
-        public IResult Complex([Complex] ComplexerType? complex)
+        public void Complex([Complex] ComplexerType? complex)
         {
-            return Respond($"({complex?.X}, {complex?.Y}, {complex?.Z})");
-        }
-
-        [Command("findcommand", "commandinfo", "getcommand", "matches")]
-        public async Task<IResult> GetCommandInfo([Remainder] string command)
-        {
-            if (!new TextParser().TryParse(command, out var output))
-                return Respond("Failed to parse the input as valid command input.");
-
-            var context = new CommandContext(output);
-
-            var searchResult = await _framework.SearchAsync(context, default);
-
-            if (!searchResult.IsSuccess)
-                return Respond("Failed to find any commands with this name.");
-
-            foreach (var result in searchResult.Result)
-            {
-                if (result != null)
-                    Respond(result.ToString());
-            }
-
-            return ExecuteResult.Success();
+            Respond($"({complex?.X}, {complex?.Y}, {complex?.Z})");
         }
     }
 }
