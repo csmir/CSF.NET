@@ -46,26 +46,26 @@ namespace CSF.Tests.Benchmarks
         private readonly static CommandContext _noparam;
         [Benchmark]
         public async Task Parameterless()
-            => _ = await _manager.ExecuteAsync(_noparam);
+            => await _manager.ExecuteAsync(_noparam);
 
         private readonly static CommandContext _param;
         [Benchmark]
         public async Task Parametered()
-            => _ = await _manager.ExecuteAsync(_param);
+            => await _manager.ExecuteAsync(_param);
 
         private readonly static CommandContext _paramnoprov;
         [Benchmark]
         public async Task ParameteredUnprovided()
-            => _ = await _manager.ExecuteAsync(_paramnoprov);
+            => await _manager.ExecuteAsync(_paramnoprov);
 
         private readonly static CommandContext _noparamnested;
         [Benchmark]
         public async Task NestedParameterless()
-            => _ = await _manager.ExecuteAsync(_noparamnested);
+            => await _manager.ExecuteAsync(_noparamnested);
 
         private readonly static CommandContext _paramnested;
         [Benchmark]
         public async Task NestedParametered()
-            => _ = await _manager.ExecuteAsync(_paramnested);
+            => await _manager.ExecuteAsync(_paramnested);
     }
 }

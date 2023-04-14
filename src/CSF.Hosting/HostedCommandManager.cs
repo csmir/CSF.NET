@@ -53,7 +53,7 @@ namespace CSF
 
                 var result = await ExecuteAsync(context, new(), cancellationToken: cancellationToken);
 
-                if (result.Code != FailureCode.None)
+                if (result.Step != FailedStep.None)
                     Logger.LogError(result.Exception, "{}", result.Message);
             }
         }

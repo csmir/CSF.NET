@@ -6,7 +6,7 @@ namespace CSF
 {
     public static class ServiceHelper
     {
-        public static IServiceCollection AddComponents(this IServiceCollection collection, BuildConfiguration context)
+        public static IServiceCollection AddComponents(this IServiceCollection collection, CommandBuildingConfiguration context)
         {
             var rootType = typeof(IModuleBase);
 
@@ -18,17 +18,17 @@ namespace CSF
             return collection;
         }
 
-        public static IServiceCollection AddCommandManager(this IServiceCollection collection, Action<BuildConfiguration> action = null)
+        public static IServiceCollection AddCommandManager(this IServiceCollection collection, Action<CommandBuildingConfiguration> action = null)
         {
             collection.AddCommandManager<CommandManager>(action);
 
             return collection;
         }
 
-        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, Action<BuildConfiguration> action = null)
+        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, Action<CommandBuildingConfiguration> action = null)
             where T : CommandManager
         {
-            var context = new BuildConfiguration();
+            var context = new CommandBuildingConfiguration();
 
             action?.Invoke(context);
 
@@ -38,7 +38,7 @@ namespace CSF
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, BuildConfiguration configuration)
+        public static IServiceCollection AddCommandManager<T>(this IServiceCollection collection, CommandBuildingConfiguration configuration)
             where T : CommandManager
         {
             collection.AddComponents(configuration);

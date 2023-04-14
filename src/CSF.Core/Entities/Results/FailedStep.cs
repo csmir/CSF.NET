@@ -1,6 +1,6 @@
 ﻿namespace CSF
 {
-    public enum FailureCode : int
+    public enum FailedStep : int
     {
         None,
 

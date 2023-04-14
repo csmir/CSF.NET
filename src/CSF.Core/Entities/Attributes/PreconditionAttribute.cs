@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     /// <summary>
     ///     Defines a precondition attribute.
@@ -9,6 +11,7 @@
         /// <inheritdoc/>
         public abstract void Check(IContext context, Command command, IServiceProvider provider);
 
+        [DoesNotReturn]
         protected virtual void Fail(string message = null, Exception exception = null)
             => throw new CheckException(message, exception);
     }

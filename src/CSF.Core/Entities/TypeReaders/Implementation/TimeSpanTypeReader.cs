@@ -35,11 +35,10 @@ namespace CSF
 
         public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
-            var str = value.ToString();
-            if (!TimeSpan.TryParse(str, out TimeSpan span))
+            if (!TimeSpan.TryParse(value, out TimeSpan span))
             {
-                str = str.ToLower().Trim();
-                MatchCollection matches = _regex.Matches(str);
+                value = value.ToLower().Trim();
+                MatchCollection matches = _regex.Matches(value);
                 if (matches.Count != 0)
                 {
 #pragma warning disable IDE0220 // Add explicit cast
@@ -49,7 +48,7 @@ namespace CSF
 #pragma warning restore IDE0220 // Add explicit cast
                 }
                 else
-                    return Fail($"The provided value is no timespan. Expected {typeof(TimeSpan).Name}, got: '{str}'. At: '{parameter.Name}'");
+                    return Fail($"The provided value is no timespan. Got: '{value}'. At: '{parameter.Name}'");
             }
 
             return span;

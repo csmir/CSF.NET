@@ -16,14 +16,14 @@ namespace CSF
         {
             _services = serviceProvider;
 
-            var context = serviceProvider.GetRequiredService<BuildConfiguration>();
+            var context = serviceProvider.GetRequiredService<CommandBuildingConfiguration>();
 
             Components = context.Build();
         }
 
-        public virtual async ValueTask<IResult> ExecuteAsync(IContext context, CommandExecutionOptions options = null, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(IContext context, CommandExecutionOptions options = null, CancellationToken cancellationToken = default)
         {
-            async ValueTask<IResult> ExecuteCommandAsync(IContext context, IServiceProvider services, CancellationToken cancellationToken)
+            async ValueTask<CommandResult> PipeAsync(IContext context, IServiceProvider services, CancellationToken cancellationToken)
             {
 #if !DEBUG
                 try
@@ -53,7 +53,7 @@ namespace CSF
                             throw new NotSupportedException("The return value of this command is not supported.");
                     }
 
-                    return new Result();
+                    return new CommandResult();
 #if !DEBUG
                 }
                 catch (PipelineException ex)
@@ -73,7 +73,7 @@ namespace CSF
 
             if (!options.ExecuteAsynchronously)
             {
-                var result = await ExecuteCommandAsync(context, services, cancellationToken);
+                var result = await PipeAsync(context, services, cancellationToken);
                 await AfterExecuteAsync(context, services, result);
 
                 return result;
@@ -81,15 +81,15 @@ namespace CSF
 
             _ = Task.Run(async () =>
             {
-                var result = await ExecuteCommandAsync(context, services, cancellationToken);
+                var result = await PipeAsync(context, services, cancellationToken);
                 await AfterExecuteAsync(context, services, result);
             },
             cancellationToken);
 
-            return new Result();
+            return new CommandResult();
         }
 
-        protected virtual ValueTask AfterExecuteAsync(IContext context, IServiceProvider services, IResult result)
+        protected virtual ValueTask AfterExecuteAsync(IContext context, IServiceProvider services, CommandResult result)
             => ValueTask.CompletedTask;
 
         public CommandCell Search(IContext context, IServiceProvider services)

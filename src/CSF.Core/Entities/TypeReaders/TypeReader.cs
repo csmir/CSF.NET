@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     /// <summary>
     ///     Represents a generic <see cref="TypeReader{T}"/> to use for parsing provided types into the targetted type.
@@ -12,6 +14,7 @@
         /// <inheritdoc />
         public abstract object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value);
 
+        [DoesNotReturn]
         public virtual object Fail(string message = null, Exception exception = null)
             => throw new ReadException(message, exception);
     }
@@ -26,8 +29,11 @@
         {
             var range = BaseTypeReader.CreateBaseReaders();
 
-            range.Add(new TimeSpanTypeReader());
-            range.Add(new ColorTypeReader());
+            int length = range.Length;
+            Array.Resize(ref range, length + 2);
+
+            range[length++] = new TimeSpanTypeReader();
+            range[length++] = new ColorTypeReader();
 
             return range;
         }

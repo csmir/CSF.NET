@@ -47,18 +47,17 @@ namespace CSF
 
         public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
-            var str = value.ToString();
-            if (int.TryParse(str.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
+            if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return Color.FromArgb(hexNumber);
 
-            var name = str;
+            var name = value;
 
             _spacedColors.TryGetValue(name, out name);
 
             if (_colors.TryGetValue(name, out var color))
                 return color;
 
-            return Fail($"The provided value is not a color. Expected {typeof(Color).Name}, got: '{str}'. At: '{parameter.Name}'");
+            return Fail($"The provided value is not a color. Got: '{value}'. At: '{parameter.Name}'");
         }
     }
 }

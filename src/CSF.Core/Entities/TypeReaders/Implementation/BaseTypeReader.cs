@@ -8,24 +8,12 @@
 
         public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
-            if (TryGetParser(out var parser))
-            {
-                if (parser(value.ToString(), out var result))
-                    return result;
-            }
+            var parser = _container.Value[Type] as Tpd<T>;
+
+            if (parser(value, out var result))
+                return result;
 
             return Fail($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
-        }
-
-        private static bool TryGetParser(out Tpd<T> parser)
-        {
-            parser = null;
-            if (_container.Value.TryGetValue(typeof(T), out var result))
-            {
-                parser = (Tpd<T>)result;
-                return true;
-            }
-            return false;
         }
 
         private static IReadOnlyDictionary<Type, Delegate> ValueGenerator()
@@ -73,9 +61,9 @@
 
     internal static class BaseTypeReader
     {
-        public static IList<ITypeReader> CreateBaseReaders()
+        public static ITypeReader[] CreateBaseReaders()
         {
-            var callback = new List<ITypeReader>()
+            var callback = new ITypeReader[]
             {
                 // char
                 new BaseTypeReader<char>(),

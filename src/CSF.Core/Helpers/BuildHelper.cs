@@ -5,14 +5,14 @@ namespace CSF
 {
     public static class BuildHelper
     {
-        public static IConditionalComponent[] Build(this BuildConfiguration context)
+        public static IConditionalComponent[] Build(this CommandBuildingConfiguration context)
         {
             var modules = context.BuildModules();
 
             return modules.SelectMany(x => x.Components).ToArray();
         }
 
-        public static IEnumerable<Module> BuildModules(this BuildConfiguration context)
+        public static IEnumerable<Module> BuildModules(this CommandBuildingConfiguration context)
         {
             var typeReaders = context.TypeReaders.ToDictionary(x => x.Type, x => x);
 

@@ -8,9 +8,9 @@
 
         }
 
-        public override IResult AsResult()
+        public override CommandResult AsResult()
         {
-            return new Result(FailureCode.Execute, Message, this);
+            return new CommandResult(FailedStep.Execute, Message, this);
         }
     }
 }
