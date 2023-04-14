@@ -51,9 +51,9 @@ namespace CSF
             {
                 var context = new CommandContext(Console.ReadLine());
 
-                var result = await ExecuteAsync(context, new(), cancellationToken: cancellationToken);
+                var result = await ExecuteAsync(context, new CommandExecutionOptions(), cancellationToken);
 
-                if (result.Step != FailedStep.None)
+                if (result.Step != ResultCode.None)
                     Logger.LogError(result.Exception, "{}", result.Message);
             }
         }

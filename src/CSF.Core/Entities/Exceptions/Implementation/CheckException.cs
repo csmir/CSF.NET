@@ -10,7 +10,7 @@
 
         public override CommandResult AsResult()
         {
-            return new CommandResult(FailedStep.Check, Message, this);
+            return new CommandResult(ResultCode.Check, Message, this);
         }
     }
 }

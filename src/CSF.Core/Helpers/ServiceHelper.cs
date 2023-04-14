@@ -8,7 +8,7 @@ namespace CSF
     {
         public static IServiceCollection AddComponents(this IServiceCollection collection, CommandBuildingConfiguration context)
         {
-            var rootType = typeof(IModuleBase);
+            var rootType = typeof(ModuleBase);
 
             foreach (var assembly in context.RegistrationAssemblies)
                 foreach (var type in assembly.GetTypes())

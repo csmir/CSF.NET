@@ -15,7 +15,7 @@
         public Attribute[] Attributes { get; }
 
         /// <inheritdoc/>
-        public IPrecondition[] Preconditions { get; }
+        public PreconditionAttribute[] Preconditions { get; }
 
         /// <summary>
         ///     The components of this module.
@@ -32,7 +32,7 @@
         /// </summary>
         public Module Root { get; }
 
-        public Module(Type type, IDictionary<Type, ITypeReader> typeReaders, Module root = null, string expectedName = null, string[] aliases = null)
+        public Module(Type type, IDictionary<Type, TypeReader> typeReaders, Module root = null, string expectedName = null, string[] aliases = null)
         {
             var attributes = type.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();
@@ -43,7 +43,7 @@
             Attributes = attributes;
             Preconditions = preconditions;
 
-            Components = this.BuildComponents(typeReaders);
+            Components = this.Build(typeReaders);
 
             Name = expectedName ?? type.Name;
             Aliases = aliases ?? new string[] { Name };

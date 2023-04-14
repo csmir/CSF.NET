@@ -38,14 +38,14 @@ namespace CSF
         public int MaxLength { get; }
 
         /// <inheritdoc/>
-        public ITypeReader TypeReader { get; }
+        public TypeReader TypeReader { get; }
 
         /// <summary>
         ///     The complexParam constructor for complexParam parameter types.
         /// </summary>
         public Constructor Constructor { get; }
 
-        public ComplexParameter(ParameterInfo parameterInfo, IDictionary<Type, ITypeReader> typeReaders)
+        public ComplexParameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);

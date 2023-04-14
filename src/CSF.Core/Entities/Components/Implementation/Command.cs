@@ -14,7 +14,7 @@ namespace CSF
         public Attribute[] Attributes { get; }
 
         /// <inheritdoc/>
-        public IPrecondition[] Preconditions { get; }
+        public PreconditionAttribute[] Preconditions { get; }
 
         /// <inheritdoc/>
         public IParameterComponent[] Parameters { get; }
@@ -40,7 +40,7 @@ namespace CSF
         /// </summary>
         public MethodInfo Target { get; }
 
-        public Command(Module module, MethodInfo method, string[] aliases, IDictionary<Type, ITypeReader> typeReaders)
+        public Command(Module module, MethodInfo method, string[] aliases, IDictionary<Type, TypeReader> typeReaders)
         {
             var attributes = method.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();

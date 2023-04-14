@@ -6,7 +6,7 @@ namespace CSF
     ///     Defines a precondition attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-    public abstract class PreconditionAttribute : Attribute, IPrecondition
+    public abstract class PreconditionAttribute : Attribute
     {
         /// <inheritdoc/>
         public abstract void Check(IContext context, Command command, IServiceProvider provider);

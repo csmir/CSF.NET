@@ -13,6 +13,6 @@
         /// <summary>
         ///     The preconditions of this component.
         /// </summary>
-        public IPrecondition[] Preconditions { get; }
+        public PreconditionAttribute[] Preconditions { get; }
     }
 }

@@ -33,6 +33,6 @@
         /// <summary>
         ///     The typereader responsible for parsing this type.
         /// </summary>
-        public ITypeReader TypeReader { get; }
+        public TypeReader TypeReader { get; }
     }
 }

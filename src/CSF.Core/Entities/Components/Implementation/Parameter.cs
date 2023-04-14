@@ -29,9 +29,9 @@ namespace CSF
         public Attribute[] Attributes { get; }
 
         /// <inheritdoc/>
-        public ITypeReader TypeReader { get; }
+        public TypeReader TypeReader { get; }
 
-        public Parameter(ParameterInfo parameterInfo, IDictionary<Type, ITypeReader> typeReaders)
+        public Parameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);

@@ -6,10 +6,19 @@ namespace CSF
     ///     Represents a generic <see cref="TypeReader{T}"/> to use for parsing provided types into the targetted type.
     /// </summary>
     /// <typeparam name="T">The targetted type for this typereader.</typeparam>
-    public abstract class TypeReader<T> : ITypeReader
+    public abstract class TypeReader<T> : TypeReader
     {
         /// <inheritdoc />
-        public Type Type { get; } = typeof(T);
+        public override Type Type { get; } = typeof(T);
+
+        /// <inheritdoc />
+        public override abstract object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value);
+    }
+
+    public abstract class TypeReader
+    {
+        /// <inheritdoc />
+        public abstract Type Type { get; }
 
         /// <inheritdoc />
         public abstract object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value);
@@ -17,15 +26,12 @@ namespace CSF
         [DoesNotReturn]
         public virtual object Fail(string message = null, Exception exception = null)
             => throw new ReadException(message, exception);
-    }
 
-    public static class TypeReader
-    {
         /// <summary>
-        ///     Gets a range of default <see cref="ITypeReader"/>'s.
+        ///     Gets a range of default <see cref="TypeReader"/>s.
         /// </summary>
-        /// <returns>A range of <see cref="ITypeReader"/>'s that are defined by default.</returns>
-        public static IEnumerable<ITypeReader> CreateDefaultReaders()
+        /// <returns>A range of <see cref="TypeReader"/>s that are defined by default.</returns>
+        public static TypeReader[] CreateDefaultReaders()
         {
             var range = BaseTypeReader.CreateBaseReaders();
 

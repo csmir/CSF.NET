@@ -20,7 +20,6 @@ namespace CSF
         /// <summary>
         ///     Gets the default options that are used across all executions that don't provide customized <see cref="CommandExecutionOptions"/>. 
         /// </summary>
-        public static CommandExecutionOptions Default
-            => new();
+        public static CommandExecutionOptions Default { get; } = new();
     }
 }

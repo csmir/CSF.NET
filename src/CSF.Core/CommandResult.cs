@@ -1,9 +1,24 @@
 ﻿namespace CSF
 {
+    public enum ResultCode : int
+    {
+        None,
+
+        Search,
+
+        Read,
+
+        Check,
+
+        Parse,
+
+        Execute,
+    }
+
     public readonly struct CommandResult
     {
         /// <inheritdoc/>
-        public FailedStep Step { get; } = FailedStep.None;
+        public ResultCode Step { get; } = ResultCode.None;
 
         /// <inheritdoc/>
         public string Message { get; } = null;
@@ -11,7 +26,7 @@
         /// <inheritdoc/>
         public Exception Exception { get; } = null;
 
-        public CommandResult(FailedStep step, string message = null, Exception exception = null)
+        public CommandResult(ResultCode step, string message = null, Exception exception = null)
         {
             Step = step;
             Message = message;

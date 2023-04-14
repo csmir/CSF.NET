@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CSF
 {
@@ -16,20 +15,20 @@ namespace CSF
         {
             var typeReaders = context.TypeReaders.ToDictionary(x => x.Type, x => x);
 
-            var rootReader = typeof(ITypeReader);
+            var rootReader = typeof(TypeReader);
             foreach (var assembly in context.RegistrationAssemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootReader.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
-                        typeReaders.Add(type, Activator.CreateInstance(type) as ITypeReader);
+                        typeReaders.Add(type, Activator.CreateInstance(type) as TypeReader);
 
-            var rootType = typeof(IModuleBase);
+            var rootType = typeof(ModuleBase);
             foreach (var assembly in context.RegistrationAssemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootType.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
                         yield return new Module(type, typeReaders);
         }
 
-        public static IConditionalComponent[] BuildComponents(this Module module, IDictionary<Type, ITypeReader> typeReaders)
+        public static IConditionalComponent[] Build(this Module module, IDictionary<Type, TypeReader> typeReaders)
         {
             var commands = (IEnumerable<IConditionalComponent>)module.BuildCommands(typeReaders)
                 .OrderBy(x => x.Parameters.Length);
@@ -41,7 +40,7 @@ namespace CSF
                 .ToArray();
         }
 
-        public static IEnumerable<Module> BuildModules(this Module module, IDictionary<Type, ITypeReader> typeReaders)
+        public static IEnumerable<Module> BuildModules(this Module module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var group in module.Type.GetNestedTypes())
                 foreach (var attribute in group.GetCustomAttributes(true))
@@ -49,7 +48,7 @@ namespace CSF
                         yield return new Module(group, typeReaders, module, gattribute.Name, gattribute.Aliases);
         }
 
-        public static IEnumerable<Command> BuildCommands(this Module module, IDictionary<Type, ITypeReader> typeReaders)
+        public static IEnumerable<Command> BuildCommands(this Module module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var method in module.Type.GetMethods())
             {
@@ -67,7 +66,7 @@ namespace CSF
             }
         }
 
-        public static IParameterComponent[] BuildParameters(this MethodBase method, IDictionary<Type, ITypeReader> typeReaders)
+        public static IParameterComponent[] BuildParameters(this MethodBase method, IDictionary<Type, TypeReader> typeReaders)
         {
             var parameters = method.GetParameters();
 
@@ -111,151 +110,6 @@ namespace CSF
             }
 
             return new(minLength, maxLength);
-        }
-
-        public static MethodCallExpression BuildDelegateInterior(this Command command)
-        {
-            var parametersType = typeof(object[]);
-            var servicesType = typeof(IServiceProvider);
-            var contextType = typeof(IContext);
-
-            var parameters = Expression.Parameter(
-                type: parametersType,
-                name: "parameters");
-
-            var services = Expression.Parameter(
-                type: servicesType,
-                name: "services");
-
-            var context = Expression.Parameter(
-                type: contextType,
-                name: "context");
-
-            var module = Expression.Variable(
-                type: command.Module.Type,
-                name: "module");
-
-            var instance = Expression.Block(new[] { module },
-                Expression.Assign(
-                left: module,
-                right: Expression.Convert(
-                    type: command.Module.Type,
-                    expression: Expression.Call(
-                        instance: services,
-                        method: servicesType.GetMethod(nameof(IServiceProvider.GetService)),
-                        arguments: Expression.Constant(command.Module.Type)))),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Context), contextType)),
-                right: context),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Command))),
-                right: Expression.Constant(command)),
-                module);
-
-            var call = Expression.Call(
-                instance: instance,
-                method: command.Target,
-                arguments: command.Parameters.Select((p, i) => Expression.Convert(Expression.ArrayIndex(parameters, Expression.Constant(i)), p.ExposedType)));
-
-            return call;
-        }
-
-        public static Func<IServiceProvider, IContext, object[], object> BuildTypeDelegate(this Command command)
-        {
-            var parametersType = typeof(object[]);
-            var servicesType = typeof(IServiceProvider);
-            var contextType = typeof(IContext);
-
-            var parameters = Expression.Parameter(
-                type: parametersType,
-                name: "parameters");
-
-            var services = Expression.Parameter(
-                type: servicesType,
-                name: "services");
-
-            var context = Expression.Parameter(
-                type: contextType,
-                name: "context");
-
-            var module = Expression.Variable(
-                type: command.Module.Type,
-                name: "module");
-
-            var instance = Expression.Block(new[] { module },
-                Expression.Assign(
-                left: module,
-                right: Expression.Convert(
-                    type: command.Module.Type,
-                    expression: Expression.Call(
-                        instance: services,
-                        method: servicesType.GetMethod(nameof(IServiceProvider.GetService)),
-                        arguments: Expression.Constant(command.Module.Type)))),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Context), contextType)),
-                right: context),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Command))),
-                right: Expression.Constant(command)),
-                module);
-
-            var call = Expression.Call(
-                instance: instance,
-                method: command.Target,
-                arguments: command.Parameters.Select((p, i) => Expression.Convert(Expression.ArrayIndex(parameters, Expression.Constant(i)), p.ExposedType)));
-
-            var lambda = Expression.Lambda<Func<IServiceProvider, IContext, object[], object>>(call, services, context, parameters);
-
-            return lambda.Compile();
-        }
-
-        public static Action<IServiceProvider, IContext, object[]> BuildVoidDelegate(this Command command)
-        {
-            var parametersType = typeof(object[]);
-            var servicesType = typeof(IServiceProvider);
-            var contextType = typeof(IContext);
-
-            var parameters = Expression.Parameter(
-                type: parametersType,
-                name: "parameters");
-
-            var services = Expression.Parameter(
-                type: servicesType,
-                name: "services");
-
-            var context = Expression.Parameter(
-                type: contextType,
-                name: "context");
-
-            var module = Expression.Variable(
-                type: command.Module.Type,
-                name: "module");
-
-            var instance = Expression.Block(new[] { module },
-                Expression.Assign(
-                left: module,
-                right: Expression.Convert(
-                    type: command.Module.Type,
-                    expression: Expression.Call(
-                        instance: services,
-                        method: servicesType.GetMethod(nameof(IServiceProvider.GetService)),
-                        arguments: Expression.Constant(command.Module.Type)))),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Context), contextType)),
-                right: context),
-                Expression.Assign(
-                left: Expression.Property(module, command.Module.Type.GetProperty(nameof(ModuleBase.Command))),
-                right: Expression.Constant(command)),
-                module);
-
-            var call = Expression.Call(
-                instance: instance,
-                method: command.Target,
-                arguments: command.Parameters.Select((p, i) => Expression.Convert(Expression.ArrayIndex(parameters, Expression.Constant(i)), p.ExposedType)));
-
-            var lambda = Expression.Lambda<Action<IServiceProvider, IContext, object[]>>(call, services, context, parameters);
-
-            return lambda.Compile();
         }
     }
 }

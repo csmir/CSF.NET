@@ -61,9 +61,9 @@
 
     internal static class BaseTypeReader
     {
-        public static ITypeReader[] CreateBaseReaders()
+        public static TypeReader[] CreateBaseReaders()
         {
-            var callback = new ITypeReader[]
+            var callback = new TypeReader[]
             {
                 // char
                 new BaseTypeReader<char>(),
