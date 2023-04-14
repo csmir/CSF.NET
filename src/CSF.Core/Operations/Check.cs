@@ -2,7 +2,7 @@
 {
     public partial class CommandManager
     {
-        public virtual CommandResult Check(Command command, IContext context, IServiceProvider services)
+        public virtual CommandResult Check(Command command, ICommandContext context, IServiceProvider services)
         {
             try
             {
@@ -19,7 +19,7 @@
 
     internal static class CheckOperations
     {
-        public static void Check(this Command command, IContext context, IServiceProvider services)
+        public static void Check(this Command command, ICommandContext context, IServiceProvider services)
         {
             foreach (var precondition in command.Preconditions)
                 precondition.Check(context, command, services);

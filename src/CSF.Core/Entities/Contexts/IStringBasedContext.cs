@@ -3,7 +3,7 @@
     /// <summary>
     ///     Represents an abstract context for text commands.
     /// </summary>
-    public interface IStringContext : IContext
+    public interface IStringBasedContext : ICommandContext
     {
         /// <remarks>
         ///     The raw input of the command.

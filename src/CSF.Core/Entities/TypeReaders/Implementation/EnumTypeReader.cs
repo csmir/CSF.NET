@@ -12,7 +12,7 @@ namespace CSF
     public class EnumTypeReader<T> : TypeReader<T>
         where T : struct, Enum
     {
-        public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             if (Enum.TryParse<T>(value, true, out var result))
                 return result;

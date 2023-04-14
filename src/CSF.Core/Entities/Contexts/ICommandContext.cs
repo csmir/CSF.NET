@@ -3,7 +3,7 @@
     /// <summary>
     ///     Represents an interface that supports all implementations of command context classes.
     /// </summary>
-    public interface IContext
+    public interface ICommandContext
     {
         /// <summary>
         ///     The command parameters.

@@ -2,16 +2,16 @@
 {
     public partial class CommandManager
     {
-        public virtual object[] Parse(Command command, IContext context, IServiceProvider services)
+        public virtual object[] Parse(Command command, ICommandContext context, IServiceProvider services)
             => command.Parameters.Parse(context, services);
 
-        public virtual object[] Parse(IParameterComponent[] components, IContext context, IServiceProvider services)
+        public virtual object[] Parse(IParameterComponent[] components, ICommandContext context, IServiceProvider services)
             => components.Parse(context, services);
     }
 
     internal static class ParseOperations
     {
-        public static object[] Parse(this IParameterComponent[] parameters, IContext context, IServiceProvider services, int index = 0)
+        public static object[] Parse(this IParameterComponent[] parameters, ICommandContext context, IServiceProvider services, int index = 0)
         {
             var args = new object[parameters.Length];
 
@@ -65,7 +65,7 @@
             return args;
         }
 
-        public static object Parse(this IParameterComponent parameter, IContext context, IServiceProvider services, string value)
+        public static object Parse(this IParameterComponent parameter, ICommandContext context, IServiceProvider services, string value)
             => parameter.TypeReader.Read(context, parameter, services, value);
     }
 }

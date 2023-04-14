@@ -2,17 +2,17 @@
 {
     public partial class CommandManager
     {
-        public virtual CommandCell Match(Command command, IContext context, IServiceProvider services)
+        public virtual CommandCell Match(Command command, ICommandContext context, IServiceProvider services)
             => command.Match(context, services);
 
-        public virtual CommandCell[] Match(IEnumerable<IConditionalComponent> components, IContext context, IServiceProvider services)
+        public virtual CommandCell[] Match(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
             => components.Match(context, services)
                          .ToArray();
     }
 
     internal static class MatchOperations
     {
-        public static IEnumerable<CommandCell> Match(this IEnumerable<IConditionalComponent> components, IContext context, IServiceProvider services)
+        public static IEnumerable<CommandCell> Match(this IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
         {
             foreach (var component in components)
             {
@@ -46,7 +46,7 @@
             }
         }
 
-        public static CommandCell Match(this Command command, IContext context, IServiceProvider services)
+        public static CommandCell Match(this Command command, ICommandContext context, IServiceProvider services)
         {
             try
             {

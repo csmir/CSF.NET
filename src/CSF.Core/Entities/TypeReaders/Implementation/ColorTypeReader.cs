@@ -45,7 +45,7 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return Color.FromArgb(hexNumber);

@@ -2,7 +2,7 @@
 {
     public partial class CommandManager
     {
-        public virtual async ValueTask<CommandResult> ExecuteAsync(IContext context, CommandExecutionOptions options = null, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, CommandExecutionOptions options = null, CancellationToken cancellationToken = default)
         {
             options ??= CommandExecutionOptions.Default;
 
@@ -26,7 +26,7 @@
             return new();
         }
 
-        public virtual async ValueTask<CommandResult> ExecuteAsync(IContext context, IServiceProvider services, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services, CancellationToken cancellationToken)
         {
 #if !DEBUG
             try
@@ -48,7 +48,7 @@
 #endif
         }
 
-        public virtual async ValueTask<CommandResult> ExecuteAsync(IContext context, IServiceProvider services, CommandCell cell, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services, CommandCell cell, CancellationToken cancellationToken)
         {
             var value = await cell.ExecuteAsync(context, services, cancellationToken);
 
@@ -66,13 +66,13 @@
             return new CommandResult();
         }
 
-        protected virtual ValueTask AfterExecuteAsync(IContext context, IServiceProvider services, CommandResult result)
+        protected virtual ValueTask AfterExecuteAsync(ICommandContext context, IServiceProvider services, CommandResult result)
             => ValueTask.CompletedTask;
     }
 
     internal static class ExecuteOperations
     {
-        public static async ValueTask<object> ExecuteAsync(this CommandCell cell, IContext context, IServiceProvider services, CancellationToken cancellationToken)
+        public static async ValueTask<object> ExecuteAsync(this CommandCell cell, ICommandContext context, IServiceProvider services, CancellationToken cancellationToken)
         {
             var module = services.GetService(cell.Command.Module.Type) as ModuleBase;
 

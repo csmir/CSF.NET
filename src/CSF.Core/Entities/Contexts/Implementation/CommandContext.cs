@@ -3,7 +3,7 @@
     /// <summary>
     ///     Represents a class that's used to describe data from the command.
     /// </summary>
-    public class CommandContext : IStringContext
+    public class CommandContext : IStringBasedContext
     {
         /// <inheritdoc/>
         public string Name { get; set; }

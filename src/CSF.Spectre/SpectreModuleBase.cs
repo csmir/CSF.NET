@@ -6,7 +6,7 @@ namespace CSF.Spectre
 {
     /// <inheritdoc/>
     public class SpectreModuleBase<T> : ModuleBase<T>
-        where T : IContext
+        where T : ICommandContext
     {
         /// <inheritdoc/>
         public override void Respond(string message)

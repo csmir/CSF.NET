@@ -2,7 +2,7 @@
 {
     public partial class CommandManager
     {
-        public virtual CommandCell Search(IContext context, IServiceProvider services)
+        public virtual CommandCell Search(ICommandContext context, IServiceProvider services)
         {
             var commands = Components.Search(context, services);
 
@@ -16,13 +16,13 @@
             throw new SearchException("Failed to find any commands that accept the provided input.", commands[0].Exception);
         }
 
-        public virtual CommandCell[] Search(IEnumerable<IConditionalComponent> components, IContext context, IServiceProvider services)
+        public virtual CommandCell[] Search(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
             => components.Search(context, services);
     }
 
     internal static class SearchOperations
     {
-        public static CommandCell[] Search(this IEnumerable<IConditionalComponent> components, IContext context, IServiceProvider services)
+        public static CommandCell[] Search(this IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
         {
             var matches = components.Where(command => command.Aliases.Contains(context.Name, StringComparer.InvariantCultureIgnoreCase));
 

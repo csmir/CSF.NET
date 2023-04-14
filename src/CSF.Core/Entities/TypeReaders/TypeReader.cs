@@ -12,7 +12,7 @@ namespace CSF
         public override Type Type { get; } = typeof(T);
 
         /// <inheritdoc />
-        public override abstract object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value);
+        public override abstract object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value);
     }
 
     public abstract class TypeReader
@@ -21,7 +21,7 @@ namespace CSF
         public abstract Type Type { get; }
 
         /// <inheritdoc />
-        public abstract object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value);
+        public abstract object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value);
 
         [DoesNotReturn]
         public virtual object Fail(string message = null, Exception exception = null)

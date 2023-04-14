@@ -2,7 +2,7 @@
 {
     public class TimeOnlyTypeReader : TypeReader<TimeOnly>
     {
-        public override object Read(IContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             return TimeOnly.MinValue;
         }

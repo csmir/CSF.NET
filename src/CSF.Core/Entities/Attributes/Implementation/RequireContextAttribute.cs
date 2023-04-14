@@ -19,7 +19,7 @@
             ContextType = contextType;
         }
 
-        public override void Check(IContext context, Command command, IServiceProvider provider)
+        public override void Check(ICommandContext context, Command command, IServiceProvider provider)
         {
             var providedType = context.GetType();
 

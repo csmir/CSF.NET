@@ -9,7 +9,7 @@ namespace CSF
     public abstract class PreconditionAttribute : Attribute
     {
         /// <inheritdoc/>
-        public abstract void Check(IContext context, Command command, IServiceProvider provider);
+        public abstract void Check(ICommandContext context, Command command, IServiceProvider provider);
 
         [DoesNotReturn]
         protected virtual void Fail(string message = null, Exception exception = null)
