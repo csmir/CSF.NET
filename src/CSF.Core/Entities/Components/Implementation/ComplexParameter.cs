@@ -32,6 +32,9 @@ namespace CSF
         public IParameterComponent[] Parameters { get; }
 
         /// <inheritdoc/>
+        public bool HasParameters { get; }
+
+        /// <inheritdoc/>
         public int MinLength { get; }
 
         /// <inheritdoc/>
@@ -41,11 +44,11 @@ namespace CSF
         public TypeReader TypeReader { get; }
 
         /// <summary>
-        ///     The complexParam constructor for complexParam parameter types.
+        ///     Gets the constructor that constructs this complex parameter.
         /// </summary>
         public Constructor Constructor { get; }
 
-        public ComplexParameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
+        internal ComplexParameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);
@@ -81,6 +84,8 @@ namespace CSF
 
             Constructor = constructor;
             Parameters = parameters;
+            HasParameters = parameters.Length > 0;
+
             Attributes = attributes;
 
             ExposedType = parameterInfo.ParameterType;

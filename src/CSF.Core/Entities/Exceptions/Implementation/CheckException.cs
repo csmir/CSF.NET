@@ -1,5 +1,8 @@
 ﻿namespace CSF
 {
+    /// <summary>
+    ///     Represents a <see cref="PipelineException"/> that is thrown when no matched command succeeded its precondition checks.
+    /// </summary>
     public sealed class CheckException : PipelineException
     {
         public CheckException(string message, Exception innerException = null)
@@ -10,7 +13,7 @@
 
         public override CommandResult AsResult()
         {
-            return new CommandResult(ResultCode.Check, Message, this);
+            return new(ResultCode.Check, this);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace CSF
         /// <inheritdoc/>
         public TypeReader TypeReader { get; }
 
-        public Parameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
+        internal Parameter(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);

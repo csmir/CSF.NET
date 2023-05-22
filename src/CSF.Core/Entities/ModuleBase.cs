@@ -35,20 +35,6 @@
         public Command Command { get; internal set; }
 
         /// <summary>
-        ///     Executed before a command is ran.
-        /// </summary>
-        /// <param name="cancellationToken">Used to signal the command execution to be halted.</param>
-        public virtual ValueTask BeforeExecuteAsync(CancellationToken cancellationToken)
-            => ValueTask.CompletedTask;
-
-        /// <summary>
-        ///     Executed after a command is ran.
-        /// </summary>
-        /// <param name="cancellationToken">Used to signal the command execution to be halted.</param>
-        public virtual ValueTask AfterExecuteAsync(CancellationToken cancellationToken)
-            => ValueTask.CompletedTask;
-
-        /// <summary>
         ///     Responds to the command with a message.
         /// </summary>
         /// <param name="message">The message to send.</param>

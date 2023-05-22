@@ -3,22 +3,22 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents information about the primary constructor of a module.
+    ///     Represents information about the primary constructor of a component.
     /// </summary>
     public class Constructor : IComponent
     {
         /// <inheritdoc/>
         public string Name { get; }
 
-        //// <inheritdoc/>
+        /// <inheritdoc/>
         public Attribute[] Attributes { get; }
 
         /// <summary>
-        ///     The constructor entry point.
+        ///     Gets the target constructor information that this constructor should call.
         /// </summary>
         public ConstructorInfo Target { get; }
 
-        public Constructor(Type type)
+        internal Constructor(Type type)
         {
             var target = type.GetConstructors()[0];
 

@@ -6,32 +6,32 @@
     public interface IParameterComponent : IComponent
     {
         /// <summary>
-        ///     The type of the parameter.
+        ///     Gets the type of the parameter.
         /// </summary>
         public Type Type { get; }
 
         /// <summary>
-        ///     Represents the type that is exposed to the runtime directly, potentially being nullable.
+        ///     Gets the type that is exposed to the runtime directly, potentially being nullable.
         /// </summary>
         public Type ExposedType { get; }
 
         /// <summary>
-        ///     Represents if the parameter is nullable.
+        ///     Gets if the parameter is nullable.
         /// </summary>
         public bool IsNullable { get; }
 
         /// <summary>
-        ///     Represents if the parameter is optional.
+        ///     Gets if the parameter is optional.
         /// </summary>
         public bool IsOptional { get; }
 
         /// <summary>
-        ///     Represents if the parameter is remainder.
+        ///     Gets if the parameter is remainder.
         /// </summary>
         public bool IsRemainder { get; }
 
         /// <summary>
-        ///     The typereader responsible for parsing this type.
+        ///     Gets the typereader responsible for parsing this type.
         /// </summary>
         public TypeReader TypeReader { get; }
     }

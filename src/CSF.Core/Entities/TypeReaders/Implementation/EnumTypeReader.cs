@@ -12,12 +12,12 @@ namespace CSF
     public class EnumTypeReader<T> : TypeReader<T>
         where T : struct, Enum
     {
-        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             if (Enum.TryParse<T>(value, true, out var result))
-                return result;
+                return Success(result);
 
-            return Fail($"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{parameter.Name}'");
+            return Failure($"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{parameter.Name}'");
         }
     }
 }

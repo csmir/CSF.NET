@@ -33,7 +33,7 @@ namespace CSF
             };
         }
 
-        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             if (!TimeSpan.TryParse(value, out TimeSpan span))
             {
@@ -48,10 +48,10 @@ namespace CSF
 #pragma warning restore IDE0220 // Add explicit cast
                 }
                 else
-                    return Fail($"The provided value is no timespan. Got: '{value}'. At: '{parameter.Name}'");
+                    return Failure($"The provided value is no timespan. Got: '{value}'. At: '{parameter.Name}'");
             }
 
-            return span;
+            return Success(span);
         }
 
         private static TimeSpan Seconds(string match)

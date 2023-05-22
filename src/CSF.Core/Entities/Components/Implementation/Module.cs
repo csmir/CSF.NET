@@ -17,22 +17,28 @@
         /// <inheritdoc/>
         public PreconditionAttribute[] Preconditions { get; }
 
+        /// <inheritdoc/>
+        public bool HasPreconditions { get; }
+
         /// <summary>
         ///     The components of this module.
         /// </summary>
         public IConditionalComponent[] Components { get; }
 
         /// <summary>
-        ///     The type of this module.
+        ///     Gets the type of this module.
         /// </summary>
         public Type Type { get; }
 
         /// <summary>
-        ///     The root module. <see langword="null"/> if not available.
+        ///     Gets the root module of the current module.
         /// </summary>
+        /// <remarks>
+        ///     This property is <see langword="null"/> if no root is specified for this module.
+        /// </remarks>
         public Module Root { get; }
 
-        public Module(Type type, IDictionary<Type, TypeReader> typeReaders, Module root = null, string expectedName = null, string[] aliases = null)
+        internal Module(Type type, IDictionary<Type, TypeReader> typeReaders, Module root = null, string expectedName = null, string[] aliases = null)
         {
             var attributes = type.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();
@@ -42,6 +48,7 @@
 
             Attributes = attributes;
             Preconditions = preconditions;
+            HasPreconditions = preconditions.Length > 0;
 
             Components = this.Build(typeReaders);
 

@@ -2,6 +2,13 @@
 {
     public partial class CommandManager
     {
+        /// <summary>
+        ///     Searches all available components for the most 
+        /// </summary>
+        /// <param name="context">The command context used to search.</param>
+        /// <param name="services">The services used to run the search query's typereaders and preconditions</param>
+        /// <returns>A command cell containing the best possible result for the provided input.</returns>
+        /// <exception cref="SearchException">Thrown when no command was found accepting the provided input.</exception>
         public virtual CommandCell Search(ICommandContext context, IServiceProvider services)
         {
             var commands = Components.Search(context, services);
@@ -13,9 +20,16 @@
                 if (!command.IsInvalid)
                     return command;
 
-            throw new SearchException("Failed to find any commands that accept the provided input.", commands[0].Exception);
+            throw commands[0].Exception;
         }
 
+        /// <summary>
+        ///     Searches a range of modules for the best available match.
+        /// </summary>
+        /// <param name="components">The components to search.</param>
+        /// <param name="context">The command context used to search.</param>
+        /// <param name="services">The services used to run the search query's typereaders and preconditions</param>
+        /// <returns>An array of command cells that best match the provided input.</returns>
         public virtual CommandCell[] Search(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
             => components.Search(context, services);
     }

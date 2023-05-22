@@ -19,12 +19,14 @@
             ContextType = contextType;
         }
 
-        public override void Check(ICommandContext context, Command command, IServiceProvider provider)
+        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
         {
             var providedType = context.GetType();
 
             if (providedType != ContextType)
-                Fail($"Invalid context was passed into the command. Expected: '{ContextType.FullName}', got '{providedType.FullName}'");
+                return Failure($"Invalid context was passed into the command. Expected: '{ContextType.FullName}', got '{providedType.FullName}'");
+
+            return Success();
         }
     }
 }

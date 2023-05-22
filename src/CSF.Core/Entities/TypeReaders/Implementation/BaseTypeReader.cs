@@ -6,14 +6,14 @@
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
-        public override object Read(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
         {
             var parser = _container.Value[Type] as Tpd<T>;
 
             if (parser(value, out var result))
-                return result;
+                return Success(result);
 
-            return Fail($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
+            return Failure($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
         }
 
         private static IReadOnlyDictionary<Type, Delegate> ValueGenerator()
@@ -50,6 +50,8 @@
                 // time
                 [typeof(DateTime)] = (Tpd<DateTime>)DateTime.TryParse,
                 [typeof(DateTimeOffset)] = (Tpd<DateTimeOffset>)DateTimeOffset.TryParse,
+                [typeof(TimeOnly)] = (Tpd<TimeOnly>)TimeOnly.TryParse,
+                [typeof(DateOnly)] = (Tpd<DateOnly>)DateOnly.TryParse,
 
                 // guid
                 [typeof(Guid)] = (Tpd<Guid>)Guid.TryParse
@@ -95,9 +97,11 @@
                 // time
                 new BaseTypeReader<DateTime>(),
                 new BaseTypeReader<DateTimeOffset>(),
+                new BaseTypeReader<TimeOnly>(),
+                new BaseTypeReader<DateOnly>(),
 
                 // guid
-                new BaseTypeReader<Guid>()
+                new BaseTypeReader<Guid>(),
             };
 
             return callback;

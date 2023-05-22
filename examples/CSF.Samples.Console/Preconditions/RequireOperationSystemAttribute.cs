@@ -1,7 +1,8 @@
-﻿namespace CSF.Console
+﻿using CSF;
+
+namespace XProject
 {
-    // This precondition will check if the operating system executing the command matches the provided platform.
-    public sealed class RequireOperatingSystemAttribute : PreconditionAttribute
+    public class RequireOperatingSystemAttribute : PreconditionAttribute
     {
         public PlatformID Platform { get; }
 
@@ -10,12 +11,12 @@
             Platform = platform;
         }
 
-        public override Task<PreconditionResult> CheckAsync(IContext context, Command info, IServiceProvider provider)
+        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
         {
-            if (Environment.OSVersion.Platform != Platform)
-                return Task.FromResult(PreconditionResult.FromError("Current OS platform does not match the expected platform!"));
+            if (Environment.OSVersion.Platform == Platform)
+                return Success();
 
-            return Task.FromResult(PreconditionResult.FromSuccess());
+            return Failure("The platform this command was executed does not support this operation.");
         }
     }
 }

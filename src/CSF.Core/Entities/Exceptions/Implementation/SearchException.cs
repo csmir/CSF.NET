@@ -1,5 +1,8 @@
 ﻿namespace CSF
 {
+    /// <summary>
+    ///     Represents a <see cref="PipelineException"/> that is thrown when no command could be found.
+    /// </summary>
     public sealed class SearchException : PipelineException
     {
         public SearchException(string message, Exception innerException = null)
@@ -10,7 +13,7 @@
 
         public override CommandResult AsResult()
         {
-            return new CommandResult(ResultCode.Search, Message, this);
+            return new(ResultCode.Search, this);
         }
     }
 }

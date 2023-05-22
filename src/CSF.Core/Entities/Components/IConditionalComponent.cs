@@ -6,13 +6,18 @@
     public interface IConditionalComponent : IComponent
     {
         /// <summary>
-        ///     The aliases of this component.
+        ///     Gets the aliases of this component.
         /// </summary>
         public string[] Aliases { get; }
 
         /// <summary>
-        ///     The preconditions of this component.
+        ///     Gets the preconditions of this component.
         /// </summary>
         public PreconditionAttribute[] Preconditions { get; }
+
+        /// <summary>
+        ///     Gets if this component has any preconditions.
+        /// </summary>
+        public bool HasPreconditions { get; }
     }
 }

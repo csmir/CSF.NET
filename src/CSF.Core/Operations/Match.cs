@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.ComponentModel;
+
+namespace CSF
 {
     public partial class CommandManager
     {
@@ -20,29 +22,15 @@
                     continue;
 
                 var length = context.Parameters.Length;
+
                 if (command.MaxLength == length)
-                {
                     yield return command.Match(context, services);
-                }
 
-                if (command.MaxLength <= length)
-                {
-                    foreach (var parameter in command.Parameters)
-                    {
-                        if (parameter.IsRemainder)
-                        {
-                            yield return command.Match(context, services);
-                        }
-                    }
-                }
+                if (command.MaxLength <= length && command.HasRemainder)
+                    yield return command.Match(context, services);
 
-                if (command.MaxLength > length)
-                {
-                    if (command.MinLength <= length)
-                    {
-                        yield return command.Match(context, services);
-                    }
-                }
+                if (command.MaxLength > length && command.MinLength <= length)
+                    yield return command.Match(context, services);
             }
         }
 
@@ -50,10 +38,11 @@
         {
             try
             {
-                foreach (var condition in command.Preconditions)
-                    condition.Check(context, command, services);
+                command.Check(context, services);
 
-                var arguments = command.Parameters.Parse(context, services);
+                var arguments = command.HasParameters 
+                    ? command.Parameters.Read(context, services) 
+                    : Array.Empty<object>();
 
                 return new(command, arguments);
             }

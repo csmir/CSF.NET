@@ -2,7 +2,7 @@
 {
     public partial class CommandManager
     {
-        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, CommandExecutionOptions options = null, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, CommandExecutionOptions options = null)
         {
             options ??= CommandExecutionOptions.Default;
 
@@ -10,7 +10,7 @@
 
             if (!options.ExecuteAsynchronously)
             {
-                var result = await ExecuteAsync(context, services, cancellationToken);
+                var result = await ExecuteAsync(context, services);
                 await AfterExecuteAsync(context, services, result);
 
                 return result;
@@ -18,24 +18,20 @@
 
             _ = Task.Run(async () =>
             {
-                var result = await ExecuteAsync(context, services, cancellationToken);
+                var result = await ExecuteAsync(context, services);
                 await AfterExecuteAsync(context, services, result);
-            },
-            cancellationToken);
+            });
 
             return new();
         }
 
-        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services)
         {
-#if !DEBUG
             try
             {
-#endif
                 var cell = Search(context, services);
 
-                return await ExecuteAsync(context, services, cell, cancellationToken);
-#if !DEBUG
+                return await ExecuteAsync(context, services, cell);
             }
             catch (PipelineException ex)
             {
@@ -45,12 +41,11 @@
             {
                 return new ExecuteException(ex.Message, ex).AsResult();
             }
-#endif
         }
 
-        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services, CommandCell cell, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, IServiceProvider services, CommandCell cell)
         {
-            var value = await cell.ExecuteAsync(context, services, cancellationToken);
+            var value = cell.Execute(context, services);
 
             switch (value)
             {
@@ -72,18 +67,14 @@
 
     internal static class ExecuteOperations
     {
-        public static async ValueTask<object> ExecuteAsync(this CommandCell cell, ICommandContext context, IServiceProvider services, CancellationToken cancellationToken)
+        public static object Execute(this CommandCell cell, ICommandContext context, IServiceProvider services)
         {
             var module = services.GetService(cell.Command.Module.Type) as ModuleBase;
 
             module.Context = context;
             module.Command = cell.Command;
 
-            await module.BeforeExecuteAsync(cancellationToken);
-
             var value = cell.Command.Target.Invoke(module, cell.Arguments);
-
-            await module.AfterExecuteAsync(cancellationToken);
 
             return value;
         }

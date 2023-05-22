@@ -6,17 +6,22 @@
     public interface IParameterContainer
     {
         /// <summary>
-        ///     The list of parameters for this component.
+        ///     Gets a list of parameters for this container.
         /// </summary>
         public IParameterComponent[] Parameters { get; }
 
         /// <summary>
-        ///     The minimum required length to use a command.
+        ///     Gets if this container contains any parameters or not.
+        /// </summary>
+        public bool HasParameters { get; }
+
+        /// <summary>
+        ///     Gets the minimum required length to use a command.
         /// </summary>
         public int MinLength { get; }
 
         /// <summary>
-        ///     The optimal length to use a command. If remainder is specified, the count will be set to infinity.
+        ///     Gets the optimal length to use a command. If remainder is specified, the count will be set to infinity.
         /// </summary>
         public int MaxLength { get; }
     }

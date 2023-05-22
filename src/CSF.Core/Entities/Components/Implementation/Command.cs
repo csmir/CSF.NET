@@ -17,7 +17,16 @@ namespace CSF
         public PreconditionAttribute[] Preconditions { get; }
 
         /// <inheritdoc/>
+        public bool HasPreconditions { get; }
+
+        /// <inheritdoc/>
         public IParameterComponent[] Parameters { get; }
+
+        /// <inheritdoc/>
+        public bool HasParameters { get; }
+
+        /// <inheritdoc/>
+        public bool HasRemainder { get; }
 
         /// <inheritdoc/>
         public int MinLength { get; }
@@ -25,22 +34,20 @@ namespace CSF
         /// <inheritdoc/>
         public int MaxLength { get; }
 
-        /// <summary>
-        ///     The command aliases.
-        /// </summary>
+        /// <inheritdoc/>
         public string[] Aliases { get; }
 
         /// <summary>
-        ///     The command module.
+        ///     Gets the module this command is declared in.
         /// </summary>
         public Module Module { get; }
 
         /// <summary>
-        ///     The command method.
+        ///     Gets the target method this command is aimed to execute.
         /// </summary>
         public MethodInfo Target { get; }
 
-        public Command(Module module, MethodInfo method, string[] aliases, IDictionary<Type, TypeReader> typeReaders)
+        internal Command(Module module, MethodInfo method, string[] aliases, IDictionary<Type, TypeReader> typeReaders)
         {
             var attributes = method.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();
@@ -48,16 +55,19 @@ namespace CSF
 
             var (minLength, maxLength) = parameters.GetLength();
 
-            if (attributes.Contains<RemainderAttribute>(false))
+            if (parameters.Any(x => x.Attributes.Contains<RemainderAttribute>(false)))
                 Assert.IsTrue(parameters[^1].IsRemainder, $"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
 
             Target = method;
             Module = module;
 
-            Attributes = module.Attributes.Concat(attributes).ToArray();
-            Preconditions = module.Preconditions.Concat(preconditions).ToArray();
+            Attributes = attributes;
+            Preconditions = preconditions;
+            HasPreconditions = preconditions.Length > 0;
 
             Parameters = parameters;
+            HasParameters = parameters.Length > 0;
+            HasRemainder = parameters.Any(x => x.IsRemainder);
 
             Name = aliases[0];
             Aliases = aliases;

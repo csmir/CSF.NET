@@ -21,8 +21,9 @@
     {
         public static void Check(this Command command, ICommandContext context, IServiceProvider services)
         {
-            foreach (var precondition in command.Preconditions)
-                precondition.Check(context, command, services);
+            if (command.HasPreconditions)
+                foreach (var precondition in command.Preconditions)
+                    precondition.EvalInternal(context, command, services);
         }
     }
 }
