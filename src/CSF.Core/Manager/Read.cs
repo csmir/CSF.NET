@@ -8,10 +8,10 @@ namespace CSF
         ///     Reads the parameters of the current command and returns the parsed input to execute it.
         /// </summary>
         /// <param name="command">The command of which the parameters should be evaluated.</param>
-        /// <param name="context">The command context used to populate read parameters.</param>
-        /// <param name="services">The services used to read parameters with.</param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
         /// <returns>An array of the values returned by the read parameters within the provided command.</returns>
-        public virtual object[] Read(Command command, ICommandContext context, IServiceProvider services)
+        protected virtual object[] Read(Command command, ICommandContext context, IServiceProvider services)
         {
             if (command.HasParameters)
                 return command.Parameters.Read(context, services);
@@ -22,10 +22,10 @@ namespace CSF
         ///     Reads the provided range of components and returns the resulting typereader information.
         /// </summary>
         /// <param name="components">The components of which the parameters should be evaluated.</param>
-        /// <param name="context">The command context used to populate read parameters.</param>
-        /// <param name="services">The services used to read parameters with.</param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
         /// <returns>An array of the values returned by the read parameters within the provided range.</returns>
-        public virtual object[] Read(IParameterComponent[] components, ICommandContext context, IServiceProvider services)
+        protected virtual object[] Read(IParameterComponent[] components, ICommandContext context, IServiceProvider services)
             => components.Read(context, services);
     }
 

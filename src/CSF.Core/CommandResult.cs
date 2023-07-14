@@ -32,7 +32,7 @@
     }
 
     /// <summary>
-    ///     Represents the result that was produced by the command.
+    ///     Represents a result that was produced by a command pipeline.
     /// </summary>
     public readonly struct CommandResult
     {

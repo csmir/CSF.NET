@@ -13,7 +13,7 @@ namespace CSF
         /// <remarks>
         ///     <list type="bullet">
         ///         <item>The type inherits <see cref="TypeReader"/> or <see cref="TypeReader{T}"/>, does not contain undeclared generic parameters and is public.</item>
-        ///         <item>The type inherits <see cref="ModuleBase"/> or <see cref="ModuleBase{T}"/> and is public.</item>
+        ///         <item>The type inherits <see cref="ModuleBase"/> or <see cref="ModuleBase{T}"/>, does not contain undeclared generic parameters and is public.</item>
         ///     </list>
         /// </remarks>
         public Assembly[] RegistrationAssemblies { get; set; } = new[] { Assembly.GetEntryAssembly() };

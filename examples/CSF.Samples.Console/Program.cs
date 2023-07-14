@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
-    .AddCommandManager();
+    .WithCommandManager();
 
 var services = collection.BuildServiceProvider();
 

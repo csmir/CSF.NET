@@ -2,7 +2,7 @@
 
 namespace CSF
 {
-    public static class BuildHelper
+    internal static class BuildHelper
     {
         public static IConditionalComponent[] Build(this CommandBuildingConfiguration context)
         {

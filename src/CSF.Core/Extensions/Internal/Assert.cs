@@ -2,7 +2,7 @@
 
 namespace CSF
 {
-    public static class Assert
+    internal static class Assert
     {
         public static void IsTrue(bool condition, string failureMessage)
         {

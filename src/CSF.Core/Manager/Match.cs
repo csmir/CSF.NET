@@ -4,10 +4,24 @@ namespace CSF
 {
     public partial class CommandManager
     {
-        public virtual CommandCell Match(Command command, ICommandContext context, IServiceProvider services)
+        /// <summary>
+        ///     Runs through a found commands and attempts to match the amount of parameters to the represented amount in the context.
+        /// </summary>
+        /// <param name="command">The command </param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
+        /// <returns>A resolved match from the provided command, containing failure or result depending on the outcome of the evaluation.</returns>
+        protected virtual CommandCell Match(Command command, ICommandContext context, IServiceProvider services)
             => command.Match(context, services);
 
-        public virtual CommandCell[] Match(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
+        /// <summary>
+        ///     Runs through a set of found commands and tests them for the availability
+        /// </summary>
+        /// <param name="components">The range of components to attempt to match.</param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
+        /// <returns>All relevant matches to the provided context.</returns>
+        protected virtual CommandCell[] Match(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
             => components.Match(context, services)
                          .ToArray();
     }

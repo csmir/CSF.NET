@@ -3,34 +3,45 @@
     public partial class CommandManager
     {
         /// <summary>
-        ///     Searches all available components for the most 
+        ///     Searches all available components for the most relevant match.
         /// </summary>
-        /// <param name="context">The command context used to search.</param>
-        /// <param name="services">The services used to run the search query's typereaders and preconditions</param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
         /// <returns>A command cell containing the best possible result for the provided input.</returns>
         /// <exception cref="SearchException">Thrown when no command was found accepting the provided input.</exception>
-        public virtual CommandCell Search(ICommandContext context, IServiceProvider services)
+        protected virtual CommandCell Search(ICommandContext context, IServiceProvider services)
         {
             var commands = Components.Search(context, services);
 
             if (commands.Length == 0)
                 throw new SearchException("Failed to find any commands that accept the provided input.");
 
+            CommandCell? result = null;
+
             foreach (var command in commands)
                 if (!command.IsInvalid)
-                    return command;
+                {
+                    if (!result.HasValue)
+                        result = command;
 
-            throw commands[0].Exception;
+                    if (command.Priority > result.Value.Priority)
+                        result = command;
+                }
+
+            if (!result.HasValue)
+                throw commands[0].Exception;
+
+            return result.Value;
         }
 
         /// <summary>
-        ///     Searches a range of modules for the best available match.
+        ///     Searches a range of modules for the most relevant match.
         /// </summary>
         /// <param name="components">The components to search.</param>
-        /// <param name="context">The command context used to search.</param>
-        /// <param name="services">The services used to run the search query's typereaders and preconditions</param>
+        /// <param name="context">The context containing information about the command input.</param>
+        /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
         /// <returns>An array of command cells that best match the provided input.</returns>
-        public virtual CommandCell[] Search(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
+        protected virtual CommandCell[] Search(IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
             => components.Search(context, services);
     }
 

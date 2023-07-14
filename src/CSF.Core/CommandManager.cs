@@ -30,7 +30,7 @@ namespace CSF
         ///     Creates a new <see cref="CommandManager"/> with provided configuration.
         /// </summary>
         /// <param name="services">The services used to handle command execution and module registration.</param>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">The configuration that should be used to construct the manager.</param>
         public CommandManager(IServiceProvider services, CommandBuildingConfiguration configuration)
         {
             _services = services;

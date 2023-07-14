@@ -14,7 +14,7 @@ namespace CSF.Tests.Benchmarks
         static Program()
         {
             _services = new ServiceCollection()
-            .AddCommandManager(x =>
+            .WithCommandManager(x =>
             {
                 x.RegistrationAssemblies = new[] { typeof(Program).Assembly };
             })

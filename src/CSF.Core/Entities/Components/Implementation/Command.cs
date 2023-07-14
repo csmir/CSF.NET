@@ -38,6 +38,11 @@ namespace CSF
         public string[] Aliases { get; }
 
         /// <summary>
+        ///     Represents the priority of a command.
+        /// </summary>
+        public byte Priority { get; }
+
+        /// <summary>
         ///     Gets the module this command is declared in.
         /// </summary>
         public Module Module { get; }
@@ -57,6 +62,8 @@ namespace CSF
 
             if (parameters.Any(x => x.Attributes.Contains<RemainderAttribute>(false)))
                 Assert.IsTrue(parameters[^1].IsRemainder, $"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
+
+            Priority = attributes.SelectFirstOrDefault<PriorityAttribute>()?.Priority ?? 0;
 
             Target = method;
             Module = module;
