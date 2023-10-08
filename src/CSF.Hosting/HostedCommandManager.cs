@@ -40,7 +40,7 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Enters a loop 
+        ///     Enters a loop through which commands are read and ran.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace CSF
 
                 var result = await ExecuteAsync(context, new CommandExecutionOptions());
 
-                if (result.Code != ResultCode.Success)
+                if (result.Failed())
                     Logger.LogError(result.Exception, "Command execution returned an exception.");
             }
         }
