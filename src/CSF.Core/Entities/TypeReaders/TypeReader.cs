@@ -53,7 +53,7 @@ namespace CSF
             if (!result.IsSuccess)
                 throw new ReadException(result.Reason);
 
-            return result;
+            return result.Value;
         }
 
         /// <summary>

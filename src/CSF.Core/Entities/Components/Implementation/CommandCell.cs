@@ -31,11 +31,6 @@ namespace CSF
         public bool IsInvalid { get; }
 
         /// <summary>
-        ///     Gets the priority of the command, where higher values take priority over lower ones.
-        /// </summary>
-        public byte Priority { get; }
-
-        /// <summary>
         ///     Creates a new <see cref="CommandResult"/> that is constructed when resolvement of a command failed.
         /// </summary>
         /// <param name="exception"></param>
@@ -58,7 +53,6 @@ namespace CSF
         {
             Command = match;
             Arguments = arguments;
-            Priority = match.Priority;
 
             Exception = null;
             IsInvalid = false;

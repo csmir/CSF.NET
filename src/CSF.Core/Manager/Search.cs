@@ -24,7 +24,7 @@
                     if (!result.HasValue)
                         result = command;
 
-                    if (command.Priority > result.Value.Priority)
+                    if (command.Command?.Priority > result.Value.Command?.Priority)
                         result = command;
                 }
 
