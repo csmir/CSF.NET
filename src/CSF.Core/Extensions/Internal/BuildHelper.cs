@@ -13,18 +13,20 @@ namespace CSF
 
         public static IEnumerable<Module> BuildModules(this CommandBuildingConfiguration context)
         {
-            var typeReaders = context.TypeReaders.ToDictionary(x => x.Type, x => x);
+            var typeReaders = TypeReader.CreateDefaultReaders().UnionBy(context.TypeReaders, x => x.Type).ToDictionary(x => x.Type, x => x);
 
             var rootReader = typeof(TypeReader);
             foreach (var assembly in context.RegistrationAssemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootReader.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
                     {
+                        var reader = Activator.CreateInstance(type) as TypeReader;
+
                         // replace existing typereader with replacement handler
-                        if (typeReaders.ContainsKey(type))
-                            typeReaders[type] = Activator.CreateInstance(type) as TypeReader;
+                        if (typeReaders.ContainsKey(reader.Type))
+                            typeReaders[reader.Type] = reader;
                         else
-                            typeReaders.Add(type, Activator.CreateInstance(type) as TypeReader);
+                            typeReaders.Add(reader.Type, reader);
                     }
 
             var rootType = typeof(ModuleBase);

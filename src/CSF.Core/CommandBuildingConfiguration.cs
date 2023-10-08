@@ -21,10 +21,7 @@ namespace CSF
         /// <summary>
         ///     A range of typereaders that are to be manually registered to all existing readers.
         /// </summary>
-        /// <remarks>
-        ///     The standard value of this collection is <see cref="TypeReader.CreateDefaultReaders"/>. In order to edit this collection, append to it or initialize a new array with this as base value.
-        /// </remarks>
-        public TypeReader[] TypeReaders { get; set; } = TypeReader.CreateDefaultReaders();
+        public TypeReader[] TypeReaders { get; set; } = Array.Empty<TypeReader>();
 
         /// <summary>
         ///     Gets the default configuration that is used when no <see cref="CommandBuildingConfiguration"/> is provided at manager creation. 
