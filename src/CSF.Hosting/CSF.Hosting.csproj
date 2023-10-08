@@ -31,8 +31,6 @@
 	<Copyright>Armano den Boef and CSF contributors.</Copyright>
 
 	<PackageIcon>csf_nogap.png</PackageIcon>
-
-	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,10 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<None Include="..\..\README.md">
-		<Pack>True</Pack>
-		<PackagePath>\</PackagePath>
-	</None>
 	<None Include="..\..\design\csf_nogap.png">
 		<Pack>True</Pack>
 		<PackagePath>\</PackagePath>
