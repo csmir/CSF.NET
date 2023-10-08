@@ -14,7 +14,7 @@
         /// <param name="options">A range of options to customize command execution flow.</param>
         /// <returns>An empty <see cref="CommandResult"/> when <see cref="CommandExecutionOptions.ExecuteAsynchronously"/> is set to <see langword="true"/>. Otherwise, the <see cref="CommandResult"/> of the executed command.
         /// </returns>
-        public virtual async ValueTask<CommandResult> ExecuteAsync(ICommandContext context, CommandExecutionOptions options = null)
+        public virtual async Task<CommandResult> ExecuteAsync(ICommandContext context, CommandExecutionOptions options = null)
         {
             options ??= CommandExecutionOptions.Default;
 

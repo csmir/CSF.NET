@@ -53,7 +53,7 @@ namespace CSF
 
                 var result = await ExecuteAsync(context, new CommandExecutionOptions());
 
-                if (result.Code != ResultCode.None)
+                if (result.Code != ResultCode.Success)
                     Logger.LogError(result.Exception, "Command execution returned an exception.");
             }
         }

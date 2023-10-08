@@ -1,14 +1,14 @@
 ﻿namespace CSF
 {
     /// <summary>
-    ///     Represents the error code that occurred during command execution. <see cref="None"/> means there was no negative result.
+    ///     Represents the error code that occurred during command execution. <see cref="Success"/> means there was no negative result.
     /// </summary>
     public enum ResultCode : int
     {
         /// <summary>
         ///     Represents no negative result.
         /// </summary>
-        None,
+        Success,
 
         /// <summary>
         ///     Represents a result tied to <see cref="SearchException"/>. Thrown when no command could be found.
@@ -37,9 +37,9 @@
     public readonly struct CommandResult
     {
         /// <summary>
-        ///     Gets the code that represents where the pipeline failed. <see cref="ResultCode.None"/> if none. 
+        ///     Gets the code that represents where the pipeline failed. <see cref="ResultCode.Success"/> if none. 
         /// </summary>
-        public ResultCode Code { get; } = ResultCode.None;
+        public ResultCode Code { get; } = ResultCode.Success;
 
         /// <summary>
         ///     The exception thrown by the pipeline in case of failure. In most cases, this is a <see cref="PipelineException" />. The <see cref="Code"/> is associated with the following exceptions:
@@ -71,6 +71,6 @@
         /// </summary>
         /// <returns></returns>
         public override string ToString()
-            => $"[{Code}]" + Exception;
+            => $"[{Code}] " + Exception;
     }
 }
