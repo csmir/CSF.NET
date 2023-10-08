@@ -49,7 +49,7 @@ namespace CSF
         {
             while (true)
             {
-                var context = new CommandContext(Console.ReadLine());
+                var context = new CommandContext(Console.ReadLine(), Parser);
 
                 var result = await ExecuteAsync(context, new CommandExecutionOptions());
 
