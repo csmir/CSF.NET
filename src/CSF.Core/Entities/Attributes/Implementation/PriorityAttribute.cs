@@ -4,7 +4,7 @@
     ///     Represents an attribute that can prioritize one result over another when multiple matches were found.
     /// </summary>
     /// <remarks>
-    ///     By default, a command has a priority of 0. Higher values take priority, meaning a command with a priority of 1 will execute if other commands have a priority of 0.
+    ///     By default, a command has a priority of 0. Higher values take priority, meaning a command with a priority of 1 will execute first if other commands have a priority of 0.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class PriorityAttribute : Attribute

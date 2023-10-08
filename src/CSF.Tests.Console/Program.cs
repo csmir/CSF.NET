@@ -14,6 +14,6 @@ while (true)
 
     var result = await framework.ExecuteAsync(context);
 
-    if (result.Code == ResultCode.Success)
-    Console.WriteLine(result);
+    if (result.Failed())
+        Console.WriteLine(result);
 }

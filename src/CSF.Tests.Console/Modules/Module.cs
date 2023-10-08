@@ -4,6 +4,20 @@ namespace CSF.Tests
 {
     public class Module : ModuleBase<CommandContext>
     {
+        [Command("priority")]
+        [Priority(1)]
+        public void Priority1(bool optional = true)
+        {
+            Respond($"Success: {Command.Priority}");
+        }
+
+        [Command("priority")]
+        [Priority(2)]
+        public void Priority2(bool optional = false)
+        {
+            Respond($"Success: {Command.Priority}");
+        }
+
         [Command("multiple")]
         public void Test(bool truee, bool falsee)
         {

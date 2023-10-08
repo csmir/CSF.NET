@@ -67,7 +67,16 @@
         }
 
         /// <summary>
-        ///     Formats a readable output from the result.
+        ///     Checks if the command from which this <see cref="CommandResult"/> was formatted failed to execute or not.
+        /// </summary>
+        /// <returns><see langword="True"/> if the command failed to execute. <see langword="False"/> if it succeeded.</returns>
+        public bool Failed()
+        {
+            return Code is not ResultCode.Success;
+        }
+
+        /// <summary>
+        ///     Formats a readable output from this <see cref="CommandResult"/>.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
