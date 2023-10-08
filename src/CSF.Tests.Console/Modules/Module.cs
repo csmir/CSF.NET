@@ -18,6 +18,18 @@ namespace CSF.Tests
             Respond($"Success: {Command.Priority}");
         }
 
+        [Command("remainder")]
+        public void Remainder([Remainder] string values)
+        {
+            Respond($"Success: {values}");
+        }
+
+        [Command("time")]
+        public void TimeOnly(TimeOnly time)
+        {
+            Respond($"Success: {time}");
+        }
+
         [Command("multiple")]
         public void Test(bool truee, bool falsee)
         {

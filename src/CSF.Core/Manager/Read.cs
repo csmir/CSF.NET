@@ -41,7 +41,12 @@ namespace CSF
 
                 if (parameter.IsRemainder)
                 {
-                    args[i] = parameter.Read(context, services, string.Join(" ", context.Parameters.Skip(index)));
+                    var input = string.Join(" ", context.Parameters.Skip(index));
+                    if (parameter.Type == typeof(string))
+                        args[i] = input;
+                    else
+                        args[i] = parameter.Read(context, services, input);
+
                     break;
                 }
 

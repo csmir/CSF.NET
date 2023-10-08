@@ -53,12 +53,12 @@
 
             var cells = matches.Match(context, services);
 
-            if (!cells.Any(x => !x.IsInvalid))
+            if (cells.All(x => x.IsInvalid))
             {
                 var module = matches.SelectFirstOrDefault<Module>();
 
                 if (module is null)
-                    return Array.Empty<CommandCell>();
+                    return cells.ToArray();
 
                 context.Name = context.Parameters[0];
                 context.Parameters = context.Parameters[1..];

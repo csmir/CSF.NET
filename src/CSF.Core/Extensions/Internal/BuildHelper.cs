@@ -19,7 +19,13 @@ namespace CSF
             foreach (var assembly in context.RegistrationAssemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootReader.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
-                        typeReaders.Add(type, Activator.CreateInstance(type) as TypeReader);
+                    {
+                        // replace existing typereader with replacement handler
+                        if (typeReaders.ContainsKey(type))
+                            typeReaders[type] = Activator.CreateInstance(type) as TypeReader;
+                        else
+                            typeReaders.Add(type, Activator.CreateInstance(type) as TypeReader);
+                    }
 
             var rootType = typeof(ModuleBase);
             foreach (var assembly in context.RegistrationAssemblies)

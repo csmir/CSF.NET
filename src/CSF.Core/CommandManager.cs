@@ -34,6 +34,7 @@ namespace CSF
         public CommandManager(IServiceProvider services, CommandBuildingConfiguration configuration)
         {
             _services = services;
+
             Components = configuration.Build();
         }
     }

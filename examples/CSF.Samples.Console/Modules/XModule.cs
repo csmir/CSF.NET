@@ -15,5 +15,11 @@ namespace XProject
         {
             Respond(message);
         }
+
+        [Command("guid")]
+        public void Guid(Guid guid)
+        {
+            Respond("Here is your guid: " + guid.ToString());
+        }
     }
 }

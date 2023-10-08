@@ -8,11 +8,14 @@ var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<CommandManager>();
 
-var input = "helloworld";
+while (true)
+{
+    var input = Console.ReadLine()!;
 
-var context = new CommandContext(input);
+    var context = new CommandContext(input);
 
-var result = await framework.ExecuteAsync(context);
+    var result = await framework.ExecuteAsync(context);
 
-if (result.Exception != null)
-    throw result.Exception;
+    if (result.Failed())
+        throw result.Exception;
+}
