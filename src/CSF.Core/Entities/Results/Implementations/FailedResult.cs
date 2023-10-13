@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace CSF
 {
@@ -38,8 +39,11 @@ namespace CSF
         }
 
         /// <inheritdoc />
-        public bool Failed()
-            => true;
+        public bool Failed([NotNullWhen(true)] out FailedResult result)
+        {
+            result = this;
+            return true;
+        }
 
         /// <inheritdoc />
         public TaskAwaiter GetAwaiter()

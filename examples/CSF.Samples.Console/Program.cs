@@ -14,8 +14,10 @@ while (true)
 
     var context = new CommandContext(input);
 
-    var result = await framework.ExecuteAsync(context);
+    var result = framework.ExecuteAsync(context);
 
-    if (result.Failed())
-        Console.WriteLine(result);
+    if (result.Failed(out var failure))
+        Console.WriteLine(failure.Exception);
+
+    await result;
 }

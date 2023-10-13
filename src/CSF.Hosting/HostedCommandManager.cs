@@ -51,10 +51,12 @@ namespace CSF
             {
                 var context = new CommandContext(Console.ReadLine(), Parser);
 
-                var result = await ExecuteAsync(context, new CommandExecutionOptions());
+                var result = ExecuteAsync(context, new CommandExecutionOptions());
 
-                if (result.Failed())
-                    Logger.LogError(result.Exception, "Command execution returned an exception.");
+                if (result.Failed(out var failure))
+                    Logger.LogError(failure.Exception, "Command execution returned an exception.");
+
+                await result;
             }
         }
 
