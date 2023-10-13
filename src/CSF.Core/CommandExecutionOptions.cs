@@ -8,11 +8,6 @@ namespace CSF
     public class CommandExecutionOptions
     {
         /// <summary>
-        ///     Gets or sets if the command execution should be asynchronous.
-        /// </summary>
-        public bool ExecuteAsynchronously { get; set; } = false;
-
-        /// <summary>
         ///     Gets or sets the service scope to be used in command execution. The services used for executing commands will be defaulted to the globally defined <see cref="IServiceProvider"/> if this property is not set.
         /// </summary>
         public IServiceScope Scope { get; set; } = null;

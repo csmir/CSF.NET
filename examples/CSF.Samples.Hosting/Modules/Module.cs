@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CSF.Samples.Hosting.Modules
+﻿namespace CSF.Samples.Hosting.Modules
 {
     public sealed class Module : ModuleBase<CommandContext>
     {

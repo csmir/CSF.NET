@@ -7,42 +7,42 @@ namespace CSF.Tests.Benchmarks
     public class BenchmarkModule : ModuleBase<CommandContext>
     {
         [Command("command")]
-        public void MyCommand()
+        public Task MyCommand()
         {
-
+            return Task.CompletedTask;
         }
 
         [Command("command")]
-        public void MyCommand(int i)
+        public Task MyCommand(int i)
         {
-
+            return Task.CompletedTask;
         }
 
         [Command("command-op")]
-        public void MyOpCommand(int i = 0)
+        public Task MyOpCommand(int i = 0)
         {
-
+            return Task.CompletedTask;
         }
 
         [Group("subcommand")]
         public class InnerModule : ModuleBase<CommandContext>
         {
             [Command("command")]
-            public void MyCommand()
+            public Task MyCommand()
             {
-                
+                return Task.CompletedTask;
             }
 
             [Command("command")]
-            public void MyCommand(int i)
+            public Task MyCommand(int i)
             {
-
+                return Task.CompletedTask;
             }
 
             [Command("command-op")]
-            public void MyOpCommand(int i = 0)
+            public Task MyOpCommand(int i = 0)
             {
-
+                return Task.CompletedTask;
             }
         }
     }

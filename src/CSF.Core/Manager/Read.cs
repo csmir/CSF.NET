@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace CSF
+﻿namespace CSF
 {
     public partial class CommandManager
     {

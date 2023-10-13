@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace CSF
+﻿namespace CSF
 {
     public partial class CommandManager
     {
@@ -54,8 +52,8 @@ namespace CSF
             {
                 command.Check(context, services);
 
-                var arguments = command.HasParameters 
-                    ? command.Parameters.Read(context, services) 
+                var arguments = command.HasParameters
+                    ? command.Parameters.Read(context, services)
                     : Array.Empty<object>();
 
                 return new(command, arguments);

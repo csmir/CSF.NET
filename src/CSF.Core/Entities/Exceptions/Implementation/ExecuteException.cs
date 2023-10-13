@@ -11,9 +11,9 @@
 
         }
 
-        public override CommandResult AsResult()
+        public override FailedResult AsResult()
         {
-            return new(ResultCode.Execute, this);
+            return new(FailureCode.Execute, this);
         }
     }
 }

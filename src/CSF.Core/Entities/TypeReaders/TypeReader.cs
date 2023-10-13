@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CSF
+﻿namespace CSF
 {
     /// <summary>
     ///     Represents a generic <see cref="TypeReader{T}"/> to use for parsing provided types into the targetted type.

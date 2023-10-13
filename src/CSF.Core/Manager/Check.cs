@@ -8,8 +8,8 @@
         /// <param name="command">The command to check all preconditions for.</param>
         /// <param name="context">The context containing information about the command input.</param>
         /// <param name="services">The services in scope to execute the pipeline in relation to the provided context.</param>
-        /// <returns>An empty <see cref="CommandResult"/> if the precondition evaluations succeeded. If any failed, the result of the first failed precondition.</returns>
-        protected virtual CommandResult Check(Command command, ICommandContext context, IServiceProvider services)
+        /// <returns>An empty <see cref="FailedResult"/> if the precondition evaluations succeeded. If any failed, the result of the first failed precondition.</returns>
+        protected virtual FailedResult Check(Command command, ICommandContext context, IServiceProvider services)
         {
             try
             {
@@ -29,8 +29,7 @@
         public static void Check(this Command command, ICommandContext context, IServiceProvider services)
         {
             if (command.HasPreconditions)
-                foreach (var precondition in command.Preconditions)
-                    precondition.EvalInternal(context, command, services);
+                Parallel.ForEach(command.Preconditions, x => x.EvalInternal(context, command, services));
         }
     }
 }

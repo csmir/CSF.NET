@@ -4,11 +4,11 @@ namespace CSF
 {
     internal static class BuildHelper
     {
-        public static IConditionalComponent[] Build(this CommandBuildingConfiguration context)
+        public static HashSet<IConditionalComponent> Build(this CommandBuildingConfiguration context)
         {
             var modules = context.BuildModules();
 
-            return modules.SelectMany(x => x.Components).ToArray();
+            return modules.SelectMany(x => x.Components).ToHashSet();
         }
 
         public static IEnumerable<Module> BuildModules(this CommandBuildingConfiguration context)

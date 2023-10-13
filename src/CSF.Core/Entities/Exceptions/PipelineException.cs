@@ -14,6 +14,6 @@
 
         }
 
-        public abstract CommandResult AsResult();
+        public abstract FailedResult AsResult();
     }
 }

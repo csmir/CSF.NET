@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace CSF
+﻿namespace CSF
 {
     /// <summary>
     ///     Represents a command resolved through the match and search pipeline.
@@ -31,7 +29,7 @@ namespace CSF
         public bool IsInvalid { get; }
 
         /// <summary>
-        ///     Creates a new <see cref="CommandResult"/> that is constructed when resolvement of a command failed.
+        ///     Creates a new <see cref="FailedResult"/> that is constructed when resolvement of a command failed.
         /// </summary>
         /// <param name="exception"></param>
         public CommandCell(Exception exception)
@@ -45,7 +43,7 @@ namespace CSF
         }
 
         /// <summary>
-        ///     Creates a new <see cref="CommandResult"/> that is constructed when resolvement of a command succeeded.
+        ///     Creates a new <see cref="FailedResult"/> that is constructed when resolvement of a command succeeded.
         /// </summary>
         /// <param name="match"></param>
         /// <param name="arguments"></param>

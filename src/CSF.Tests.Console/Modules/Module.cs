@@ -13,9 +13,10 @@ namespace CSF.Tests
 
         [Command("priority")]
         [Priority(2)]
-        public void Priority2(bool optional = false)
+        public Task Priority2(bool optional = false)
         {
             Respond($"Success: {Command.Priority}");
+            return Task.CompletedTask;
         }
 
         [Command("remainder")]

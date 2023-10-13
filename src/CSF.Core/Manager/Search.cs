@@ -49,16 +49,16 @@
     {
         public static CommandCell[] Search(this IEnumerable<IConditionalComponent> components, ICommandContext context, IServiceProvider services)
         {
-            var matches = components.Where(command => command.Aliases.Contains(context.Name, StringComparer.InvariantCultureIgnoreCase));
+            var matches = components.Where(command => command.Aliases.Any(x => x == context.Name));
 
-            var cells = matches.Match(context, services);
+            var cells = matches.Match(context, services).ToArray();
 
             if (cells.All(x => x.IsInvalid))
             {
                 var module = matches.SelectFirstOrDefault<Module>();
 
                 if (module is null)
-                    return cells.ToArray();
+                    return cells;
 
                 context.Name = context.Parameters[0];
                 context.Parameters = context.Parameters[1..];
@@ -66,7 +66,7 @@
                 return module.Components.Search(context, services);
             }
 
-            return cells.ToArray();
+            return cells;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace CSF
         /// <summary>
         ///     Gets the components registered to this manager.
         /// </summary>
-        public IConditionalComponent[] Components { get; }
+        public HashSet<IConditionalComponent> Components { get; }
 
         /// <summary>
         ///     Creates a new <see cref="CommandManager"/> with default configuration.

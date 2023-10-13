@@ -12,7 +12,7 @@ while (true)
 {
     var context = new CommandContext(Console.ReadLine()!);
 
-    var result = await framework.ExecuteAsync(context);
+    var result = framework.ExecuteAsync(context);
 
     if (result.Failed())
         Console.WriteLine(result);
