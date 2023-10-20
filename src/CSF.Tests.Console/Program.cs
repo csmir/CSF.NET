@@ -8,6 +8,14 @@ var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<CommandManager>();
 
+//var delayed = new CommandContext("delayed");
+//var direct = new CommandContext("direct");
+
+// framework.ExecuteAsync(delayed);
+// framework.ExecuteAsync(direct);
+
+//await Task.Delay(Timeout.Infinite);
+
 while (true)
 {
     var context = new CommandContext(Console.ReadLine()!);
@@ -16,6 +24,4 @@ while (true)
 
     if (result.Failed(out var failure))
         Console.WriteLine(failure.Exception);
-
-    await result;
 }
