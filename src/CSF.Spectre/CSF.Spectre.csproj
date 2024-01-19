@@ -41,10 +41,7 @@
 
   <ItemGroup>
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<ProjectReference Include="..\..\src\CSF.Core\CSF.Core.csproj" />
+	<PackageReference Include="CSF.NET" Version="2.1" />
   </ItemGroup>
 
 </Project>
