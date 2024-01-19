@@ -11,7 +11,7 @@ namespace XProject
             Platform = platform;
         }
 
-        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
+        public override Result EvaluateAsync(ICommandContext context, Command command, IServiceProvider provider)
         {
             if (Environment.OSVersion.Platform == Platform)
                 return Success();
