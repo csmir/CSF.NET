@@ -8,20 +8,20 @@ var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<CommandManager>();
 
-//var delayed = new CommandContext("delayed");
-//var direct = new CommandContext("direct");
+var delayed = new CommandContext("delayed");
+var direct = new CommandContext("direct");
 
-// framework.ExecuteAsync(delayed);
-// framework.ExecuteAsync(direct);
+framework.ExecuteAsync(delayed);
+framework.ExecuteAsync(direct);
 
-//await Task.Delay(Timeout.Infinite);
+await Task.Delay(Timeout.Infinite);
 
-while (true)
-{
-    var context = new CommandContext(Console.ReadLine()!);
+//while (true)
+//{
+//    var context = new CommandContext(Console.ReadLine()!);
 
-    var result = framework.ExecuteAsync(context);
+//    var result = framework.ExecuteAsync(context);
 
-    if (result.Failed(out var failure))
-        Console.WriteLine(failure.Exception);
-}
+//    if (result.Failed(out var failure))
+//        Console.WriteLine(failure.Exception);
+//}
