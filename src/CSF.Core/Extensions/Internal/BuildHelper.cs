@@ -4,19 +4,19 @@ namespace CSF
 {
     internal static class BuildHelper
     {
-        public static HashSet<IConditionalComponent> Build(this CommandBuildingConfiguration context)
+        public static HashSet<IConditionalComponent> Build(this FrameworkBuilder context)
         {
             var modules = context.BuildModules();
 
             return modules.SelectMany(x => x.Components).ToHashSet();
         }
 
-        public static IEnumerable<Module> BuildModules(this CommandBuildingConfiguration context)
+        public static IEnumerable<Module> BuildModules(this FrameworkBuilder context)
         {
             var typeReaders = TypeReader.CreateDefaultReaders().UnionBy(context.TypeReaders, x => x.Type).ToDictionary(x => x.Type, x => x);
 
             var rootReader = typeof(TypeReader);
-            foreach (var assembly in context.RegistrationAssemblies)
+            foreach (var assembly in context.Assemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootReader.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
                     {
@@ -30,7 +30,7 @@ namespace CSF
                     }
 
             var rootType = typeof(ModuleBase);
-            foreach (var assembly in context.RegistrationAssemblies)
+            foreach (var assembly in context.Assemblies)
                 foreach (var type in assembly.GetTypes())
                     if (rootType.IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
                         yield return new Module(type, typeReaders);
