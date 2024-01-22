@@ -36,7 +36,7 @@ namespace CSF
             }
 
             if (!fallback.HasValue)
-                return new SearchResult(new SearchException(""));
+                return new SearchResult(new SearchException("")); // TODO
 
             return fallback;
         }
@@ -54,7 +54,7 @@ namespace CSF
 
             // verify check success, if not, return the failure.
             if (!check.Success)
-                return new(search.Command, new MatchException("", check.Exception));
+                return new(search.Command, new MatchException("", check.Exception)); // TODO
 
             // read the command parameters in right order.
             var readResult = await ReadAsync(context, search, args);
