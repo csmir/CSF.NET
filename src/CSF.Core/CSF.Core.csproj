@@ -4,11 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<RootNamespace>CSF</RootNamespace>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-	<AssemblyVersion>2.1.1</AssemblyVersion>
-	<PackageVersion>2.1.1</PackageVersion>
-	<FileVersion>2.1.1.0</FileVersion>
-	<Version>2.1.1</Version>
+	<AssemblyVersion>2.1.2</AssemblyVersion>
+	<PackageVersion>2.1.2</PackageVersion>
+	<FileVersion>2.1.2.0</FileVersion>
+	<Version>2.1.2</Version>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 
@@ -16,7 +17,7 @@
 	<RepositoryUrl>https://github.com/Rozen4334/CSF.NET</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 
-	<PackageReleaseNotes>Version 2.1; Made for net6+.</PackageReleaseNotes>
+	<PackageReleaseNotes>Version 2.1.2; Made for net6+.</PackageReleaseNotes>
 	<PackageTags>Text, Console, Commands, Framework</PackageTags>
 	  
 	<Title>Command Standardization Framework</Title>

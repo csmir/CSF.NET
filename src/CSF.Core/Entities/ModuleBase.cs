@@ -35,6 +35,11 @@
         public Command Command { get; internal set; }
 
         /// <summary>
+        ///     Gets the service provider used for executing the currently executed command.
+        /// </summary>
+        public IServiceProvider Services { get; internal set; }
+
+        /// <summary>
         ///     Responds to the command with a message.
         /// </summary>
         /// <param name="message">The message to send.</param>

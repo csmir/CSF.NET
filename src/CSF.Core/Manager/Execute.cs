@@ -77,6 +77,7 @@
 
             module.Context = context;
             module.Command = cell.Command;
+            module.Services = services;
 
             var value = cell.Command.Target.Invoke(module, cell.Arguments);
 
