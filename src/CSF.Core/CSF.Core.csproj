@@ -5,10 +5,10 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<RootNamespace>CSF</RootNamespace>
 
-	<AssemblyVersion>2.1</AssemblyVersion>
-	<PackageVersion>2.1</PackageVersion>
+	<AssemblyVersion>2.1.1</AssemblyVersion>
+	<PackageVersion>2.1.1</PackageVersion>
 	<FileVersion>2.1.1.0</FileVersion>
-	<Version>2.1</Version>
+	<Version>2.1.1</Version>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 
