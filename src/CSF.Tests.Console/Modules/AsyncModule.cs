@@ -8,7 +8,7 @@ namespace CSF.Tests.Console.Modules
 {
     public sealed class AsyncModule : ModuleBase<CommandContext>
     {
-        [Command("delayed")]
+        [Command("delayed", "delay")]
         public async Task AsyncRunDelayed()
         {
             await Task.Delay(5000);
@@ -16,7 +16,7 @@ namespace CSF.Tests.Console.Modules
             Respond("Success. (Delayed).");
         }
 
-        [Command("direct")]
+        [Command("direct", "dir")]
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task AsyncRunDirect()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

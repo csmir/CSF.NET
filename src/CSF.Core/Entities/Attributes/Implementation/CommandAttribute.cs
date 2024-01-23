@@ -33,23 +33,14 @@
         [CLSCompliant(false)]
         public CommandAttribute(string name, params string[] aliases)
         {
-            static void Assign(ref string[] arr, string value, int pos)
-            {
-                Assert.IsNotEmpty(value);
-                arr[pos] = value;
-                pos++;
-            }
+            var arr = new string[aliases.Length + 1];
 
-            var i = 0;
-            var array = new string[aliases.Length + 1];
+            arr[0] = name;
 
-            Assign(ref array, name, i);
-
-            foreach (var value in aliases)
-                Assign(ref array, value, i);
+            Array.Copy(aliases, 0, arr, 1, aliases.Length);
 
             Name = name;
-            Aliases = array;
+            Aliases = arr;
         }
     }
 }
