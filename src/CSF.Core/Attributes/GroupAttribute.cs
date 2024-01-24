@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     /// <summary>
     ///     Represents a command group, functioning much like subcommands.
@@ -21,7 +23,7 @@
         /// </summary>
         /// <param name="name"></param>
         public GroupAttribute(string name)
-            : this(name, Array.Empty<string>())
+            : this(name, [])
         {
 
         }
@@ -32,25 +34,19 @@
         /// <param name="name"></param>
         /// <param name="aliases"></param>
         [CLSCompliant(false)]
-        public GroupAttribute(string name, params string[] aliases)
+        public GroupAttribute([DisallowNull] string name, params string[] aliases)
         {
-            static void Assign(ref string[] arr, string value, int pos)
-            {
-                Assert.IsNotEmpty(value);
-                arr[pos] = value;
-                pos++;
-            }
+            if (string.IsNullOrWhiteSpace(name))
+                ThrowHelpers.InvalidArg(name);
 
-            var i = 0;
-            var array = new string[aliases.Length + 1];
+            var arr = new string[aliases.Length + 1];
 
-            Assign(ref array, name, i);
+            arr[0] = name;
 
-            foreach (var value in aliases)
-                Assign(ref array, value, i);
+            Array.Copy(aliases, 0, arr, 1, aliases.Length);
 
             Name = name;
-            Aliases = array;
+            Aliases = arr;
         }
     }
 }

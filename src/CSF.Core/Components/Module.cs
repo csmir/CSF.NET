@@ -50,7 +50,7 @@
             Preconditions = preconditions;
             HasPreconditions = preconditions.Length > 0;
 
-            Components = this.Build(typeReaders);
+            Components = this.GetComponents(typeReaders);
 
             Name = expectedName ?? type.Name;
             Aliases = aliases ?? [ Name ];

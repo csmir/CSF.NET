@@ -6,14 +6,14 @@
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
-        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IParameterComponent parameter, string value)
         {
             var parser = _container.Value[Type] as Tpd<T>;
 
             if (parser(value, out var result))
-                return Success(result);
+                return ValueTask.FromResult(Success(result));
 
-            return Failure($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'");
+            return ValueTask.FromResult(Error($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'"));
         }
 
         private static IReadOnlyDictionary<Type, Delegate> ValueGenerator()

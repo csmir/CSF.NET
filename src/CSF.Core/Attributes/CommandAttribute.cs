@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     /// <summary>
     ///     An attribute that represents the required info to map a command.
@@ -20,8 +22,8 @@
         ///     Sets up a new command attribute with the provided name.
         /// </summary>
         /// <param name="name"></param>
-        public CommandAttribute(string name)
-            : this(name, Array.Empty<string>())
+        public CommandAttribute([DisallowNull] string name)
+            : this(name, [])
         {
 
         }
@@ -31,25 +33,19 @@
         /// </summary>
         /// <param name="name"></param>
         [CLSCompliant(false)]
-        public CommandAttribute(string name, params string[] aliases)
+        public CommandAttribute([DisallowNull] string name, params string[] aliases)
         {
-            static void Assign(ref string[] arr, string value, int pos)
-            {
-                Assert.IsNotEmpty(value);
-                arr[pos] = value;
-                pos++;
-            }
+            if (string.IsNullOrWhiteSpace(name))
+                ThrowHelpers.InvalidArg(name);
 
-            var i = 0;
-            var array = new string[aliases.Length + 1];
+            var arr = new string[aliases.Length + 1];
 
-            Assign(ref array, name, i);
+            arr[0] = name;
 
-            foreach (var value in aliases)
-                Assign(ref array, value, i);
+            Array.Copy(aliases, 0, arr, 1, aliases.Length);
 
             Name = name;
-            Aliases = array;
+            Aliases = arr;
         }
     }
 }

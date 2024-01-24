@@ -70,9 +70,12 @@ namespace CSF
                 IsOptional = false;
 
             var constructor = new Constructor(Type);
-            var parameters = constructor.Target.BuildParameters(typeReaders);
+            var parameters = constructor.Target.GetParameters(typeReaders);
 
-            Assert.IsTrue(parameters.Length > 0, "Complex types are expected to have at least 1 constructor parameter.");
+            if (parameters.Length > 0)
+            {
+                ThrowHelpers.InvalidOp("Complex types are expected to have at least 1 constructor parameter.");
+            }
 
             var (minLength, maxLength) = parameters.GetLength();
 

@@ -1,23 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace CSF
+﻿namespace CSF
 {
-    /// <summary>
-    ///     Defines the default <see cref="TypeReader{T}"/> for enums.
-    /// </summary>
-    /// <remarks>
-    ///     To implement this typereader, you must first define it with the associated enum and add it to the <see cref="IServiceCollection"/>.
-    /// </remarks>
-    /// <typeparam name="T">The enum this parser belongs to.</typeparam>
-    public class EnumTypeReader<T> : TypeReader<T>
-        where T : struct, Enum
+    internal class EnumTypeReader(Type targetEnumType) : TypeReader
     {
-        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
-        {
-            if (Enum.TryParse<T>(value, true, out var result))
-                return Success(result);
+        public override Type Type { get; } = targetEnumType;
 
-            return Failure($"The provided value is not a part the enum specified. Expected: '{typeof(T).Name}', got: '{value}'. At: '{parameter.Name}'");
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IParameterComponent parameter, string value)
+        {
+            if (Enum.TryParse(Type, value, true, out var result))
+                return ValueTask.FromResult(Success(result));
+
+            return ValueTask.FromResult(Error($"The provided value is not a part the enum specified. Expected: '{Type.Name}', got: '{value}'. At: '{parameter.Name}'"));
         }
     }
 }

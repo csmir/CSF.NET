@@ -13,7 +13,5 @@
         {
 
         }
-
-        public abstract FailedResult AsResult();
     }
 }

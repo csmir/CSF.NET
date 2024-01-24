@@ -3,30 +3,24 @@
     /// <summary>
     ///     Represents a precondition that checks if the provided context is valid.
     /// </summary>
-    public sealed class RequireContextAttribute : PreconditionAttribute
+    /// <remarks>
+    ///     Compiles a new <see cref="RequireContextAttribute{T}"/> from provided <typeparamref name="T"/>.
+    /// </remarks>
+    public sealed class RequireContextAttribute<T>() : PreconditionAttribute
     {
         /// <summary>
         ///     The context type to compare against.
         /// </summary>
-        public Type ContextType { get; }
+        public Type ContextType { get; } = typeof(T);
 
-        /// <summary>
-        ///     Compiles a new <see cref="RequireContextAttribute"/> from provided <paramref name="contextType"/>.
-        /// </summary>
-        /// <param name="contextType"></param>
-        public RequireContextAttribute(Type contextType)
-        {
-            ContextType = contextType;
-        }
-
-        public override Result EvaluateAsync(ICommandContext context, Command command, IServiceProvider provider)
+        public override ValueTask<CheckResult> EvaluateAsync(ICommandContext context, Command command)
         {
             var providedType = context.GetType();
 
             if (providedType != ContextType)
-                return Failure($"Invalid context was passed into the command. Expected: '{ContextType.FullName}', got '{providedType.FullName}'");
+                return ValueTask.FromResult(new CheckResult(new CheckException($"Invalid context was passed into the command. Expected: '{ContextType.FullName}', got '{providedType.FullName}'")));
 
-            return Success();
+            return ValueTask.FromResult(new CheckResult());
         }
     }
 }

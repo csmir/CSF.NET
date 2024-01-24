@@ -38,7 +38,7 @@
                 if (param.IsNullable && arg is null or "null" or "nothing")
                     return new(arg);
 
-                return await param.TypeReader.EvaluateAsync(context, param, arg);
+                return await param.TypeReader.ObjectEvaluateAsync(context, param, arg);
             }
 
             var results = new ReadResult[param.Length];

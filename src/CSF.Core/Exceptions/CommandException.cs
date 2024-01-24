@@ -10,10 +10,5 @@
         {
 
         }
-
-        public override FailedResult AsResult()
-        {
-            return new(FailureCode.Execute, this);
-        }
     }
 }

@@ -1,4 +1,6 @@
-﻿[assembly: CLSCompliant(true)]
+﻿using System.Reflection;
+
+[assembly: CLSCompliant(true)]
 
 namespace CSF
 {
@@ -8,14 +10,31 @@ namespace CSF
     /// <remarks>
     ///     Guides and documentation can be found at: <see href="https://github.com/csmir/CSF.NET/wiki"/>
     /// </remarks>
-    public class CommandManager
+    public sealed class CommandManager
     {
         /// <summary>
         ///     Gets the components registered to this manager.
         /// </summary>
         public HashSet<IConditionalComponent> Components { get; }
 
-        public async Task<IResult> ExecuteAsync(ICommandContext context, object[] args)
+        /// <summary>
+        ///     Gets the assemblies used to register <see cref="Components"/> to this manager.
+        /// </summary>
+        public Assembly[] Assemblies { get; }
+
+        public CommandManager(IEnumerable<IConditionalComponent> components, Assembly[] assemblies)
+        {
+            Components = components.ToHashSet();
+            Assemblies = assemblies;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public async ValueTask<IResult> ExecuteAsync(ICommandContext context, params object[] args)
         {
             // search all relevant commands.
             var searches = Search(args);
@@ -41,13 +60,19 @@ namespace CSF
             return fallback;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public IEnumerable<SearchResult> Search(object[] args)
         {
             // recursively search for commands in the execution.
             return Components.RecursiveSearch(args, 0);
         }
 
-        public static async Task<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args)
+        #region Matching
+        internal static async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args)
         {
             // check command preconditions.
             var check = await CheckAsync(context, search.Command);
@@ -73,8 +98,10 @@ namespace CSF
             // return successful match if execution reaches here.
             return new(search.Command, reads);
         }
+        #endregion
 
-        public static async Task<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args)
+        #region Reading
+        internal static async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args)
         {
             // skip if no parameters exist.
             if (!search.Command.HasParameters)
@@ -98,18 +125,24 @@ namespace CSF
             // input is too long or too short.
             return [];
         }
-        
-        public static async Task<CheckResult> CheckAsync(ICommandContext context, Command command)
+        #endregion
+
+        #region Checking
+        internal static async ValueTask<CheckResult> CheckAsync(ICommandContext context, Command command)
         {
             foreach (var precon in command.Preconditions)
             {
-                if (!await precon.EvaluateAsync(context, command))
-                    return new(new CheckException(""));
+                var result = await precon.EvaluateAsync(context, command);
+
+                if (!result.Success)
+                    return result;
             }
             return new();
         }
+        #endregion
 
-        public static async Task<RunResult> RunAsync(ICommandContext context, MatchResult match)
+        #region Running
+        internal static async ValueTask<RunResult> RunAsync(ICommandContext context, MatchResult match)
         {
             try
             {
@@ -131,5 +164,6 @@ namespace CSF
                 return new(match.Command, exception);
             }
         }
+        #endregion
     }
 }

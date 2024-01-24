@@ -30,6 +30,15 @@
         public ICommandContext Context { get; internal set; }
 
         /// <summary>
+        ///     Gets the command execution services as provided by the command scope.
+        /// </summary>
+        public IServiceProvider Services
+        {
+            get
+                => Context.Options.Scope.ServiceProvider;
+        }
+
+        /// <summary>
         ///     Gets the component that displays all information about the command thats currently in scope.
         /// </summary>
         public Command Command { get; internal set; }
@@ -41,7 +50,7 @@
         public virtual void Respond(string message)
             => Console.WriteLine(message);
 
-        public virtual CommandManager.RunResult ReturnTypeHandle(object value)
+        public virtual RunResult ReturnTypeHandle(object value)
         {
             switch (value)
             {

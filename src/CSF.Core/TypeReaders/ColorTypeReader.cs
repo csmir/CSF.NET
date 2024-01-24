@@ -45,19 +45,19 @@ namespace CSF
             _spacedColors = spacedNames;
         }
 
-        public override Result Evaluate(ICommandContext context, IParameterComponent parameter, IServiceProvider services, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IParameterComponent parameter, string value)
         {
             if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
-                return Success(Color.FromArgb(hexNumber));
+                return ValueTask.FromResult(Success(Color.FromArgb(hexNumber)));
 
             var name = value;
 
             _spacedColors.TryGetValue(name, out name);
 
             if (_colors.TryGetValue(name, out var color))
-                return Success(color);
+                return ValueTask.FromResult(Success(color));
 
-            return Failure($"The provided value is not a color. Got: '{value}'. At: '{parameter.Name}'");
+            return ValueTask.FromResult(Error($"The provided value is not a color. Got: '{value}'. At: '{parameter.Name}'"));
         }
     }
 }

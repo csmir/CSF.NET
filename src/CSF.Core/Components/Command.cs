@@ -57,12 +57,17 @@ namespace CSF
         {
             var attributes = method.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();
-            var parameters = method.BuildParameters(typeReaders);
+            var parameters = method.GetParameters(typeReaders);
 
             var (minLength, maxLength) = parameters.GetLength();
 
             if (parameters.Any(x => x.Attributes.Contains<RemainderAttribute>(false)))
-                Assert.IsTrue(parameters[^1].IsRemainder, $"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
+            {
+                if (parameters[^1].IsRemainder)
+                {
+                    ThrowHelpers.InvalidOp($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
+                }
+            }
 
             Priority = attributes.SelectFirstOrDefault<PriorityAttribute>()?.Priority ?? 0;
 

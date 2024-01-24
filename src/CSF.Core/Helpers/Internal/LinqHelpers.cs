@@ -2,7 +2,7 @@
 
 namespace CSF
 {
-    internal static class LinqHelper
+    internal static class LinqHelpers
     {
         public static IEnumerable<T> CastWhere<T>(this IEnumerable input)
         {

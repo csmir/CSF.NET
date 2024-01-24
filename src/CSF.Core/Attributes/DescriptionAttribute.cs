@@ -1,4 +1,6 @@
-﻿namespace CSF
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CSF
 {
     /// <summary>
     ///     Represents the description of a command.
@@ -15,9 +17,10 @@
         ///     Sets up a new <see cref="DescriptionAttribute"/> with provided value.
         /// </summary>
         /// <param name="description"></param>
-        public DescriptionAttribute(string description)
+        public DescriptionAttribute([DisallowNull] string description)
         {
-            Assert.IsNotEmpty(description);
+            if (string.IsNullOrWhiteSpace(description))
+                ThrowHelpers.InvalidArg(description);
 
             Description = description;
         }

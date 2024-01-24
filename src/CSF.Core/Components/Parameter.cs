@@ -57,7 +57,10 @@ namespace CSF
             else
                 IsRemainder = false;
 
-            if (Type != typeof(string) && Type != typeof(object))
+            if (Type.IsEnum)
+                TypeReader = new EnumTypeReader(Type);
+
+            else if (Type != typeof(string) && Type != typeof(object))
                 TypeReader = typeReaders[Type];
 
             Attributes = attributes;
