@@ -1,9 +1,8 @@
-﻿namespace CSF
+﻿namespace CSF.Parsing
 {
-    public abstract class Parser
+    public abstract class Parser<T>
+        where T : IEquatable<T>
     {
-        public static Parser Text { get; } = new TextParser();
-
-        public abstract ParserCell Parse(string rawInput);
+        public abstract object[] Parse(T value);
     }
 }

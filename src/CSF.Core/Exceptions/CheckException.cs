@@ -1,4 +1,4 @@
-﻿namespace CSF
+﻿namespace CSF.Exceptions
 {
     /// <summary>
     ///     Represents a <see cref="ExecutionException"/> that is thrown when no matched command succeeded its precondition checks.
