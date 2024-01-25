@@ -53,7 +53,7 @@
             Components = this.GetComponents(typeReaders);
 
             Name = expectedName ?? type.Name;
-            Aliases = aliases ?? [ Name ];
+            Aliases = aliases ?? [Name];
         }
 
         /// <summary>

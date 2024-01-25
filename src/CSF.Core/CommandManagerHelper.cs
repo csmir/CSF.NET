@@ -17,7 +17,7 @@
                     var nested = module.Components.RecursiveSearch(args, searchHeight + 1);
                     discovered.AddRange(nested);
                 }
-                else 
+                else
                     // add the top level matches immediately.
                     discovered.Add(new(component as Command, searchHeight));
 

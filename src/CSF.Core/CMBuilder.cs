@@ -6,7 +6,7 @@ namespace CSF
     {
         private bool _disposed = false;
 
-        public HashSet<Assembly> Assemblies { get; set; } = [ Assembly.GetEntryAssembly() ];
+        public HashSet<Assembly> Assemblies { get; set; } = [Assembly.GetEntryAssembly()];
 
         public HashSet<TypeReader> TypeReaders { get; set; } = [];
 

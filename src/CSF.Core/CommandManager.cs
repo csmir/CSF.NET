@@ -41,7 +41,7 @@ namespace CSF
 
             // define a fallback for unsuccesful execution.
             MatchResult? fallback = default;
-            
+
             // order searches by descending for priority definitions.
             foreach (var search in searches.OrderByDescending(x => x.Command.Priority))
             {
