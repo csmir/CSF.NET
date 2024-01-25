@@ -3,12 +3,8 @@
     /// <summary>
     ///     Represents a <see cref="ExecutionException"/> that is thrown when no matched command succeeded parsing its parameters.
     /// </summary>
-    public sealed class ReadException : ExecutionException
+    public sealed class ReadException(string message, Exception innerException = null) 
+        : ExecutionException(message, innerException)
     {
-        public ReadException(string message, Exception innerException = null)
-            : base(message, innerException)
-        {
-
-        }
     }
 }

@@ -36,13 +36,24 @@ namespace CSF
         public CommandAttribute([DisallowNull] string name, params string[] aliases)
         {
             if (string.IsNullOrWhiteSpace(name))
-                ThrowHelpers.InvalidArg(name);
+                ThrowHelpers.ArgMissing(name);
 
             var arr = new string[aliases.Length + 1];
+            for (int i = 0; i < aliases.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(aliases[i]))
+                    ThrowHelpers.ArgMissing(aliases);
+
+                if (arr.Contains(aliases[i]))
+                    ThrowHelpers.RangeDuplicate(aliases);
+
+                arr[i + 1] = aliases[i];
+            }
+
+            if (arr.Contains(name))
+                ThrowHelpers.RangeDuplicate(aliases);
 
             arr[0] = name;
-
-            Array.Copy(aliases, 0, arr, 1, aliases.Length);
 
             Name = name;
             Aliases = arr;

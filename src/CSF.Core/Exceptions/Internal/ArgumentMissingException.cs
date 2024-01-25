@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    public interface IResult
+    internal sealed class ArgumentMissingException(string paramName, string message) 
+        : ArgumentException(message, paramName)
     {
-        public Exception Exception { get; } 
 
-        public bool Success { get; } 
     }
 }

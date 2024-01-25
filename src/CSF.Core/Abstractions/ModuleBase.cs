@@ -50,7 +50,7 @@
         public virtual void Respond(string message)
             => Console.WriteLine(message);
 
-        public virtual RunResult ReturnTypeHandle(object value)
+        public virtual RunResult ReturnTypeResolve(object value)
         {
             switch (value)
             {
@@ -59,18 +59,18 @@
                 case null:
                     return new(Command, null);
                 default:
-                    throw new NotSupportedException("The return value of this command is not supported.");
+                    throw new NotSupportedException($"The return value of the command in question is not supported. Consider overriding {nameof(ReturnTypeResolve)} to add your own return type resolver.");
             }
         }
 
-        public virtual async ValueTask BeforeExecuteAsync()
+        public virtual ValueTask BeforeExecuteAsync()
         {
-
+            return ValueTask.CompletedTask;
         }
 
-        public virtual async ValueTask AfterExecuteAsync()
+        public virtual ValueTask AfterExecuteAsync()
         {
-
+            return ValueTask.CompletedTask;
         }
     }
 }

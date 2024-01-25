@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSF
 {
-    public interface IResult
+    internal sealed class RangeDuplicateException(string paramName, string message) 
+        : ArgumentException(paramName, message)
     {
-        public Exception Exception { get; } 
 
-        public bool Success { get; } 
     }
 }

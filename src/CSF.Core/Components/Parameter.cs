@@ -58,7 +58,7 @@ namespace CSF
                 IsRemainder = false;
 
             if (Type.IsEnum)
-                TypeReader = new EnumTypeReader(Type);
+                TypeReader = EnumTypeReader.GetOrCreate(Type);
 
             else if (Type != typeof(string) && Type != typeof(object))
                 TypeReader = typeReaders[Type];

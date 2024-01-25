@@ -157,7 +157,7 @@ namespace CSF
 
                 await module.AfterExecuteAsync();
 
-                return module.ReturnTypeHandle(value);
+                return module.ReturnTypeResolve(value);
             }
             catch (Exception exception)
             {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using CSF.Exceptions;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -13,9 +14,15 @@ namespace CSF
         }
 
         [DoesNotReturn]
-        public static void InvalidArg(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
+        public static void ArgMissing(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
         {
-            throw new ArgumentException("Argument is not in valid state, being null, empty or whitespace.", paramName: arg);
+            throw new ArgumentMissingException(arg, "Argument is not in valid state, being null, empty or whitespace.");
+        }
+
+        [DoesNotReturn]
+        public static void RangeDuplicate(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
+        {
+            throw new RangeDuplicateException(arg, "Range contains a duplicate value, which is not supported by the implementation.");
         }
     }
 }

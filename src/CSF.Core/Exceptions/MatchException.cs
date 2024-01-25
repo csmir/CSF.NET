@@ -1,11 +1,8 @@
 ﻿namespace CSF
 {
-    public class MatchException : ExecutionException
+    public class MatchException(string message, Exception innerException = null) 
+        : ExecutionException(message, innerException)
     {
-        public MatchException(string message, Exception innerException = null)
-            : base(message, innerException)
-        {
 
-        }
     }
 }

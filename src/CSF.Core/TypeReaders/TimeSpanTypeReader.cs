@@ -2,10 +2,10 @@
 
 namespace CSF
 {
-    internal class TimeSpanTypeReader : TypeReader<TimeSpan>
+    internal partial class TimeSpanTypeReader : TypeReader<TimeSpan>
     {
         private readonly IReadOnlyDictionary<string, Func<string, TimeSpan>> _callback;
-        private readonly Regex _regex = new(@"(\d*)\s*([a-zA-Z]*)\s*(?:and|,)?\s*", RegexOptions.Compiled);
+        private readonly Regex _regex = GenTSRegex();
 
         public TimeSpanTypeReader()
         {
@@ -71,5 +71,8 @@ namespace CSF
 
         private static TimeSpan Months(string match)
             => new(((int)(int.Parse(match) * 30.437)), 0, 0, 0);
+
+        [GeneratedRegex(@"(\d*)\s*([a-zA-Z]*)\s*(?:and|,)?\s*", RegexOptions.Compiled)]
+        private static partial Regex GenTSRegex();
     }
 }

@@ -20,7 +20,7 @@ namespace CSF
         public DescriptionAttribute([DisallowNull] string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                ThrowHelpers.InvalidArg(description);
+                ThrowHelpers.ArgMissing(description);
 
             Description = description;
         }

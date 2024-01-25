@@ -1,10 +1,14 @@
 ﻿namespace CSF
 {
-    /// <summary>
-    ///     Represents a class that's used to describe data from the command.
-    /// </summary>
-    public class CommandContext<T>(T options) : ICommandContext
+    public class CommandContext<T>(T options) : CommandContext(options), ICommandContext
         where T : IExecutionOptions
+    {
+        public new T Options { get; } = options;
+
+        IExecutionOptions ICommandContext.Options { get; } = options;
+    }
+
+    public class CommandContext(IExecutionOptions options) : ICommandContext
     {
         public IExecutionOptions Options { get; } = options;
     }
