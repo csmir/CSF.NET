@@ -1,20 +1,20 @@
-﻿using CSF;
-using Microsoft.Extensions.DependencyInjection;
+﻿//using CSF;
+//using Microsoft.Extensions.DependencyInjection;
 
-var collection = new ServiceCollection()
-    .WithCommandManager();
+//var collection = new ServiceCollection()
+//    .WithCommandManager();
 
-var services = collection.BuildServiceProvider();
+//var services = collection.BuildServiceProvider();
 
-var framework = services.GetRequiredService<CommandManager>();
+//var framework = services.GetRequiredService<CommandManager>();
 
-var delayed = new CommandContext("delayed");
-var direct = new CommandContext("direct");
+//var delayed = new CommandContext("delayed");
+//var direct = new CommandContext("direct");
 
-framework.ExecuteAsync(delayed);
-framework.ExecuteAsync(direct);
+//framework.ExecuteAsync(delayed);
+//framework.ExecuteAsync(direct);
 
-await Task.Delay(Timeout.Infinite);
+//await Task.Delay(Timeout.Infinite);
 
 //while (true)
 //{
@@ -25,3 +25,17 @@ await Task.Delay(Timeout.Infinite);
 //    if (result.Failed(out var failure))
 //        Console.WriteLine(failure.Exception);
 //}
+
+using CSF.Parsing;
+
+var parser = new StringParser();
+
+while (true)
+{
+    var text = Console.ReadLine();
+
+    var value = parser.Parse(text);
+
+    foreach (var item in value)
+        Console.WriteLine("-> " + item);
+}
