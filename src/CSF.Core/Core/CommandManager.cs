@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using CSF.TypeReaders;
+﻿using CSF.TypeReaders;
 using CSF.Helpers;
 using CSF.Reflection;
 using CSF.Exceptions;
@@ -8,7 +7,7 @@ using CSF.Exceptions;
 
 namespace CSF
 {
-    public sealed class CommandManager
+    public class CommandManager
     {
         public IServiceProvider Services { get; }
 
@@ -36,7 +35,7 @@ namespace CSF
             Configuration = configuration;
         }
 
-        public async ValueTask<IResult> ExecuteAsync(ICommandContext context, params object[] args)
+        public virtual async Task<IResult> ExecuteAsync(ICommandContext context, params object[] args)
         {
             // search all relevant commands.
             var searches = Search(args);
@@ -57,26 +56,26 @@ namespace CSF
             }
 
             if (!fallback.HasValue)
-                return new SearchResult(new SearchException("")); // TODO
+                return new SearchResult(new SearchException("No command was found with the provided input."));
 
             return fallback;
         }
 
-        public IEnumerable<SearchResult> Search(object[] args)
+        public virtual IEnumerable<SearchResult> Search(object[] args)
         {
             // recursively search for commands in the execution.
             return Components.RecursiveSearch(args, 0);
         }
 
         #region Matching
-        private static async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args)
+        private async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args)
         {
             // check command preconditions.
             var check = await CheckAsync(context, search.Command);
 
             // verify check success, if not, return the failure.
             if (!check.Success)
-                return new(search.Command, new MatchException("", check.Exception)); // TODO
+                return new(search.Command, new MatchException("Command failed to reach execution state. View inner exception for more details.", check.Exception));
 
             // read the command parameters in right order.
             var readResult = await ReadAsync(context, search, args);
@@ -98,8 +97,10 @@ namespace CSF
         #endregion
 
         #region Reading
-        private static async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args)
+        private async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args)
         {
+            context.LogDebug("Attempting argument conversion for {}", search.Command);
+
             // skip if no parameters exist.
             if (!search.Command.HasParameters)
                 return [];
@@ -125,8 +126,10 @@ namespace CSF
         #endregion
 
         #region Checking
-        private static async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command)
+        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command)
         {
+            context.LogDebug("Attempting validations for {}", command);
+
             foreach (var precon in command.Preconditions)
             {
                 var result = await precon.EvaluateAsync(context, command);
@@ -143,6 +146,8 @@ namespace CSF
         {
             try
             {
+                context.LogInformation("Executing {} with {} resolved arguments.", match.Command, match.Reads.Length);
+
                 var module = Services.GetService(match.Command.Module.Type) as ModuleBase;
 
                 module.Context = context;
@@ -184,19 +189,5 @@ namespace CSF
             }
         }
         #endregion
-    }
-
-    public static class CollectionExtensions
-    {
-        public static IServiceCollection WithCommandManager(this IServiceCollection collection, Action<CommandConfiguration> action = null)
-        {
-            var context = new CommandConfiguration();
-
-            action?.Invoke(context);
-
-            collection.AddCommandManager(context);
-
-            return collection;
-        }
     }
 }

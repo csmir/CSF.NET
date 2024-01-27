@@ -2,15 +2,14 @@
 using CSF.Exceptions;
 using CSF.Helpers;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 
 namespace CSF.TypeReaders
 {
     public abstract class TypeReader<T> : TypeReader
     {
-        /// <inheritdoc />
         public override Type Type { get; } = typeof(T);
 
-        /// <inheritdoc />
         public override abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value);
     }
 

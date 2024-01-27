@@ -5,19 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CSF.Preconditions
 {
-    /// <summary>
-    ///     Defines a precondition attribute.
-    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public abstract class PreconditionAttribute : Attribute
     {
         private static readonly string _exHeader = "Precondition result halted further command execution. View inner exception for more details.";
-        /// <summary>
-        ///     Evaluates a condition to handle a command and returns the result.
-        /// </summary>
-        /// <param name="context">The command context used to execute the command currently in scope.</param>
-        /// <param name="command">The command that is to be executed if this and all other precondition evaluations succeed.</param>
-        /// <returns>A result that represents the outcome of the evaluation.</returns>
+
         public abstract ValueTask<CheckResult> EvaluateAsync(ICommandContext context, CommandInfo command);
 
         public static CheckResult Error([DisallowNull] Exception exception)
