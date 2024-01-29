@@ -2,13 +2,16 @@
 using CSF.Preconditions;
 using CSF.Reflection;
 using CSF.TypeReaders;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace CSF.Helpers
 {
-    internal static class ReflectionHelpers
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public static class ReflectionHelpers
     {
-        private static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var group in module.Type.GetNestedTypes())
             {
@@ -22,7 +25,8 @@ namespace CSF.Helpers
             }
         }
 
-        private static IEnumerable<CommandInfo> GetCommands(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IEnumerable<CommandInfo> GetCommands(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var method in module.Type.GetMethods())
             {
