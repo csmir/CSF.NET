@@ -1,4 +1,5 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
+using CSF.Reflection;
 using System.Text.RegularExpressions;
 
 namespace CSF.TypeReaders
@@ -34,7 +35,7 @@ namespace CSF.TypeReaders
             };
         }
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (!TimeSpan.TryParse(value, out TimeSpan span))
             {

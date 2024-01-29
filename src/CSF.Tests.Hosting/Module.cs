@@ -1,6 +1,9 @@
-﻿namespace CSF.Tests.Hosting
+﻿using CSF.Core;
+using CSF.Hosting;
+
+namespace CSF.Tests.Hosting
 {
-    public sealed class Module : ModuleBase<CommandContext>
+    public sealed class Module : HostedModuleBase<HostedCommandContext>
     {
 #pragma warning disable IDE0052 // Remove unread private members
         private readonly IServiceProvider _provider;
@@ -13,6 +16,6 @@
 
         [Command("help")]
         public void Help()
-            => Respond("Helped");
+            => Console.WriteLine("Helped");
     }
 }

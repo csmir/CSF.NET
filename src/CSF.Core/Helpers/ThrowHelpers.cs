@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace CSF.Helpers
 {
-    internal static class ThrowHelpers
+    public static class ThrowHelpers
     {
         [DoesNotReturn]
         public static void InvalidOp([DisallowNull] string failureMessage)

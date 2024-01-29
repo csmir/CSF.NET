@@ -3,11 +3,14 @@
   <PropertyGroup>
 	<TargetFramework>net8.0</TargetFramework>
 	<ImplicitUsings>enable</ImplicitUsings>
+	<RootNamespace>CSF</RootNamespace>
 	  
 	<AssemblyVersion>2.1</AssemblyVersion>
 	<PackageVersion>2.1</PackageVersion>
 	<FileVersion>2.1.1.0</FileVersion>
 	<Version>2.1</Version>
+
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 
 	<Authors>Armano den Boef and CSF contributors.</Authors>
 

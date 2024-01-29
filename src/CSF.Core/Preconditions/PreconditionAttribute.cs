@@ -1,6 +1,7 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
 using CSF.Exceptions;
 using CSF.Helpers;
+using CSF.Reflection;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CSF.Preconditions
@@ -10,7 +11,7 @@ namespace CSF.Preconditions
     {
         private static readonly string _exHeader = "Precondition result halted further command execution. View inner exception for more details.";
 
-        public abstract ValueTask<CheckResult> EvaluateAsync(ICommandContext context, CommandInfo command);
+        public abstract ValueTask<CheckResult> EvaluateAsync(ICommandContext context, CommandInfo command, CancellationToken cancellationToken);
 
         public static CheckResult Error([DisallowNull] Exception exception)
         {

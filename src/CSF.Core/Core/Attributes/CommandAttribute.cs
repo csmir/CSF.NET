@@ -1,7 +1,7 @@
 ﻿using CSF.Helpers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CSF
+namespace CSF.Core
 {
     /// <summary>
     ///     An attribute that represents the required info to map a command.

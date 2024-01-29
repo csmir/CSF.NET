@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CSF
+namespace CSF.Core
 {
     /// <summary>
     ///     Represents an attribute that can prioritize one result over another when multiple matches were found.

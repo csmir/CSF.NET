@@ -1,9 +1,10 @@
-﻿using CSF.Reflection;
-
-namespace CSF
+﻿namespace CSF.Core
 {
-    public abstract class CommandContext : ICommandContext
+    public class CommandContext : ICommandContext
     {
+        private readonly object _lock = new();
+        private ICommandResult _fallback;
+
         public virtual void LogCritical(string message, params object[] args)
         {
 
@@ -31,7 +32,28 @@ namespace CSF
 
         public virtual void LogWarning(string message, params object[] args)
         {
-            
+
+        }
+
+        bool ICommandContext.TryGetFallback(out ICommandResult result)
+        {
+            lock (_lock)
+            {
+                result = _fallback;
+
+                return _fallback != null;
+            }
+        }
+
+        void ICommandContext.TrySetFallback(ICommandResult result)
+        {
+            lock (_lock)
+            {
+                if (_fallback != null)
+                {
+                    _fallback = result;
+                }
+            }
         }
     }
 }

@@ -1,17 +1,23 @@
-﻿using CSF.TypeReaders;
+﻿using CSF.Exceptions;
 using CSF.Helpers;
 using CSF.Reflection;
-using CSF.Exceptions;
+using CSF.TypeReaders;
+using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 
 [assembly: CLSCompliant(true)]
 
-namespace CSF
+namespace CSF.Core
 {
-    public class CommandManager
+    public class CommandManager : IDisposable
     {
-        public IServiceProvider Services { get; }
+        private readonly object _searchLock = new();
 
         public IReadOnlySet<IConditional> Components { get; }
+
+        public IServiceProvider Services { get; }
+
+        public IResultHandler ResultHandler { get; }
 
         public TypeReader[] TypeReaders { get; }
 
@@ -32,53 +38,96 @@ namespace CSF
 
             Services = services;
 
+            ResultHandler = services.GetService<IResultHandler>();  
+
             Configuration = configuration;
         }
 
-        public virtual async Task<IResult> ExecuteAsync(ICommandContext context, params object[] args)
+        public void Execute(ICommandContext context, params object[] args)
+            => ExecuteAsync(context, args).Wait();
+
+        public Task ExecuteAsync(ICommandContext context, params object[] args)
+            => ExecuteAsync(context, args, cancellationToken: default);
+
+        public async Task ExecuteAsync(ICommandContext context, object[] args, CancellationToken cancellationToken = default)
         {
-            // search all relevant commands.
-            var searches = Search(args);
-
-            // define a fallback for unsuccesful execution.
-            MatchResult? fallback = default;
-
-            // order searches by descending for priority definitions.
-            foreach (var search in searches.OrderByDescending(x => x.Command.Priority))
+            switch (Configuration.ExecutionPattern)
             {
-                var match = await MatchAsync(context, search, args);
-
-                if (fallback is not null)
-                    fallback = match;
-
-                if (match.Success)
-                    return await RunAsync(context, match);
+                case TaskAwaitOptions.Await:
+                    {
+                        context.LogDebug("Starting execution. Execution pattern = [Await].");
+                        await ExecuteInternalAsync(context, args, cancellationToken);
+                    }
+                    return;
+                case TaskAwaitOptions.Discard:
+                    {
+                        context.LogDebug("Starting execution. Execution pattern = [Discard].");
+                        _ = ExecuteInternalAsync(context, args, cancellationToken);
+                    }
+                    return;
             }
-
-            if (!fallback.HasValue)
-                return new SearchResult(new SearchException("No command was found with the provided input."));
-
-            return fallback;
         }
 
-        public virtual IEnumerable<SearchResult> Search(object[] args)
+        public IEnumerable<SearchResult> Search(object[] args)
         {
             // recursively search for commands in the execution.
-            return Components.RecursiveSearch(args, 0);
+            lock (_searchLock)
+            {
+                return Components.RecursiveSearch(args, 0);
+            }
         }
 
+        #region Executing
+        private async Task ExecuteInternalAsync(ICommandContext context, object[] args, CancellationToken cancellationToken)
+        {
+            var searches = Search(args);
+
+            var c = 0;
+
+            foreach (var search in searches.OrderByDescending(x => x.Command.Priority))
+            {
+                c++;
+
+                var match = await MatchAsync(context, search, args, cancellationToken);
+
+                // enter the invocation logic when a match is succesful.
+                if (match.Success)
+                {
+                    var result = await RunAsync(context, match, cancellationToken);
+                    await ResultHandler.HandleAsync(context, result, cancellationToken);
+
+                    return;
+                }
+
+                context.TrySetFallback(match);
+            }
+
+            // if no searches were found, we send searchfailure.
+            if (c is 0)
+            {
+                await ResultHandler.HandleAsync(context, new SearchResult(new SearchException("No commands were found with the provided input.")), cancellationToken);
+            }
+
+            // if there is a fallback present, we send matchfailure.
+            if (context.TryGetFallback(out var fallback))
+            {
+                await ResultHandler.HandleAsync(context, fallback, cancellationToken);
+            }
+        }
+        #endregion
+
         #region Matching
-        private async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args)
+        private async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
             // check command preconditions.
-            var check = await CheckAsync(context, search.Command);
+            var check = await CheckAsync(context, search.Command, cancellationToken);
 
             // verify check success, if not, return the failure.
             if (!check.Success)
                 return new(search.Command, new MatchException("Command failed to reach execution state. View inner exception for more details.", check.Exception));
 
             // read the command parameters in right order.
-            var readResult = await ReadAsync(context, search, args);
+            var readResult = await ReadAsync(context, search, args, cancellationToken);
 
             // exchange the reads for result, verifying successes in the process.
             var reads = new object[readResult.Length];
@@ -97,7 +146,7 @@ namespace CSF
         #endregion
 
         #region Reading
-        private async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args)
+        private async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
             context.LogDebug("Attempting argument conversion for {}", search.Command);
 
@@ -110,15 +159,15 @@ namespace CSF
 
             // check if input equals command length.
             if (search.Command.MaxLength == length)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0);
+                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
 
             // check if input is longer than command, but remainder to concatenate.
             if (search.Command.MaxLength <= length && search.Command.HasRemainder)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0);
+                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
 
             // check if input is shorter than command, but optional parameters to replace.
             if (search.Command.MaxLength > length && search.Command.MinLength <= length)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0);
+                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
 
             // input is too long or too short.
             return [];
@@ -126,13 +175,13 @@ namespace CSF
         #endregion
 
         #region Checking
-        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command)
+        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command, CancellationToken cancellationToken)
         {
             context.LogDebug("Attempting validations for {}", command);
 
             foreach (var precon in command.Preconditions)
             {
-                var result = await precon.EvaluateAsync(context, command);
+                var result = await precon.EvaluateAsync(context, command, cancellationToken);
 
                 if (!result.Success)
                     return result;
@@ -142,7 +191,7 @@ namespace CSF
         #endregion
 
         #region Running
-        private async ValueTask<RunResult> RunAsync(ICommandContext context, MatchResult match)
+        private async ValueTask<RunResult> RunAsync(ICommandContext context, MatchResult match, CancellationToken cancellationToken)
         {
             try
             {
@@ -154,11 +203,11 @@ namespace CSF
                 module.Command = match.Command;
                 module.Services = Services;
 
-                await module.BeforeExecuteAsync();
+                await module.BeforeExecuteAsync(cancellationToken);
 
                 var value = match.Command.Target.Invoke(module, match.Reads);
 
-                await module.AfterExecuteAsync();
+                await module.AfterExecuteAsync(cancellationToken);
 
                 return module.ReturnTypeResolve(value);
             }
@@ -189,5 +238,15 @@ namespace CSF
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+
+        }
+
+        public override string ToString()
+        {
+            
+        }
     }
 }

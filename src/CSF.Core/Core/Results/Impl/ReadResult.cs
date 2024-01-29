@@ -1,6 +1,6 @@
 ﻿namespace CSF
 {
-    public readonly struct ReadResult : IResult
+    public readonly struct ReadResult : ICommandResult
     {
         public Exception Exception { get; } = null;
 

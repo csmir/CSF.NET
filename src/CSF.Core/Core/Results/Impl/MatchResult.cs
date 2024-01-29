@@ -2,7 +2,7 @@
 
 namespace CSF
 {
-    public readonly struct MatchResult : IResult
+    public readonly struct MatchResult : ICommandResult
     {
         public Exception Exception { get; } = null;
 

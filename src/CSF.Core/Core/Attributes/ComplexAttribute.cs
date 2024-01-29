@@ -1,4 +1,4 @@
-﻿namespace CSF
+﻿namespace CSF.Core
 {
     /// <summary>
     ///     Marks a parameter as complex, which will attempt to fetch the primary constructor values and use those as command parameters.

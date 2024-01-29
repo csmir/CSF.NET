@@ -1,4 +1,4 @@
-﻿namespace CSF
+﻿namespace CSF.Core
 {
     /// <summary>
     ///     Represents an attribute that sets a specified constructor as the dependency injection constructor.

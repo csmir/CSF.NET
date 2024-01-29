@@ -1,4 +1,5 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
+using CSF.Reflection;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
@@ -46,7 +47,7 @@ namespace CSF.TypeReaders
             _spacedColors = spacedNames;
         }
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return ValueTask.FromResult(Success(Color.FromArgb(hexNumber)));

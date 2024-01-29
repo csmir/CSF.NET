@@ -1,4 +1,5 @@
-﻿using CSF.Helpers;
+﻿using CSF.Core;
+using CSF.Helpers;
 using CSF.Preconditions;
 using CSF.TypeReaders;
 using System.Reflection;
@@ -8,42 +9,29 @@ namespace CSF.Reflection
 
     public sealed class CommandInfo : IConditional, IArgumentBucket
     {
-
         public string Name { get; }
-
 
         public Attribute[] Attributes { get; }
 
-
         public PreconditionAttribute[] Preconditions { get; }
-
 
         public bool HasPreconditions { get; }
 
-
         public IArgument[] Parameters { get; }
-
 
         public bool HasParameters { get; }
 
-
         public bool HasRemainder { get; }
-
 
         public int MinLength { get; }
 
-
         public int MaxLength { get; }
-
 
         public string[] Aliases { get; }
 
-
         public byte Priority { get; }
 
-
         public ModuleInfo Module { get; }
-
 
         public MethodInfo Target { get; }
 
@@ -61,6 +49,11 @@ namespace CSF.Reflection
                 {
                     ThrowHelpers.InvalidOp($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
                 }
+            }
+
+            if (method.ReturnType == typeof(Task))
+            {
+
             }
 
             Priority = attributes.SelectFirstOrDefault<PriorityAttribute>()?.Priority ?? 0;

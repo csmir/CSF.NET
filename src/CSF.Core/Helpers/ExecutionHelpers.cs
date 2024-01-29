@@ -1,4 +1,5 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
+using CSF.Reflection;
 
 namespace CSF.Helpers
 {
@@ -29,9 +30,9 @@ namespace CSF.Helpers
             return discovered;
         }
 
-        public static async Task<ReadResult[]> RecursiveReadAsync(this IArgument[] param, ICommandContext context, object[] args, int index)
+        public static async Task<ReadResult[]> RecursiveReadAsync(this IArgument[] param, ICommandContext context, object[] args, int index, CancellationToken cancellationToken)
         {
-            static async ValueTask<ReadResult> ReadAsync(IArgument param, ICommandContext context, object arg)
+            static async ValueTask<ReadResult> ReadAsync(IArgument param, ICommandContext context, object arg, CancellationToken cancellationToken)
             {
                 if (arg.GetType() == param.Type)
                     return new(arg);
@@ -39,7 +40,7 @@ namespace CSF.Helpers
                 if (param.IsNullable && arg is null or "null" or "nothing")
                     return new(arg);
 
-                return await param.TypeReader.ObjectEvaluateAsync(context, param, arg);
+                return await param.TypeReader.ObjectEvaluateAsync(context, param, arg, cancellationToken);
             }
 
             var results = new ReadResult[param.Length];
@@ -54,7 +55,7 @@ namespace CSF.Helpers
                     if (parameter.Type == typeof(string))
                         results[i] = new(input);
                     else
-                        results[i] = await ReadAsync(parameter, context, input);
+                        results[i] = await ReadAsync(parameter, context, input, cancellationToken);
 
                     break;
                 }
@@ -67,7 +68,7 @@ namespace CSF.Helpers
 
                 if (parameter is ComplexArgumentInfo complex)
                 {
-                    var result = await complex.Parameters.RecursiveReadAsync(context, args, index);
+                    var result = await complex.Parameters.RecursiveReadAsync(context, args, index, cancellationToken);
 
                     index += result.Length;
 
@@ -86,7 +87,7 @@ namespace CSF.Helpers
                     continue;
                 }
 
-                results[i] = await ReadAsync(parameter, context, args[index]);
+                results[i] = await ReadAsync(parameter, context, args[index], cancellationToken);
                 index++;
             }
 

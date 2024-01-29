@@ -1,4 +1,6 @@
-﻿namespace CSF.Tests.Console.Modules
+﻿using CSF.Core;
+
+namespace CSF.Tests.Console.Modules
 {
     public sealed class AsyncModule : ModuleBase<CommandContext>
     {
@@ -7,13 +9,13 @@
         {
             await Task.Delay(5000);
 
-            Respond("Success. (Delayed).");
+            System.Console.WriteLine("Success. (Delayed).");
         }
 
         [Command("direct")]
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task AsyncRunDirect()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-            => Respond("Success. (Direct).");
+            => System.Console.WriteLine("Success. (Direct).");
     }
 }

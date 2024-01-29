@@ -1,4 +1,5 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
+using CSF.Reflection;
 
 namespace CSF.TypeReaders
 {
@@ -8,7 +9,7 @@ namespace CSF.TypeReaders
 
         public override Type Type { get; } = targetEnumType;
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (Enum.TryParse(Type, value, true, out var result))
                 return ValueTask.FromResult(Success(result));

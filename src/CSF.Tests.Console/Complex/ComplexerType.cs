@@ -1,4 +1,6 @@
-﻿namespace CSF.Tests.Complex
+﻿using CSF.Core;
+
+namespace CSF.Tests.Complex
 {
     public class ComplexerType
     {

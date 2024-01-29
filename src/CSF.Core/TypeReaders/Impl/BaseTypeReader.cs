@@ -1,4 +1,5 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
+using CSF.Reflection;
 
 namespace CSF.TypeReaders
 {
@@ -8,7 +9,7 @@ namespace CSF.TypeReaders
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value)
+        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             var parser = _container.Value[Type] as Tpd<T>;
 

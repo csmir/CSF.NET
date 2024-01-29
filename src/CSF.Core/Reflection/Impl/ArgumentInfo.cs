@@ -1,4 +1,5 @@
-﻿using CSF.Helpers;
+﻿using CSF.Core;
+using CSF.Helpers;
 using CSF.TypeReaders;
 using System.Reflection;
 

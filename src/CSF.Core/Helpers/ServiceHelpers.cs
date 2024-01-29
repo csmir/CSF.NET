@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CSF.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CSF.Helpers
 {
-    internal static class ServiceHelpers
+    public static class ServiceHelpers
     {
         public static IServiceCollection ModulesAddTransient(this IServiceCollection collection, CommandConfiguration configuration)
         {

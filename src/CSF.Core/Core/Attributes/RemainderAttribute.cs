@@ -1,4 +1,4 @@
-﻿namespace CSF
+﻿namespace CSF.Core
 {
     /// <summary>
     ///     Defines that this parameter should be the remainder of the command phrase.

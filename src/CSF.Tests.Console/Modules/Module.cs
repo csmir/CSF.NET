@@ -1,4 +1,5 @@
-﻿using CSF.Tests.Complex;
+﻿using CSF.Core;
+using CSF.Tests.Complex;
 
 namespace CSF.Tests
 {
@@ -8,63 +9,63 @@ namespace CSF.Tests
         [Priority(1)]
         public void Priority1(bool optional = true)
         {
-            Respond($"Success: {Command.Priority}");
+            System.Console.WriteLine($"Success: {Command.Priority}");
         }
 
         [Command("priority")]
         [Priority(2)]
         public Task Priority2(bool optional = false)
         {
-            Respond($"Success: {Command.Priority}");
+            System.Console.WriteLine($"Success: {Command.Priority}");
             return Task.CompletedTask;
         }
 
         [Command("remainder")]
         public void Remainder([Remainder] string values)
         {
-            Respond($"Success: {values}");
+            System.Console.WriteLine($"Success: {values}");
         }
 
         [Command("time")]
         public void TimeOnly(TimeOnly time)
         {
-            Respond($"Success: {time}");
+            System.Console.WriteLine($"Success: {time}");
         }
 
         [Command("multiple")]
         public void Test(bool truee, bool falsee)
         {
-            Respond($"Success: {truee}, {falsee}");
+            System.Console.WriteLine($"Success: {truee}, {falsee}");
         }
 
         [Command("multiple")]
         public void Test(int i1, int i2)
         {
-            Respond($"Success: {i1}, {i2}");
+            System.Console.WriteLine($"Success: {i1}, {i2}");
         }
 
         [Command("optional")]
         public void Test(int i = 0, string str = "")
         {
-            Respond($"Success: {i}, {str}");
+            System.Console.WriteLine($"Success: {i}, {str}");
         }
 
         [Command("nullable")]
         public void Nullable(long? l)
         {
-            Respond($"Success: {l}");
+            System.Console.WriteLine($"Success: {l}");
         }
 
         [Command("complex")]
         public void Complex([Complex] ComplexType complex)
         {
-            Respond($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
+            System.Console.WriteLine($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
         }
 
         [Command("complexnullable")]
         public void Complex([Complex] ComplexerType? complex)
         {
-            Respond($"({complex?.X}, {complex?.Y}, {complex?.Z})");
+            System.Console.WriteLine($"({complex?.X}, {complex?.Y}, {complex?.Z})");
         }
 
         [Group("nested")]
@@ -73,37 +74,37 @@ namespace CSF.Tests
             [Command("multiple")]
             public void Test(bool truee, bool falsee)
             {
-                Respond($"Success: {truee}, {falsee}");
+                System.Console.WriteLine($"Success: {truee}, {falsee}");
             }
 
             [Command("multiple")]
             public void Test(int i1, int i2)
             {
-                Respond($"Success: {i1}, {i2}");
+                System.Console.WriteLine($"Success: {i1}, {i2}");
             }
 
             [Command("optional")]
             public void Test(int i = 0, string str = "")
             {
-                Respond($"Success: {i}, {str}");
+                System.Console.WriteLine($"Success: {i}, {str}");
             }
 
             [Command("nullable")]
             public void Nullable(long? l)
             {
-                Respond($"Success: {l}");
+                System.Console.WriteLine($"Success: {l}");
             }
 
             [Command("complex")]
             public void Complex([Complex] ComplexType complex)
             {
-                Respond($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
+                System.Console.WriteLine($"({complex.X}, {complex.Y}, {complex.Z}) {complex.Complexer}: {complex.Complexer.X}, {complex.Complexer.Y}, {complex.Complexer.Z}");
             }
 
             [Command("complexnullable")]
             public void Complex([Complex] ComplexerType? complex)
             {
-                Respond($"({complex?.X}, {complex?.Y}, {complex?.Z})");
+                System.Console.WriteLine($"({complex?.X}, {complex?.Y}, {complex?.Z})");
             }
         }
     }

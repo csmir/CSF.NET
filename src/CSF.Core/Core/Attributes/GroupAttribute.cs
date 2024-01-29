@@ -1,7 +1,7 @@
 ﻿using CSF.Helpers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CSF
+namespace CSF.Core
 {
     /// <summary>
     ///     Represents a command group, functioning much like subcommands.

@@ -1,8 +1,8 @@
-﻿using CSF.Reflection;
+﻿using CSF.Core;
 using CSF.Exceptions;
 using CSF.Helpers;
+using CSF.Reflection;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics;
 
 namespace CSF.TypeReaders
 {
@@ -10,7 +10,7 @@ namespace CSF.TypeReaders
     {
         public override Type Type { get; } = typeof(T);
 
-        public override abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value);
+        public override abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken);
     }
 
     public abstract class TypeReader
@@ -19,17 +19,17 @@ namespace CSF.TypeReaders
 
         public abstract Type Type { get; }
 
-        public abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value);
+        public abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken);
 
-        internal ValueTask<ReadResult> ObjectEvaluateAsync(ICommandContext context, IArgument parameter, object value)
+        internal ValueTask<ReadResult> ObjectEvaluateAsync(ICommandContext context, IArgument parameter, object value, CancellationToken cancellationToken)
         {
             if (value.GetType() == Type)
                 return ValueTask.FromResult(new ReadResult(value));
 
             if (value is string str)
-                return EvaluateAsync(context, parameter, str);
+                return EvaluateAsync(context, parameter, str, cancellationToken);
 
-            return EvaluateAsync(context, parameter, value.ToString());
+            return EvaluateAsync(context, parameter, value.ToString(), cancellationToken);
         }
 
         public virtual ReadResult Error([DisallowNull] Exception exception)

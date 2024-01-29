@@ -1,6 +1,6 @@
 ﻿using CSF.Reflection;
 
-namespace CSF
+namespace CSF.Core
 {
     public abstract class ModuleBase<T> : ModuleBase
         where T : ICommandContext
@@ -50,12 +50,12 @@ namespace CSF
             return new RunResult(Command, exception: null);
         }
 
-        public virtual ValueTask BeforeExecuteAsync()
+        public virtual ValueTask BeforeExecuteAsync(CancellationToken cancellationToken)
         {
             return ValueTask.CompletedTask;
         }
 
-        public virtual ValueTask AfterExecuteAsync()
+        public virtual ValueTask AfterExecuteAsync(CancellationToken cancellationToken)
         {
             return ValueTask.CompletedTask;
         }

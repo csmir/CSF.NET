@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CSF
+namespace CSF.Core
 {
     public interface ICommandContext
     {
@@ -15,5 +15,9 @@ namespace CSF
         public void LogError(string message, params object[] args);
 
         public void LogCritical(string message, params object[] args);
+
+        internal bool TryGetFallback([NotNullWhen(true)] out ICommandResult result);
+
+        internal void TrySetFallback(ICommandResult result);
     }
 }
