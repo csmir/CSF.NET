@@ -2,15 +2,23 @@
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the result of a match operation within the command execution pipeline.
+    /// </summary>
     public readonly struct MatchResult : ICommandResult
     {
+        /// <inheritdoc />
         public Exception Exception { get; } = null;
 
+        /// <inheritdoc />
+        public bool Success { get; }
+
+        /// <summary>
+        ///     Gets the command known during the matching operation.
+        /// </summary>
         public CommandInfo Command { get; }
 
-        public object[] Reads { get; }
-
-        public bool Success { get; }
+        internal object[] Reads { get; } = null;
 
         internal MatchResult(CommandInfo command, object[] reads)
         {
@@ -22,7 +30,6 @@ namespace CSF
         internal MatchResult(CommandInfo command, Exception exception)
         {
             Command = command;
-            Reads = null;
             Success = false;
 
             Exception = exception;

@@ -266,7 +266,7 @@ namespace CSF.Core
 
                 await module.AfterExecuteAsync(cancellationToken);
 
-                return module.ReturnTypeResolve(value);
+                return await module.ResolveInvocationResultAsync(value);
             }
             catch (Exception exception)
             {

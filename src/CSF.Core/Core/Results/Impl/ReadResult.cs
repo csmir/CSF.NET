@@ -1,12 +1,17 @@
 ﻿namespace CSF
 {
+    /// <summary>
+    ///     Represents the result of a read operation within the command execution pipeline.
+    /// </summary>
     public readonly struct ReadResult : ICommandResult
     {
+        /// <inheritdoc />
         public Exception Exception { get; } = null;
 
-        public object Value { get; }
-
+        /// <inheritdoc />
         public bool Success { get; }
+
+        internal object Value { get; } = null;
 
         internal ReadResult(object value)
         {
@@ -17,7 +22,6 @@
         internal ReadResult(Exception exception)
         {
             Exception = exception;
-            Value = null;
             Success = false;
         }
     }

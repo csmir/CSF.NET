@@ -2,13 +2,24 @@
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the result of a search operation within the command execution pipeline.
+    /// </summary>
     public readonly struct SearchResult : ICommandResult
     {
+        /// <inheritdoc />
         public Exception Exception { get; } = null;
 
-        public CommandInfo Command { get; }
-
+        /// <inheritdoc />
         public bool Success { get; }
+
+        /// <summary>
+        ///     Gets the command that was found for this result.
+        /// </summary>
+        /// <remarks>
+        ///     Will be <see langword="null"/> if <see cref="Success"/> returns <see langword="false"/>.
+        /// </remarks>
+        public CommandInfo Command { get; } = null;
 
         internal int SearchHeight { get; }
 
@@ -22,7 +33,6 @@ namespace CSF
         internal SearchResult(Exception exception)
         {
             Exception = exception;
-            Command = null;
             SearchHeight = 0;
             Success = false;
         }

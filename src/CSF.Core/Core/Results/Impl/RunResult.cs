@@ -2,15 +2,21 @@
 
 namespace CSF
 {
+    /// <summary>
+    ///     Represents the result of an invocation operation within the command execution pipeline.
+    /// </summary>
     public readonly struct RunResult : ICommandResult
     {
+        /// <inheritdoc />
         public Exception Exception { get; } = null;
 
-        public object ReturnType { get; } = null;
-
-        public CommandInfo Command { get; }
-
+        /// <inheritdoc />
         public bool Success { get; }
+
+        /// <summary>
+        ///     Gets the command responsible for the invocation.
+        /// </summary>
+        public CommandInfo Command { get; }
 
         internal RunResult(CommandInfo command, Exception exception)
         {
@@ -19,9 +25,8 @@ namespace CSF
             Success = false;
         }
 
-        internal RunResult(CommandInfo command, object returnValue)
+        internal RunResult(CommandInfo command)
         {
-            ReturnType = returnValue;
             Command = command;
             Success = true;
         }
