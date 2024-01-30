@@ -242,10 +242,5 @@ namespace CSF.Core
         {
 
         }
-
-        public override string ToString()
-        {
-
-        }
     }
 }
