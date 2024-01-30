@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CSF
+﻿namespace CSF
 {
     public interface ICommandResult
     {

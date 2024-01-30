@@ -33,7 +33,7 @@ namespace CSF.Helpers
 
                 // thrown when collection is null.
                 throw new ArgumentException(
-                    message: "Provided collection must be initialized. It is not allowed to be null.", 
+                    message: "Provided collection must be initialized. It is not allowed to be null.",
                     paramName: arg);
             }
 
@@ -41,7 +41,7 @@ namespace CSF.Helpers
             if (value is string)
             {
                 throw new ArgumentMissingException(
-                    message: "Provided string must carry at least a character that is not whitespace. It is not allowed to be null or empty.", 
+                    message: "Provided string must carry at least a character that is not whitespace. It is not allowed to be null or empty.",
                     paramName: arg);
             }
 
@@ -56,7 +56,7 @@ namespace CSF.Helpers
         public static void NotDistinct(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
         {
             throw new ArgumentException(
-                message: "Provided collection cannot contain duplicate values.", 
+                message: "Provided collection cannot contain duplicate values.",
                 paramName: arg);
         }
     }

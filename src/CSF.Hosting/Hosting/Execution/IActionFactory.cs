@@ -12,7 +12,7 @@ namespace CSF.Hosting
     public interface IActionFactory<T> : IActionFactory
         where T : ICommandContext
     {
-        public new ValueTask<T> CreateContextAsync(CancellationToken cancellationToken); 
+        public new ValueTask<T> CreateContextAsync(CancellationToken cancellationToken);
 
         async ValueTask<ICommandContext> IActionFactory.CreateContextAsync(CancellationToken cancellationToken)
         {

@@ -3,7 +3,6 @@ using CSF.Helpers;
 using CSF.Reflection;
 using CSF.TypeReaders;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel;
 
 [assembly: CLSCompliant(true)]
 
@@ -37,7 +36,7 @@ namespace CSF.Core
 
             Services = services;
 
-            _resultHandle = services.GetService<ResultResolver>() ?? ResultResolver.Default;  
+            _resultHandle = services.GetService<ResultResolver>() ?? ResultResolver.Default;
 
             Configuration = configuration;
         }
@@ -246,7 +245,7 @@ namespace CSF.Core
 
         public override string ToString()
         {
-            
+
         }
     }
 }

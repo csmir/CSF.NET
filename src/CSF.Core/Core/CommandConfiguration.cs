@@ -7,7 +7,7 @@ namespace CSF.Core
 {
     public class CommandConfiguration
     {
-        private Assembly[] _assemblies = [ Assembly.GetExecutingAssembly() ];
+        private Assembly[] _assemblies = [Assembly.GetExecutingAssembly()];
 
         public Assembly[] Assemblies
         {

@@ -2,11 +2,6 @@
 using CSF.Hosting;
 using CSF.Parsing;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSF.Tests.Hosting
 {
@@ -47,7 +42,7 @@ namespace CSF.Tests.Hosting
 
         public void Dispose()
         {
-            
+
         }
     }
 }

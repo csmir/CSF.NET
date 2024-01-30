@@ -19,7 +19,7 @@ await Host.CreateDefaultBuilder(args)
             }
             else
             {
-                
+
             }
         });
     })
