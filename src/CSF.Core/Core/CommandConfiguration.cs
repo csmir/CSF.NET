@@ -46,7 +46,7 @@ namespace CSF.Core
         private ResultResolver _resultResolver = ResultResolver.Default;
 
         /// <summary>
-        ///     Gets a resolver that contains a handler for handling command post-execution data.
+        ///     Gets or sets a resolver that contains a handler for handling command post-execution data.
         /// </summary>
         public ResultResolver ResultResolver
         {
@@ -54,7 +54,18 @@ namespace CSF.Core
             {
                 return _resultResolver;
             }
+            set
+            {
+                if (value == null)
+                {
+                    ThrowHelpers.InvalidArg(value);
+                }
+
+                _resultResolver = value;
+            }
         }
+
+        private AsyncApproach _asyncApproach = AsyncApproach.Default;
 
         /// <summary>
         ///     Gets or sets the approach to asynchronousity in commands.
@@ -64,7 +75,22 @@ namespace CSF.Core
         ///     If set to <see cref="AsyncApproach.Discard"/>, the manager will seperate the command execution from the entry stack, and slip it to another thread. 
         ///     Only change this value if you have read the documentation of <see cref="Core.AsyncApproach"/> and understand the definitions.
         /// </remarks>
-        public AsyncApproach AsyncApproach { get; set; } = AsyncApproach.Default;
+        public AsyncApproach AsyncApproach
+        {
+            get
+            {
+                return _asyncApproach;
+            }
+            set
+            {
+                if (value is not AsyncApproach.Await or AsyncApproach.Discard)
+                {
+                    ThrowHelpers.InvalidOp("AsyncApproach does not support values that exceed the provided options, ranging between 0 and 1.");
+                }
+
+                _asyncApproach = value;
+            }
+        }
 
         /// <summary>
         ///     Replaces the existing values in <see cref="Assemblies"/> with a new collection.
@@ -147,7 +173,7 @@ namespace CSF.Core
                 ThrowHelpers.InvalidArg(typeReaders);
             }
 
-            _typeReaders = typeReaders.Distinct(TypeReaderEqualityComparer.Default).ToArray();
+            _typeReaders = typeReaders.Distinct(TypeReader.EqualityComparer.Default).ToArray();
 
             return this;
         }
@@ -167,7 +193,7 @@ namespace CSF.Core
                 ThrowHelpers.InvalidArg(typeReader);
             }
 
-            if (_typeReaders.Contains(typeReader, TypeReaderEqualityComparer.Default))
+            if (_typeReaders.Contains(typeReader, TypeReader.EqualityComparer.Default))
             {
                 ThrowHelpers.NotDistinct(typeReader);
             }
@@ -189,7 +215,7 @@ namespace CSF.Core
         {
             if (typeReader != null)
             {
-                if (!_typeReaders.Contains(typeReader, TypeReaderEqualityComparer.Default))
+                if (!_typeReaders.Contains(typeReader, TypeReader.EqualityComparer.Default))
                 {
                     AddTr(typeReader);
                 }

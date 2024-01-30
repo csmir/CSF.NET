@@ -69,5 +69,34 @@ namespace CSF.TypeReaders
 
             return range;
         }
+
+        internal class EqualityComparer : IEqualityComparer<TypeReader>
+        {
+            private static readonly Lazy<EqualityComparer> _i = new();
+
+            public bool Equals(TypeReader x, TypeReader y)
+            {
+                if (x == y)
+                    return true;
+
+                if (x.Type == y.Type)
+                    return true;
+
+                return false;
+            }
+
+            public int GetHashCode([DisallowNull] TypeReader obj)
+            {
+                return obj.GetHashCode();
+            }
+
+            public static EqualityComparer Default
+            {
+                get
+                {
+                    return _i.Value;
+                }
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace CSF.Hosting
         {
             var context = await ActionFactory.CreateContextAsync(cancellationToken).ConfigureAwait(false);
 
-            await ExecuteAsync(context, args, cancellationToken);
+            await TryExecuteAsync(context, args, cancellationToken);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

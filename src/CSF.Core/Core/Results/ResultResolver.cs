@@ -2,7 +2,7 @@
 {
     public sealed class ResultResolver(Func<ICommandContext, ICommandResult, IServiceProvider, Task> handler)
     {
-        private static readonly ResultResolver _i = new(null);
+        private static readonly Lazy<ResultResolver> _i = new(() => new ResultResolver(null));
 
         public Func<ICommandContext, ICommandResult, IServiceProvider, Task> Handler { get; } = handler;
 
@@ -20,7 +20,7 @@
         {
             get
             {
-                return _i;
+                return _i.Value;
             }
         }
     }

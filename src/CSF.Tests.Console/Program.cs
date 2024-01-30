@@ -32,5 +32,5 @@ while (true)
 {
     var input = parser.Parse(Console.ReadLine()!);
 
-    await framework.ExecuteAsync(null, input);
+    await framework.TryExecuteAsync(null, input);
 }

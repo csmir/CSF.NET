@@ -8,46 +8,95 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CSF.Core
 {
+    /// <summary>
+    ///     The root type serving as a basis for all operations and functionality as provided by the Command Standardization Framework.
+    /// </summary>
+    /// <remarks>
+    ///     This API is completely CLS compliant where it is supported, always implementing an overload that is CLS compliant, where it otherwise would not be.
+    /// </remarks>
     public class CommandManager : IDisposable
     {
         private readonly object _searchLock = new();
         private readonly ResultResolver _resultHandle;
 
-        public IReadOnlySet<IConditional> Components { get; }
+        /// <summary>
+        ///     Gets the collection containing all commands, groups and subcommands as implemented by the assemblies that were registered in the <see cref="CommandConfiguration"/> provided when creating the manager.
+        /// </summary>
+        public IReadOnlySet<IConditional> Commands { get; }
 
+        /// <summary>
+        ///     Gets the services used to create transient instances of modules that host command execution, with full support for dependency injection in mind.
+        /// </summary>
         public IServiceProvider Services { get; }
 
-        public TypeReader[] TypeReaders { get; }
-
+        /// <summary>
+        ///     Gets the configuration used to configure execution operations and registration options.
+        /// </summary>
         public CommandConfiguration Configuration { get; }
 
+        /// <summary>
+        ///     Creates a new instance of <see cref="CommandManager"/> with provided arguments.
+        /// </summary>
+        /// <remarks>
+        ///     It is suggested to configure and create the <see cref="CommandManager"/> by calling <see cref="ServiceHelpers.ConfigureCommands(IServiceCollection, Action{CommandConfiguration})"/>.
+        ///     Creating the manager manually will have a negative impact on performance, unless each <see cref="ModuleBase"/> is manually added to the <paramref name="services"/> as provided.
+        /// </remarks>
+        /// <param name="services">A built collection of services that hosts services to be injected or received at request.</param>
+        /// <param name="configuration">A configuration to be used to configure the execution and registration of commands.</param>
         public CommandManager(IServiceProvider services, CommandConfiguration configuration)
         {
-            TypeReaders = configuration.TypeReaders.Distinct(TypeReaderEqualityComparer.Default).ToArray();
-
             if (configuration.Assemblies == null || configuration.Assemblies.Length == 0)
             {
                 ThrowHelpers.InvalidArg(nameof(configuration.Assemblies));
             }
 
-            Components = BuildComponents(configuration)
+            Commands = BuildComponents(configuration)
                 .SelectMany(x => x.Components)
                 .ToHashSet();
 
+            services ??= ServiceProvider.Default;
+
             Services = services;
-
-            _resultHandle = services.GetService<ResultResolver>() ?? ResultResolver.Default;
-
             Configuration = configuration;
+
+            _resultHandle = services.GetService<ResultResolver>() 
+                ?? ResultResolver.Default;
         }
 
-        public void Execute(ICommandContext context, params object[] args)
-            => ExecuteAsync(context, args).Wait();
+        /// <summary>
+        ///     Makes an attempt at executing a command from provided <paramref name="args"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The arguments intended for searching for a target need to be <see cref="string"/>, as <see cref="ModuleInfo"/> and <see cref="CommandInfo"/> store their aliases this way also.
+        /// </remarks>
+        /// <param name="context">A command context that persist for the duration of the execution pipeline, serving as a metadata and logging container.</param>
+        /// <param name="args">A set of arguments that are expected to discover, populate and invoke a target command.</param>
+        public void TryExecute(ICommandContext context, params object[] args)
+            => TryExecuteAsync(context, args).Wait();
 
-        public Task ExecuteAsync(ICommandContext context, params object[] args)
-            => ExecuteAsync(context, args, cancellationToken: default);
+        /// <summary>
+        ///     Makes an attempt at executing a command from provided <paramref name="args"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The arguments intended for searching for a target need to be <see cref="string"/>, as <see cref="ModuleInfo"/> and <see cref="CommandInfo"/> store their aliases this way also.
+        /// </remarks>
+        /// <param name="context">A command context that persist for the duration of the execution pipeline, serving as a metadata and logging container.</param>
+        /// <param name="args">A set of arguments that are expected to discover, populate and invoke a target command.</param>
+        /// <returns>An awaitable <see cref="Task"/> hosting the state of execution. This task should be awaited, even if <see cref="CommandConfiguration.AsyncApproach"/> is set to <see cref="AsyncApproach.Discard"/>.</returns>
+        public Task TryExecuteAsync(ICommandContext context, params object[] args)
+            => TryExecuteAsync(context, args, cancellationToken: default);
 
-        public async Task ExecuteAsync(ICommandContext context, object[] args, CancellationToken cancellationToken = default)
+        /// <summary>
+        ///     Makes an attempt at executing a command from provided <paramref name="args"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The arguments intended for searching for a target need to be <see cref="string"/>, as <see cref="ModuleInfo"/> and <see cref="CommandInfo"/> store their aliases this way also.
+        /// </remarks>
+        /// <param name="context">A command context that persist for the duration of the execution pipeline, serving as a metadata and logging container.</param>
+        /// <param name="args">A set of arguments that are expected to discover, populate and invoke a target command.</param>
+        /// <param name="cancellationToken">A token that can be provided from a <see cref="CancellationTokenSource"/> and later used to cancel asynchronous execution.</param>
+        /// <returns>An awaitable <see cref="Task"/> hosting the state of execution. This task should be awaited, even if <see cref="CommandConfiguration.AsyncApproach"/> is set to <see cref="AsyncApproach.Discard"/>.</returns>
+        public async Task TryExecuteAsync(ICommandContext context, object[] args, CancellationToken cancellationToken = default)
         {
             switch (Configuration.AsyncApproach)
             {
@@ -66,12 +115,17 @@ namespace CSF.Core
             }
         }
 
+        /// <summary>
+        ///     Searches all commands for any matches of <paramref name="args"/>.
+        /// </summary>
+        /// <param name="args">A set of arguments intended to discover commands as a query.</param>
+        /// <returns>A lazily evaluated <see cref="IEnumerable{T}"/> that holds the results of the search query.</returns>
         public IEnumerable<SearchResult> Search(object[] args)
         {
             // recursively search for commands in the execution.
             lock (_searchLock)
             {
-                return Components.RecursiveSearch(args, 0);
+                return Commands.RecursiveSearch(args, 0);
             }
         }
 
@@ -196,7 +250,11 @@ namespace CSF.Core
             {
                 context.LogInformation("Executing {} with {} resolved arguments.", match.Command, match.Reads.Length);
 
-                var module = Services.GetService(match.Command.Module.Type) as ModuleBase;
+                var targetInstance = Services.GetService(match.Command.Module.Type);
+
+                var module = targetInstance != null 
+                    ? targetInstance as ModuleBase 
+                    : ActivatorUtilities.CreateInstance(Services, match.Command.Module.Type) as ModuleBase;
 
                 module.Context = context;
                 module.Command = match.Command;
@@ -220,7 +278,7 @@ namespace CSF.Core
         #region Building
         private IEnumerable<ModuleInfo> BuildComponents(CommandConfiguration configuration)
         {
-            var typeReaders = TypeReader.CreateDefaultReaders().UnionBy(TypeReaders, x => x.Type).ToDictionary(x => x.Type, x => x);
+            var typeReaders = TypeReader.CreateDefaultReaders().UnionBy(configuration.TypeReaders, x => x.Type).ToDictionary(x => x.Type, x => x);
 
             var rootType = typeof(ModuleBase);
             foreach (var assembly in configuration.Assemblies)
@@ -237,6 +295,24 @@ namespace CSF.Core
             }
         }
         #endregion
+
+        internal class ServiceProvider : IServiceProvider
+        {
+            private static readonly Lazy<ServiceProvider> _i = new();
+
+            public object GetService(Type serviceType)
+            {
+                return null;
+            }
+
+            public static ServiceProvider Default
+            {
+                get
+                {
+                    return _i.Value;
+                }
+            }
+        }
 
         public void Dispose()
         {
