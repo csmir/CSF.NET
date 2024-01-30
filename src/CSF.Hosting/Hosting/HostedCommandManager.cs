@@ -3,6 +3,8 @@ using CSF.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+[assembly: CLSCompliant(true)]
+
 namespace CSF.Hosting
 {
     public class HostedCommandManager : CommandManager, IHostedService

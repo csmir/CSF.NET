@@ -4,10 +4,8 @@ using System.ComponentModel;
 
 namespace CSF.Helpers
 {
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public static class ExecutionHelpers
+    internal static class ExecutionHelpers
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<SearchResult> RecursiveSearch(this IEnumerable<IConditional> components, object[] args, int searchHeight)
         {
             List<SearchResult> discovered = [];
@@ -33,7 +31,6 @@ namespace CSF.Helpers
             return discovered;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static async Task<ReadResult[]> RecursiveReadAsync(this IArgument[] param, ICommandContext context, object[] args, int index, CancellationToken cancellationToken)
         {
             static async ValueTask<ReadResult> ReadAsync(IArgument param, ICommandContext context, object arg, CancellationToken cancellationToken)

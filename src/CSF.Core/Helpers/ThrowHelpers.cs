@@ -1,14 +1,21 @@
-﻿using CSF.Exceptions;
-using System.Collections;
+﻿using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace CSF.Helpers
 {
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    /// <summary>
+    ///     Represents a set of methods to throw exceptions for the invalid state of objects or operations.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ThrowHelpers
     {
+        /// <summary>
+        ///     Throws <see cref="InvalidOperationException"/> for any use.
+        /// </summary>
+        /// <param name="failureMessage">The message to throw.</param>
+        /// <exception cref="InvalidOperationException"></exception>
         [DoesNotReturn]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InvalidOp([DisallowNull] string failureMessage)
@@ -16,6 +23,12 @@ namespace CSF.Helpers
             throw new InvalidOperationException(failureMessage);
         }
 
+        /// <summary>
+        ///     Throws <see cref="ArgumentException"/> for value population.
+        /// </summary>
+        /// <param name="value">The object for which to throw</param>
+        /// <param name="arg">Do not set.</param>
+        /// <exception cref="ArgumentException"></exception>
         [DoesNotReturn]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InvalidArg(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
@@ -40,8 +53,8 @@ namespace CSF.Helpers
             // if value is a string, this check ensures that more data is provided at throw, regarding the state of the string.
             if (value is string)
             {
-                throw new ArgumentMissingException(
-                    message: "Provided string must carry at least a character that is not whitespace. It is not allowed to be null or empty.",
+                throw new ArgumentException(
+                    message: "Provided string must carry at least one character that is not whitespace. It is not allowed to be null or empty.",
                     paramName: arg);
             }
 
@@ -51,6 +64,12 @@ namespace CSF.Helpers
                 paramName: arg);
         }
 
+        /// <summary>
+        ///     Throws <see cref="ArgumentException"/> for duplicate values in a collection.
+        /// </summary>
+        /// <param name="value">The object for which to throw.</param>
+        /// <param name="arg">Do not set.</param>
+        /// <exception cref="ArgumentException"></exception>
         [DoesNotReturn]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void NotDistinct(object value, [CallerArgumentExpression(nameof(value))] string arg = null)

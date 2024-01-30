@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace CSF.Tests.Hosting
 {
-    public class Factory : IActionFactory<HostedCommandContext>
+    public class ActionFactory : IActionFactory<HostedCommandContext>
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly StringParser _stringParser;
 
-        public Factory(ILoggerFactory loggerFactory)
+        public ActionFactory(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
             _stringParser = new StringParser();

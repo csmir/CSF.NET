@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 await Host.CreateDefaultBuilder(args)
-    .ConfigureCommands<Factory>((context, configuration) =>
+    .ConfigureCommands<ActionFactory>((context, configuration) =>
     {
         configuration.AsyncApproach = AsyncApproach.Await;
 

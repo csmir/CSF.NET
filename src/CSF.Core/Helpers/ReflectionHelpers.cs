@@ -7,10 +7,8 @@ using System.Reflection;
 
 namespace CSF.Helpers
 {
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public static class ReflectionHelpers
+    internal static class ReflectionHelpers
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var group in module.Type.GetNestedTypes())
@@ -25,7 +23,6 @@ namespace CSF.Helpers
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<CommandInfo> GetCommands(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
         {
             foreach (var method in module.Type.GetMethods())
