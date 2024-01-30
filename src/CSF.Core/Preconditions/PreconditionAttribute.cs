@@ -16,7 +16,7 @@ namespace CSF.Preconditions
         public static CheckResult Error([DisallowNull] Exception exception)
         {
             if (exception == null)
-                ThrowHelpers.ArgMissing(exception);
+                ThrowHelpers.InvalidArg(exception);
 
             if (exception is CheckException checkEx)
             {
@@ -28,7 +28,7 @@ namespace CSF.Preconditions
         public virtual CheckResult Error([DisallowNull] string error)
         {
             if (string.IsNullOrEmpty(error))
-                ThrowHelpers.ArgMissing(error);
+                ThrowHelpers.InvalidArg(error);
 
             return new(new CheckException(error));
         }

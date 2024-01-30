@@ -42,12 +42,12 @@ namespace CSF.Hosting
 
                     if (args == null)
                     {
-                        ThrowHelpers.ArgMissing(args);
+                        ThrowHelpers.InvalidArg(args);
                     }
 
                     if (args.Length == 0)
                     {
-                        ThrowHelpers.ArgMissing(args);
+                        ThrowHelpers.InvalidArg(args);
                     }
 
                     await ExecuteAsync(args, cancellationToken).ConfigureAwait(false);

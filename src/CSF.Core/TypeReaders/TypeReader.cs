@@ -35,7 +35,7 @@ namespace CSF.TypeReaders
         public virtual ReadResult Error([DisallowNull] Exception exception)
         {
             if (exception == null)
-                ThrowHelpers.ArgMissing(exception);
+                ThrowHelpers.InvalidArg(exception);
 
             if (exception is ReadException readEx)
             {
@@ -47,7 +47,7 @@ namespace CSF.TypeReaders
         public virtual ReadResult Error([DisallowNull] string error)
         {
             if (string.IsNullOrEmpty(error))
-                ThrowHelpers.ArgMissing(error);
+                ThrowHelpers.InvalidArg(error);
 
             return new(new ReadException(error));
         }

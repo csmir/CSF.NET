@@ -21,7 +21,7 @@ namespace CSF.Core
         public DescriptionAttribute([DisallowNull] string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                ThrowHelpers.ArgMissing(description);
+                ThrowHelpers.InvalidArg(description);
 
             Description = description;
         }

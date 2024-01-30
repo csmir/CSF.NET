@@ -12,12 +12,11 @@ namespace CSF.Core
     public class CommandManager : IDisposable
     {
         private readonly object _searchLock = new();
+        private readonly ResultResolver _resultHandle;
 
         public IReadOnlySet<IConditional> Components { get; }
 
         public IServiceProvider Services { get; }
-
-        public IResultHandler ResultHandler { get; }
 
         public TypeReader[] TypeReaders { get; }
 
@@ -25,11 +24,11 @@ namespace CSF.Core
 
         public CommandManager(IServiceProvider services, CommandConfiguration configuration)
         {
-            TypeReaders = configuration.TypeReaders.Distinct().ToArray();
+            TypeReaders = configuration.TypeReaders.Distinct(TypeReaderEqualityComparer.Default).ToArray();
 
             if (configuration.Assemblies == null || configuration.Assemblies.Length == 0)
             {
-                ThrowHelpers.ArgMissing(nameof(configuration.Assemblies));
+                ThrowHelpers.InvalidArg(nameof(configuration.Assemblies));
             }
 
             Components = BuildComponents(configuration)
@@ -38,7 +37,7 @@ namespace CSF.Core
 
             Services = services;
 
-            ResultHandler = services.GetService<IResultHandler>();  
+            _resultHandle = services.GetService<ResultResolver>() ?? ResultResolver.Default;  
 
             Configuration = configuration;
         }
@@ -94,7 +93,8 @@ namespace CSF.Core
                 if (match.Success)
                 {
                     var result = await RunAsync(context, match, cancellationToken);
-                    await ResultHandler.HandleAsync(context, result, cancellationToken);
+
+                    await _resultHandle.TryHandleAsync(context, result, Services);
 
                     return;
                 }
@@ -105,13 +105,13 @@ namespace CSF.Core
             // if no searches were found, we send searchfailure.
             if (c is 0)
             {
-                await ResultHandler.HandleAsync(context, new SearchResult(new SearchException("No commands were found with the provided input.")), cancellationToken);
+                await _resultHandle.TryHandleAsync(context, new SearchResult(new SearchException("No commands were found with the provided input.")), Services);
             }
 
             // if there is a fallback present, we send matchfailure.
             if (context.TryGetFallback(out var fallback))
             {
-                await ResultHandler.HandleAsync(context, fallback, cancellationToken);
+                await _resultHandle.TryHandleAsync(context, fallback, Services);
             }
         }
         #endregion

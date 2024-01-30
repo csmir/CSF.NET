@@ -6,9 +6,21 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 await Host.CreateDefaultBuilder(args)
-    .WithCommands<Factory>((context, config) =>
+    .WithCommands<Factory>((context, configuration) =>
     {
-        config.Assemblies = [ Assembly.GetEntryAssembly() ];
+        configuration.TryAddAssembly(Assembly.GetEntryAssembly());
+
+        configuration.ConfigureResultAction(async (context, result, services) =>
+        {
+            if (result.Success)
+            {
+
+            }
+            else
+            {
+                
+            }
+        });
     })
     .ConfigureLogging(x =>
     {

@@ -29,7 +29,7 @@ namespace CSF.Tests.Hosting
 
             if (args.Length == 0)
             {
-                ThrowHelpers.ArgMissing(args);
+                ThrowHelpers.InvalidArg(args);
             }
 
             return ValueTask.FromResult(args);
