@@ -1,10 +1,26 @@
 ﻿using CSF.Core;
-using CSF.Parsing;
 using CSF.Helpers;
+using CSF.Parsing;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 var collection = new ServiceCollection()
-    .WithCommands(_ => { });
+    .ConfigureCommands(configuration =>
+    {
+        configuration.AsyncApproach = AsyncApproach.Await;
+        configuration.ConfigureResultAction(async (context, result, services) =>
+        {
+            if (result.Success)
+            {
+
+            }
+            else
+            {
+
+            }
+        });
+        configuration.WithAssemblies(Assembly.GetEntryAssembly());
+    });
 
 var services = collection.BuildServiceProvider();
 

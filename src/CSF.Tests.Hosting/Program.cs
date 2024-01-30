@@ -1,15 +1,16 @@
-﻿using CSF.Helpers;
-using CSF.Hosting;
+﻿using CSF.Core;
+using CSF.Helpers;
 using CSF.Tests.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 await Host.CreateDefaultBuilder(args)
-    .WithCommands<Factory>((context, configuration) =>
+    .ConfigureCommands<Factory>((context, configuration) =>
     {
-        configuration.TryAddAssembly(Assembly.GetEntryAssembly());
+        configuration.AsyncApproach = AsyncApproach.Await;
 
+        configuration.TryAddAssembly(Assembly.GetEntryAssembly());
         configuration.ConfigureResultAction(async (context, result, services) =>
         {
             if (result.Success)

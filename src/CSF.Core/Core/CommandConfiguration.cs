@@ -2,7 +2,6 @@
 using CSF.TypeReaders;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CSF.Core
 {
@@ -38,7 +37,7 @@ namespace CSF.Core
             }
         }
 
-        public TaskAwaitOptions ExecutionPattern { get; set; }
+        public AsyncApproach AsyncApproach { get; set; }
 
         public CommandConfiguration WithAssemblies(params Assembly[] assemblies)
         {

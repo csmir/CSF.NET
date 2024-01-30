@@ -11,13 +11,13 @@ namespace CSF.Helpers
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static class ServiceHelpers
     {
-        public static IHostBuilder WithCommands<TFactory>(this IHostBuilder builder, [DisallowNull] Action<HostBuilderContext, CommandConfiguration> configureDelegate)
+        public static IHostBuilder ConfigureCommands<TFactory>(this IHostBuilder builder, [DisallowNull] Action<HostBuilderContext, CommandConfiguration> configureDelegate)
             where TFactory : class, IActionFactory
         {
-            return builder.WithCommands<HostedCommandManager, TFactory>(configureDelegate);
+            return builder.ConfigureCommands<HostedCommandManager, TFactory>(configureDelegate);
         }
 
-        public static IHostBuilder WithCommands<TManager, TFactory>(this IHostBuilder builder, [DisallowNull] Action<HostBuilderContext, CommandConfiguration> configureDelegate)
+        public static IHostBuilder ConfigureCommands<TManager, TFactory>(this IHostBuilder builder, [DisallowNull] Action<HostBuilderContext, CommandConfiguration> configureDelegate)
             where TManager : HostedCommandManager where TFactory : class, IActionFactory
         {
             builder.ConfigureServices((context, services) =>

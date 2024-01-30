@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSF.Core
 {
-    public enum TaskAwaitOptions
+    public enum AsyncApproach
     {
         Default = Await,
 

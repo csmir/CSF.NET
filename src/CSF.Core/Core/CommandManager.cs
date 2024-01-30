@@ -50,15 +50,15 @@ namespace CSF.Core
 
         public async Task ExecuteAsync(ICommandContext context, object[] args, CancellationToken cancellationToken = default)
         {
-            switch (Configuration.ExecutionPattern)
+            switch (Configuration.AsyncApproach)
             {
-                case TaskAwaitOptions.Await:
+                case AsyncApproach.Await:
                     {
                         context.LogDebug("Starting execution. Execution pattern = [Await].");
                         await ExecuteInternalAsync(context, args, cancellationToken);
                     }
                     return;
-                case TaskAwaitOptions.Discard:
+                case AsyncApproach.Discard:
                     {
                         context.LogDebug("Starting execution. Execution pattern = [Discard].");
                         _ = ExecuteInternalAsync(context, args, cancellationToken);

@@ -9,21 +9,21 @@ namespace CSF.Helpers
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static class ServiceHelpers
     {
-        public static IServiceCollection WithCommands(this IServiceCollection collection, [DisallowNull] Action<CommandConfiguration> action)
+        public static IServiceCollection ConfigureCommands(this IServiceCollection collection, [DisallowNull] Action<CommandConfiguration> configureDelegate)
         {
-            collection.WithCommands<CommandManager>(action);
+            collection.WithCommands<CommandManager>(configureDelegate);
 
             return collection;
         }
 
-        public static IServiceCollection WithCommands<T>(this IServiceCollection collection, [DisallowNull] Action<CommandConfiguration> action)
+        public static IServiceCollection WithCommands<T>(this IServiceCollection collection, [DisallowNull] Action<CommandConfiguration> configureDelegate)
             where T : CommandManager
         {
-            var cmdConf = new CommandConfiguration();
+            var configuration = new CommandConfiguration();
 
-            action(cmdConf);
+            configureDelegate(configuration);
 
-            collection.WithCommands<T>(cmdConf);
+            collection.WithCommands<T>(configuration);
 
             return collection;
         }
