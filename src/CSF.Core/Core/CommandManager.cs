@@ -234,7 +234,7 @@ namespace CSF.Core
 
             foreach (var precon in command.Preconditions)
             {
-                var result = await precon.EvaluateAsync(context, command, cancellationToken);
+                var result = await precon.EvaluateAsync(context, Services, command, cancellationToken);
 
                 if (!result.Success)
                     return result;

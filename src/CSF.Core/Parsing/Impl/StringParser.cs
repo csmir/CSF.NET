@@ -2,11 +2,33 @@
 
 namespace CSF.Parsing
 {
+    /// <summary>
+    ///     The default implementation of <see cref="Parser{T}"/>, implementing <see cref="string"/> as the raw value.
+    /// </summary>
+    /// <remarks>
+    ///     As edge cases are discovered in the parser logic, the parser guidelines may change, and command input might improve, or degrade based on different usecases.
+    /// </remarks>
     public class StringParser : Parser<string>
     {
         const char quote = '"';
         const char whitespace = ' ';
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This parser sets the following guidelines:
+        ///     <list type="number">
+        ///         <item>
+        ///             <b>Whitespace</b> announcements will wrap the previous argument and build a new one.
+        ///         </item>
+        ///         <item>
+        ///             <b>Quotations</b> will wrap the previous argument and build a new one.
+        ///         </item>
+        ///         <item>
+        ///             <b>Quoted</b> arguments will start when a start-quote is discovered, and consider all following whitespace as part of the previous argument. 
+        ///             This argument will only be wrapped when an end-quote is announced.
+        ///         </item>
+        ///     </list>
+        /// </remarks>
         public override object[] Parse(string toParse)
         {
             var arr = Array.Empty<string>();

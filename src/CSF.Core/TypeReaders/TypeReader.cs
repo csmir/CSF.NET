@@ -9,13 +9,11 @@ namespace CSF.TypeReaders
     public abstract class TypeReader<T> : TypeReader
     {
         public override Type Type { get; } = typeof(T);
-
-        public override abstract ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken);
     }
 
     public abstract class TypeReader
     {
-        private static readonly string _exHeader = "TypeReader failed to parse provided value as '{0}'. View inner exception for more details.";
+        const string _exHeader = "TypeReader failed to parse provided value as '{0}'. View inner exception for more details.";
 
         public abstract Type Type { get; }
 
