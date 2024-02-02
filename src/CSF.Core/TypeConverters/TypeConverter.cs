@@ -4,7 +4,7 @@ using CSF.Helpers;
 using CSF.Reflection;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CSF.TypeReaders
+namespace CSF.TypeConverters
 {
     /// <inheritdoc />
     /// <typeparam name="T">The type this <see cref="TypeConverter{T}"/> should convert into.</typeparam>

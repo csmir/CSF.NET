@@ -2,7 +2,7 @@
 using CSF.Reflection;
 using System.Text.RegularExpressions;
 
-namespace CSF.TypeReaders
+namespace CSF.TypeConverters
 {
     internal partial class TimeSpanConverter : TypeConverter<TimeSpan>
     {
@@ -35,7 +35,7 @@ namespace CSF.TypeReaders
             };
         }
 
-        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IServiceProvider services, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (!TimeSpan.TryParse(value, out TimeSpan span))
             {

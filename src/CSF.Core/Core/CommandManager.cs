@@ -1,7 +1,7 @@
 ﻿using CSF.Exceptions;
 using CSF.Helpers;
 using CSF.Reflection;
-using CSF.TypeReaders;
+using CSF.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: CLSCompliant(true)]
@@ -204,7 +204,7 @@ namespace CSF.Core
             context.LogDebug("Attempting argument conversion for {}", search.Command);
 
             // skip if no parameters exist.
-            if (!search.Command.HasParameters)
+            if (!search.Command.HasArguments)
                 return [];
 
             // determine height of search to discover command name.
@@ -212,15 +212,15 @@ namespace CSF.Core
 
             // check if input equals command length.
             if (search.Command.MaxLength == length)
-                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // check if input is longer than command, but remainder to concatenate.
             if (search.Command.MaxLength <= length && search.Command.HasRemainder)
-                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // check if input is shorter than command, but optional parameters to replace.
             if (search.Command.MaxLength > length && search.Command.MinLength <= length)
-                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // input is too long or too short.
             return [];

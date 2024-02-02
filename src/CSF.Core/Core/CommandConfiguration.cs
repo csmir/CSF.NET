@@ -1,5 +1,5 @@
 ﻿using CSF.Helpers;
-using CSF.TypeReaders;
+using CSF.TypeConverters;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 

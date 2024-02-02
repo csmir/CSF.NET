@@ -1,7 +1,7 @@
 ﻿using CSF.Core;
 using CSF.Reflection;
 
-namespace CSF.TypeReaders
+namespace CSF.TypeConverters
 {
     internal class EnumTypeReader(Type targetEnumType) : TypeConverter
     {
@@ -9,7 +9,7 @@ namespace CSF.TypeReaders
 
         public override Type Type { get; } = targetEnumType;
 
-        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IServiceProvider services, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (Enum.TryParse(Type, value, true, out var result))
                 return ValueTask.FromResult(Success(result));

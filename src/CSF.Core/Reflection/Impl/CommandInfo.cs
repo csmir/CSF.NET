@@ -1,38 +1,59 @@
 ﻿using CSF.Core;
 using CSF.Helpers;
 using CSF.Preconditions;
-using CSF.TypeReaders;
+using CSF.TypeConverters;
 using System.Reflection;
 
 namespace CSF.Reflection
 {
-
+    /// <summary>
+    ///     Reveals information about a command.
+    /// </summary>
     public sealed class CommandInfo : IConditional, IArgumentBucket
     {
+        /// <inheritdoc />
         public string Name { get; }
 
+        /// <inheritdoc />
         public Attribute[] Attributes { get; }
 
+        /// <inheritdoc />
         public PreconditionAttribute[] Preconditions { get; }
 
+        /// <inheritdoc />
         public bool HasPreconditions { get; }
 
-        public IArgument[] Parameters { get; }
+        /// <inheritdoc />
+        public IArgument[] Arguments { get; }
 
-        public bool HasParameters { get; }
+        /// <inheritdoc />
+        public bool HasArguments { get; }
 
+        /// <inheritdoc />
         public bool HasRemainder { get; }
 
+        /// <inheritdoc />
         public int MinLength { get; }
 
+        /// <inheritdoc />
         public int MaxLength { get; }
 
+        /// <inheritdoc />
         public string[] Aliases { get; }
 
+        /// <summary>
+        ///     Gets the priority of this command.
+        /// </summary>
         public byte Priority { get; }
 
+        /// <summary>
+        ///     Gets the module in which the command is known.
+        /// </summary>
         public ModuleInfo Module { get; }
 
+        /// <summary>
+        ///     Gets the invocation target of this command.
+        /// </summary>
         public MethodInfo Target { get; }
 
         internal CommandInfo(ModuleInfo module, MethodInfo method, string[] aliases, IDictionary<Type, TypeConverter> typeReaders)
@@ -65,8 +86,8 @@ namespace CSF.Reflection
             Preconditions = preconditions;
             HasPreconditions = preconditions.Length > 0;
 
-            Parameters = parameters;
-            HasParameters = parameters.Length > 0;
+            Arguments = parameters;
+            HasArguments = parameters.Length > 0;
             HasRemainder = parameters.Any(x => x.IsRemainder);
 
             Name = aliases[0];
@@ -76,8 +97,8 @@ namespace CSF.Reflection
             MaxLength = maxLength;
         }
 
-
+        /// <inheritdoc />
         public override string ToString()
-            => $"{Module}.{Target.Name}['{Name}']({string.Join<IArgument>(", ", Parameters)})";
+            => $"{Module}.{Target.Name}['{Name}']({string.Join<IArgument>(", ", Arguments)})";
     }
 }

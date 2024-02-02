@@ -1,28 +1,36 @@
 ﻿using CSF.Core;
 using CSF.Helpers;
-using CSF.TypeReaders;
+using CSF.TypeConverters;
 using System.Reflection;
 
 namespace CSF.Reflection
 {
-
+    /// <inheritdoc />
     public sealed class ArgumentInfo : IArgument
     {
+        /// <inheritdoc />
         public string Name { get; }
 
+        /// <inheritdoc />
         public Type Type { get; }
 
+        /// <inheritdoc />
         public Type ExposedType { get; }
 
+        /// <inheritdoc />
         public bool IsNullable { get; }
 
+        /// <inheritdoc />
         public bool IsOptional { get; }
 
+        /// <inheritdoc />
         public bool IsRemainder { get; }
 
+        /// <inheritdoc />
         public Attribute[] Attributes { get; }
 
-        public TypeConverter TypeReader { get; }
+        /// <inheritdoc />
+        public TypeConverter Converter { get; }
 
         internal ArgumentInfo(ParameterInfo parameterInfo, IDictionary<Type, TypeConverter> typeReaders)
         {
@@ -51,16 +59,17 @@ namespace CSF.Reflection
                 IsRemainder = false;
 
             if (Type.IsEnum)
-                TypeReader = EnumTypeReader.GetOrCreate(Type);
+                Converter = EnumTypeReader.GetOrCreate(Type);
 
             else if (Type != typeof(string) && Type != typeof(object))
-                TypeReader = typeReaders[Type];
+                Converter = typeReaders[Type];
 
             Attributes = attributes;
             ExposedType = parameterInfo.ParameterType;
             Name = parameterInfo.Name;
         }
 
+        /// <inheritdoc />
         public override string ToString()
             => $"{Type.Name} {Name}";
     }

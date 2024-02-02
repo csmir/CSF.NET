@@ -1,7 +1,7 @@
 ﻿using CSF.Core;
 using CSF.Reflection;
 
-namespace CSF.TypeReaders
+namespace CSF.TypeConverters
 {
     internal class BaseTypeReader<T> : TypeConverter<T>
     {
@@ -9,7 +9,7 @@ namespace CSF.TypeReaders
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
-        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IServiceProvider services, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             var parser = _container.Value[Type] as Tpd<T>;
 
@@ -19,7 +19,7 @@ namespace CSF.TypeReaders
             return ValueTask.FromResult(Error($"The provided value does not match the expected type. Expected {typeof(T).Name}, got {value}. At: '{parameter.Name}'"));
         }
 
-        private static IReadOnlyDictionary<Type, Delegate> ValueGenerator()
+        private static Dictionary<Type, Delegate> ValueGenerator()
         {
             var callback = new Dictionary<Type, Delegate>
             {

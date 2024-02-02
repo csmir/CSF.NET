@@ -5,12 +5,12 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace CSF.TypeReaders
+namespace CSF.TypeConverters
 {
     internal class ColorConverter : TypeConverter<Color>
     {
         private readonly Dictionary<string, Color> _colors;
-        private readonly IReadOnlyDictionary<string, string> _spacedColors;
+        private readonly Dictionary<string, string> _spacedColors;
 
         public ColorConverter()
         {
@@ -47,7 +47,7 @@ namespace CSF.TypeReaders
             _spacedColors = spacedNames;
         }
 
-        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IServiceProvider services, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return ValueTask.FromResult(Success(Color.FromArgb(hexNumber)));

@@ -1,7 +1,7 @@
 ﻿using CSF.Core;
 using CSF.Preconditions;
 using CSF.Reflection;
-using CSF.TypeReaders;
+using CSF.TypeConverters;
 using System.Reflection;
 
 namespace CSF.Helpers
@@ -49,7 +49,7 @@ namespace CSF.Helpers
         public static IConditional[] GetComponents(this ModuleInfo module, IDictionary<Type, TypeConverter> typeReaders)
         {
             var commands = (IEnumerable<IConditional>)GetCommands(module, typeReaders)
-                .OrderBy(x => x.Parameters.Length);
+                .OrderBy(x => x.Arguments.Length);
 
             var modules = (IEnumerable<IConditional>)GetModules(module, typeReaders)
                 .OrderBy(x => x.Components.Length);

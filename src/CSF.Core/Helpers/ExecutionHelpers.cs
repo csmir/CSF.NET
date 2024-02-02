@@ -40,7 +40,7 @@ namespace CSF.Helpers
                 if (param.IsNullable && arg is null or "null" or "nothing")
                     return new(arg);
 
-                return await param.TypeReader.ObjectEvaluateAsync(context, services, param, arg, cancellationToken);
+                return await param.Converter.ObjectEvaluateAsync(context, services, param, arg, cancellationToken);
             }
 
             var results = new ConvertResult[param.Length];
@@ -68,7 +68,7 @@ namespace CSF.Helpers
 
                 if (parameter is ComplexArgumentInfo complex)
                 {
-                    var result = await complex.Parameters.RecursiveConvertAsync(context, services, args, index, cancellationToken);
+                    var result = await complex.Arguments.RecursiveConvertAsync(context, services, args, index, cancellationToken);
 
                     index += result.Length;
 
