@@ -3,7 +3,7 @@
 namespace CSF.Core
 {
     /// <summary>
-    ///     Represents an attribute that can prioritize one result over another when multiple matches were found.
+    ///     An attribute that can prioritize one result over another when multiple matches were found.
     /// </summary>
     /// <remarks>
     ///     By default, a command has a priority of 0. Higher values take priority, meaning a command with a priority of 1 will execute first if other commands have a priority of 0.

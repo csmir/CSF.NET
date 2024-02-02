@@ -4,8 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 namespace CSF.Core
 {
     /// <summary>
-    ///     Represents a command group, functioning much like subcommands.
+    ///     An attribute that signifies a module to be a group, allowing functionality much like subcommands.
     /// </summary>
+    /// <remarks>
+    ///     This attribute does not work on top-level modules.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class GroupAttribute : Attribute
     {
@@ -22,7 +25,7 @@ namespace CSF.Core
         /// <summary>
         ///     Creates a new <see cref="GroupAttribute"/> with defined name.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The group name.</param>
         public GroupAttribute([DisallowNull] string name)
             : this(name, [])
         {
@@ -32,9 +35,8 @@ namespace CSF.Core
         /// <summary>
         ///     Creates a new <see cref="GroupAttribute"/> with defined name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="aliases"></param>
-        [CLSCompliant(false)]
+        /// <param name="name">The group name.</param>
+        /// <param name="aliases">The group's aliases.</param>
         public GroupAttribute([DisallowNull] string name, params string[] aliases)
         {
             if (string.IsNullOrWhiteSpace(name))

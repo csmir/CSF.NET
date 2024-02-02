@@ -3,7 +3,7 @@
 namespace CSF.Core
 {
     /// <summary>
-    ///     Represents a container that contains metadata and logging access for a command attempted to be executed.
+    ///     A container that contains metadata and logging access for a command attempted to be executed.
     /// </summary>
     /// <remarks>
     ///     It is generally not adviced to implement this interface directly. Instead, consider implementing <see cref="CommandContext"/>.

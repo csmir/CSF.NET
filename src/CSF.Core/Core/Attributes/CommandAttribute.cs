@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CSF.Core
 {
     /// <summary>
-    ///     An attribute that represents the required info to map a command.
+    ///     An attribute that signifies a method as a command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public sealed class CommandAttribute : Attribute
@@ -15,17 +15,25 @@ namespace CSF.Core
         public string Name { get; }
 
         /// <summary>
-        ///     The command aliases.
+        ///     The command's aliases.
         /// </summary>
         public string[] Aliases { get; }
 
+        /// <summary>
+        ///     Creates a new <see cref="CommandAttribute"/> with provided name.
+        /// </summary>
+        /// <param name="name">The command name.</param>
         public CommandAttribute([DisallowNull] string name)
             : this(name, [])
         {
 
         }
 
-        [CLSCompliant(false)]
+        /// <summary>
+        ///     Creates a new <see cref="CommandAttribute"/> with provided name and aliases.
+        /// </summary>
+        /// <param name="name">The command name.</param>
+        /// <param name="aliases">The command's aliases.</param>
         public CommandAttribute([DisallowNull] string name, params string[] aliases)
         {
             if (string.IsNullOrWhiteSpace(name))
