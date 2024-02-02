@@ -63,9 +63,9 @@ namespace CSF.Preconditions
         }
 
         /// <summary>
-        ///     Creates a new <see cref="CheckResult"/> representing a succesful evaluation.
+        ///     Creates a new <see cref="CheckResult"/> representing a successful evaluation.
         /// </summary>
-        /// <returns>A <see cref="CheckResult"/> representing the succesful evaluation.</returns>
+        /// <returns>A <see cref="CheckResult"/> representing the successful evaluation.</returns>
         public virtual CheckResult Success()
         {
             return new();

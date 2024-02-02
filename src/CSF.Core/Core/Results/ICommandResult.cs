@@ -18,7 +18,7 @@
         public Exception Exception { get; }
 
         /// <summary>
-        ///     Gets if the result was succesful or not.
+        ///     Gets if the result was successful or not.
         /// </summary>
         public bool Success { get; }
     }

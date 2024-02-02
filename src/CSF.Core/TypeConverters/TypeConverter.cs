@@ -16,10 +16,10 @@ namespace CSF.TypeConverters
         public override Type Type { get; } = typeof(T);
 
         /// <summary>
-        ///     Creates a new <see cref="ConvertResult"/> representing a succesful evaluation.
+        ///     Creates a new <see cref="ConvertResult"/> representing a successful evaluation.
         /// </summary>
         /// <param name="value">The value converted from a raw argument into the target type of this converter.</param>
-        /// <returns>A <see cref="ConvertResult"/> representing the succesful evaluation.</returns>
+        /// <returns>A <see cref="ConvertResult"/> representing the successful evaluation.</returns>
         public virtual ConvertResult Success(T value)
         {
             return base.Success(value);
@@ -94,10 +94,10 @@ namespace CSF.TypeConverters
         }
 
         /// <summary>
-        ///     Creates a new <see cref="ConvertResult"/> representing a succesful evaluation.
+        ///     Creates a new <see cref="ConvertResult"/> representing a successful evaluation.
         /// </summary>
         /// <param name="value">The value converted from a raw argument into the target type of this converter.</param>
-        /// <returns>A <see cref="ConvertResult"/> representing the succesful evaluation.</returns>
+        /// <returns>A <see cref="ConvertResult"/> representing the successful evaluation.</returns>
         public virtual ConvertResult Success(object value)
         {
             return new(value);

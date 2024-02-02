@@ -142,7 +142,7 @@ namespace CSF.Core
 
                 var match = await MatchAsync(context, search, args, cancellationToken);
 
-                // enter the invocation logic when a match is succesful.
+                // enter the invocation logic when a match is successful.
                 if (match.Success)
                 {
                     var result = await RunAsync(context, match, cancellationToken);
