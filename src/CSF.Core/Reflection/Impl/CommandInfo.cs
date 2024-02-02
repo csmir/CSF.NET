@@ -35,7 +35,7 @@ namespace CSF.Reflection
 
         public MethodInfo Target { get; }
 
-        internal CommandInfo(ModuleInfo module, MethodInfo method, string[] aliases, IDictionary<Type, TypeReader> typeReaders)
+        internal CommandInfo(ModuleInfo module, MethodInfo method, string[] aliases, IDictionary<Type, TypeConverter> typeReaders)
         {
             var attributes = method.GetAttributes(true);
             var preconditions = attributes.GetPreconditions();

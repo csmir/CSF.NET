@@ -1,9 +1,9 @@
 ﻿namespace CSF
 {
     /// <summary>
-    ///     The result of a read operation within the command execution pipeline.
+    ///     The result of a convert operation within the command execution pipeline.
     /// </summary>
-    public readonly struct ReadResult : ICommandResult
+    public readonly struct ConvertResult : ICommandResult
     {
         /// <inheritdoc />
         public Exception Exception { get; } = null;
@@ -13,13 +13,13 @@
 
         internal object Value { get; } = null;
 
-        internal ReadResult(object value)
+        internal ConvertResult(object value)
         {
             Value = value;
             Success = true;
         }
 
-        internal ReadResult(Exception exception)
+        internal ConvertResult(Exception exception)
         {
             Exception = exception;
             Success = false;

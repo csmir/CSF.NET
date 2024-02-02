@@ -8,7 +8,7 @@ namespace CSF.Helpers
 {
     internal static class ReflectionHelpers
     {
-        public static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
+        public static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeConverter> typeReaders)
         {
             foreach (var group in module.Type.GetNestedTypes())
             {
@@ -22,7 +22,7 @@ namespace CSF.Helpers
             }
         }
 
-        public static IEnumerable<CommandInfo> GetCommands(ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
+        public static IEnumerable<CommandInfo> GetCommands(ModuleInfo module, IDictionary<Type, TypeConverter> typeReaders)
         {
             foreach (var method in module.Type.GetMethods())
             {
@@ -46,7 +46,7 @@ namespace CSF.Helpers
             }
         }
 
-        public static IConditional[] GetComponents(this ModuleInfo module, IDictionary<Type, TypeReader> typeReaders)
+        public static IConditional[] GetComponents(this ModuleInfo module, IDictionary<Type, TypeConverter> typeReaders)
         {
             var commands = (IEnumerable<IConditional>)GetCommands(module, typeReaders)
                 .OrderBy(x => x.Parameters.Length);
@@ -58,7 +58,7 @@ namespace CSF.Helpers
                 .ToArray();
         }
 
-        public static IArgument[] GetParameters(this MethodBase method, IDictionary<Type, TypeReader> typeReaders)
+        public static IArgument[] GetParameters(this MethodBase method, IDictionary<Type, TypeConverter> typeReaders)
         {
             var parameters = method.GetParameters();
 

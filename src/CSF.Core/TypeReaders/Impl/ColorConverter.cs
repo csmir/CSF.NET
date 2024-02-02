@@ -7,12 +7,12 @@ using System.Text;
 
 namespace CSF.TypeReaders
 {
-    internal class ColorTypeReader : TypeReader<Color>
+    internal class ColorConverter : TypeConverter<Color>
     {
         private readonly Dictionary<string, Color> _colors;
         private readonly IReadOnlyDictionary<string, string> _spacedColors;
 
-        public ColorTypeReader()
+        public ColorConverter()
         {
             var properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
             var colors = new Dictionary<string, Color>(properties.Length - 1, StringComparer.OrdinalIgnoreCase);
@@ -47,7 +47,7 @@ namespace CSF.TypeReaders
             _spacedColors = spacedNames;
         }
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (int.TryParse(value.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber, null, out var hexNumber))
                 return ValueTask.FromResult(Success(Color.FromArgb(hexNumber)));

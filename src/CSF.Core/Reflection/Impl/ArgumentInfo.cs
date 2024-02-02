@@ -22,9 +22,9 @@ namespace CSF.Reflection
 
         public Attribute[] Attributes { get; }
 
-        public TypeReader TypeReader { get; }
+        public TypeConverter TypeReader { get; }
 
-        internal ArgumentInfo(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
+        internal ArgumentInfo(ParameterInfo parameterInfo, IDictionary<Type, TypeConverter> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);

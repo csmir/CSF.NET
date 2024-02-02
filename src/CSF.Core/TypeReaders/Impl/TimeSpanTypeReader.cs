@@ -4,12 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace CSF.TypeReaders
 {
-    internal partial class TimeSpanTypeReader : TypeReader<TimeSpan>
+    internal partial class TimeSpanConverter : TypeConverter<TimeSpan>
     {
         private readonly IReadOnlyDictionary<string, Func<string, TimeSpan>> _callback;
         private readonly Regex _regex = GenTSRegex();
 
-        public TimeSpanTypeReader()
+        public TimeSpanConverter()
         {
             _callback = new Dictionary<string, Func<string, TimeSpan>>
             {
@@ -35,7 +35,7 @@ namespace CSF.TypeReaders
             };
         }
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (!TimeSpan.TryParse(value, out TimeSpan span))
             {

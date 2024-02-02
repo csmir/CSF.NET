@@ -3,13 +3,13 @@ using CSF.Reflection;
 
 namespace CSF.TypeReaders
 {
-    internal class BaseTypeReader<T> : TypeReader<T>
+    internal class BaseTypeReader<T> : TypeConverter<T>
     {
         private delegate bool Tpd<TValue>(string str, out TValue value);
 
         private readonly static Lazy<IReadOnlyDictionary<Type, Delegate>> _container = new(ValueGenerator);
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             var parser = _container.Value[Type] as Tpd<T>;
 
@@ -64,11 +64,11 @@ namespace CSF.TypeReaders
         }
     }
 
-    internal static class BaseTypeReader
+    internal static class BaseTypeConverter
     {
-        public static TypeReader[] CreateBaseReaders()
+        public static TypeConverter[] CreateBaseReaders()
         {
-            var callback = new TypeReader[]
+            var callback = new TypeConverter[]
             {
                 // char
                 new BaseTypeReader<char>(),

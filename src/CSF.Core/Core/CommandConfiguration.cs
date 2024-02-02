@@ -26,16 +26,16 @@ namespace CSF.Core
             }
         }
 
-        private TypeReader[] _typeReaders = [];
+        private TypeConverter[] _typeReaders = [];
 
         /// <summary>
-        ///     Gets a collection of <see cref="TypeReader"/>'s that the <see cref="CommandManager"/> will use to handle unknown argument types.
+        ///     Gets a collection of <see cref="TypeConverter"/>'s that the <see cref="CommandManager"/> will use to handle unknown argument types.
         /// </summary>
         /// <remarks>
-        ///     It is adviced <b>not</b> to create new implementations of <see cref="TypeReader"/> without first confirming if the target type is not already supported. 
+        ///     It is adviced <b>not</b> to create new implementations of <see cref="TypeConverter"/> without first confirming if the target type is not already supported. 
         ///     All valuetypes and time/date types are already supported out of the box.
         /// </remarks>
-        public TypeReader[] TypeReaders
+        public TypeConverter[] Converters
         {
             get
             {
@@ -159,41 +159,41 @@ namespace CSF.Core
         }
 
         /// <summary>
-        ///     Replaces the existing values in <see cref="TypeReaders"/> with a new collection.
+        ///     Replaces the existing values in <see cref="Converters"/> with a new collection.
         /// </summary>
         /// <remarks>
         ///     To prevent duplicate value recognition, <see cref="Enumerable.Distinct{TSource}(IEnumerable{TSource})"/> is called to remove duplicates from <paramref name="typeReaders"/>.
         /// </remarks>
-        /// <param name="typeReaders">A collection of <see cref="TypeReader"/>'s to parse unknown argument types.</param>
+        /// <param name="typeReaders">A collection of <see cref="TypeConverter"/>'s to parse unknown argument types.</param>
         /// <returns>The same <see cref="CommandConfiguration"/> for call chaining.</returns>
-        public CommandConfiguration WithTypeReaders(params TypeReader[] typeReaders)
+        public CommandConfiguration WithTypeReaders(params TypeConverter[] typeReaders)
         {
             if (typeReaders == null)
             {
                 ThrowHelpers.InvalidArg(typeReaders);
             }
 
-            _typeReaders = typeReaders.Distinct(TypeReader.EqualityComparer.Default).ToArray();
+            _typeReaders = typeReaders.Distinct(TypeConverter.EqualityComparer.Default).ToArray();
 
             return this;
         }
 
         /// <summary>
-        ///     Adds a <see cref="TypeReader"/> to <see cref="TypeReaders"/>.
+        ///     Adds a <see cref="TypeConverter"/> to <see cref="Converters"/>.
         /// </summary>
         /// <remarks>
-        ///     This call will throw if <see cref="TypeReaders"/> already contains an implementation of the target type, validated by a custom equality comparer.
+        ///     This call will throw if <see cref="Converters"/> already contains an implementation of the target type, validated by a custom equality comparer.
         /// </remarks>
-        /// <param name="typeReader">A <see cref="TypeReader"/> to parse unknown argument types.</param>
+        /// <param name="typeReader">A <see cref="TypeConverter"/> to parse unknown argument types.</param>
         /// <returns>The same <see cref="CommandConfiguration"/> for call chaining.</returns>
-        public CommandConfiguration AddTypeReader(TypeReader typeReader)
+        public CommandConfiguration AddTypeReader(TypeConverter typeReader)
         {
             if (typeReader == null)
             {
                 ThrowHelpers.InvalidArg(typeReader);
             }
 
-            if (_typeReaders.Contains(typeReader, TypeReader.EqualityComparer.Default))
+            if (_typeReaders.Contains(typeReader, TypeConverter.EqualityComparer.Default))
             {
                 ThrowHelpers.NotDistinct(typeReader);
             }
@@ -204,18 +204,18 @@ namespace CSF.Core
         }
 
         /// <summary>
-        ///     Attempts to add a <see cref="TypeReader"/> to <see cref="TypeReaders"/>.
+        ///     Attempts to add a <see cref="TypeConverter"/> to <see cref="Converters"/>.
         /// </summary>
         /// <remarks>
-        ///     Will not add <paramref name="typeReader"/> to <see cref="TypeReaders"/> if it already contains an implementation of the target type, validated by a custom equality comparer.
+        ///     Will not add <paramref name="typeReader"/> to <see cref="Converters"/> if it already contains an implementation of the target type, validated by a custom equality comparer.
         /// </remarks>
-        /// <param name="typeReader">A <see cref="TypeReader"/> to parse unknown argument types.</param>
+        /// <param name="typeReader">A <see cref="TypeConverter"/> to parse unknown argument types.</param>
         /// <returns>The same <see cref="CommandConfiguration"/> for call chaining.</returns>
-        public CommandConfiguration TryAddTypeReader(TypeReader typeReader)
+        public CommandConfiguration TryAddTypeReader(TypeConverter typeReader)
         {
             if (typeReader != null)
             {
-                if (!_typeReaders.Contains(typeReader, TypeReader.EqualityComparer.Default))
+                if (!_typeReaders.Contains(typeReader, TypeConverter.EqualityComparer.Default))
                 {
                     AddTr(typeReader);
                 }
@@ -249,7 +249,7 @@ namespace CSF.Core
             _assemblies[oLen] = assembly;
         }
 
-        private void AddTr(TypeReader typeReader)
+        private void AddTr(TypeConverter typeReader)
         {
             var oLen = _typeReaders.Length;
             Array.Resize(ref _typeReaders, oLen);

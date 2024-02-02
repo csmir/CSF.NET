@@ -180,7 +180,7 @@ namespace CSF.Core
                 return new(search.Command, new MatchException("Command failed to reach execution state. View inner exception for more details.", check.Exception));
 
             // read the command parameters in right order.
-            var readResult = await ReadAsync(context, search, args, cancellationToken);
+            var readResult = await ConvertAsync(context, search, args, cancellationToken);
 
             // exchange the reads for result, verifying successes in the process.
             var reads = new object[readResult.Length];
@@ -199,7 +199,7 @@ namespace CSF.Core
         #endregion
 
         #region Reading
-        private async ValueTask<ReadResult[]> ReadAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
+        private async ValueTask<ConvertResult[]> ConvertAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
             context.LogDebug("Attempting argument conversion for {}", search.Command);
 
@@ -212,15 +212,15 @@ namespace CSF.Core
 
             // check if input equals command length.
             if (search.Command.MaxLength == length)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
+                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // check if input is longer than command, but remainder to concatenate.
             if (search.Command.MaxLength <= length && search.Command.HasRemainder)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
+                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // check if input is shorter than command, but optional parameters to replace.
             if (search.Command.MaxLength > length && search.Command.MinLength <= length)
-                return await search.Command.Parameters.RecursiveReadAsync(context, args[length..], 0, cancellationToken);
+                return await search.Command.Parameters.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
 
             // input is too long or too short.
             return [];
@@ -278,7 +278,7 @@ namespace CSF.Core
         #region Building
         private IEnumerable<ModuleInfo> BuildComponents(CommandConfiguration configuration)
         {
-            var typeReaders = TypeReader.CreateDefaultReaders().UnionBy(configuration.TypeReaders, x => x.Type).ToDictionary(x => x.Type, x => x);
+            var typeReaders = TypeConverter.CreateDefaultReaders().UnionBy(configuration.Converters, x => x.Type).ToDictionary(x => x.Type, x => x);
 
             var rootType = typeof(ModuleBase);
             foreach (var assembly in configuration.Assemblies)

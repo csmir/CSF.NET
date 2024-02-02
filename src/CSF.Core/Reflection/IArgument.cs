@@ -21,6 +21,6 @@ namespace CSF.Reflection
         public bool IsRemainder { get; }
 
 
-        public TypeReader TypeReader { get; }
+        public TypeConverter TypeReader { get; }
     }
 }

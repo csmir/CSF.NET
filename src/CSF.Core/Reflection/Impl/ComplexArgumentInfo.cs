@@ -41,12 +41,12 @@ namespace CSF.Reflection
         public int MaxLength { get; }
 
 
-        public TypeReader TypeReader { get; }
+        public TypeConverter TypeReader { get; }
 
 
         public ConstructorInfo Constructor { get; }
 
-        internal ComplexArgumentInfo(ParameterInfo parameterInfo, IDictionary<Type, TypeReader> typeReaders)
+        internal ComplexArgumentInfo(ParameterInfo parameterInfo, IDictionary<Type, TypeConverter> typeReaders)
         {
             var underlying = Nullable.GetUnderlyingType(parameterInfo.ParameterType);
             var attributes = parameterInfo.GetAttributes(false);

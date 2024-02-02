@@ -3,13 +3,13 @@ using CSF.Reflection;
 
 namespace CSF.TypeReaders
 {
-    internal class EnumTypeReader(Type targetEnumType) : TypeReader
+    internal class EnumTypeReader(Type targetEnumType) : TypeConverter
     {
         private static readonly Dictionary<Type, EnumTypeReader> _readers = [];
 
         public override Type Type { get; } = targetEnumType;
 
-        public override ValueTask<ReadResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
+        public override ValueTask<ConvertResult> EvaluateAsync(ICommandContext context, IArgument parameter, string value, CancellationToken cancellationToken)
         {
             if (Enum.TryParse(Type, value, true, out var result))
                 return ValueTask.FromResult(Success(result));
