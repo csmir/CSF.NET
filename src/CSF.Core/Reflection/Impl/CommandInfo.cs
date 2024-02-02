@@ -66,7 +66,7 @@ namespace CSF.Reflection
 
             if (parameters.Any(x => x.Attributes.Contains<RemainderAttribute>(false)))
             {
-                if (parameters[^1].IsRemainder)
+                if (parameters.Length > 1 && parameters[^1].IsRemainder)
                 {
                     ThrowHelpers.InvalidOp($"{nameof(RemainderAttribute)} can only exist on the last parameter of a method.");
                 }

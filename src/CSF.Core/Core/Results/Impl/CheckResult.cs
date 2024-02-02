@@ -16,5 +16,10 @@
             Exception = exception;
             Success = false;
         }
+
+        internal CheckResult(bool success)
+        {
+            Success = success;
+        }
     }
 }

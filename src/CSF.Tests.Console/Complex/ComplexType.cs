@@ -1,6 +1,6 @@
 ﻿using CSF.Core;
 
-namespace CSF.Tests.Complex
+namespace CSF.Tests
 {
     public class ComplexType
     {

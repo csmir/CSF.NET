@@ -1,5 +1,4 @@
 ﻿using CSF.Core;
-using CSF.Tests.Complex;
 
 namespace CSF.Tests
 {

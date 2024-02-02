@@ -1,6 +1,7 @@
 ﻿using CSF.Core;
 using CSF.Helpers;
 using CSF.Parsing;
+using CSF.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -12,11 +13,11 @@ var collection = new ServiceCollection()
         {
             if (result.Success)
             {
-
+                await Task.CompletedTask;
             }
             else
             {
-
+                Console.WriteLine(result.Exception);
             }
         });
         configuration.WithAssemblies(Assembly.GetEntryAssembly());
@@ -32,5 +33,5 @@ while (true)
 {
     var input = parser.Parse(Console.ReadLine()!);
 
-    await framework.TryExecuteAsync(null, input);
+    await framework.TryExecuteAsync(new LoggingContext(), input);
 }

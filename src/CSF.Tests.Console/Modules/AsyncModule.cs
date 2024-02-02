@@ -1,6 +1,6 @@
 ﻿using CSF.Core;
 
-namespace CSF.Tests.Console.Modules
+namespace CSF.Tests
 {
     public sealed class AsyncModule : ModuleBase<CommandContext>
     {

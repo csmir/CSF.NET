@@ -60,7 +60,7 @@ namespace CSF.Core
             Configuration = configuration;
 
             _resultHandle = services.GetService<ResultResolver>() 
-                ?? ResultResolver.Default;
+                ?? Configuration.ResultResolver;
         }
 
         /// <summary>
@@ -159,6 +159,7 @@ namespace CSF.Core
             if (c is 0)
             {
                 await _resultHandle.TryHandleAsync(context, new SearchResult(new SearchException("No commands were found with the provided input.")), Services);
+                return;
             }
 
             // if there is a fallback present, we send matchfailure.
@@ -190,7 +191,7 @@ namespace CSF.Core
                 if (!readResult[i].Success)
                     return new(search.Command, readResult[i].Exception);
 
-                reads[i] = readResult[i];
+                reads[i] = readResult[i].Value;
             }
 
             // return successful match if execution reaches here.
@@ -198,10 +199,27 @@ namespace CSF.Core
         }
         #endregion
 
+        #region Checking
+        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command, CancellationToken cancellationToken)
+        {
+            context.LogDebug("Attempting validations for {0}", command);
+
+            foreach (var precon in command.Preconditions)
+            {
+                var result = await precon.EvaluateAsync(context, Services, command, cancellationToken);
+
+                if (!result.Success)
+                    return result;
+            }
+
+            return new(true);
+        }
+        #endregion
+
         #region Reading
         private async ValueTask<ConvertResult[]> ConvertAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
-            context.LogDebug("Attempting argument conversion for {}", search.Command);
+            context.LogDebug("Attempting argument conversion for {0}", search.Command);
 
             // skip if no parameters exist.
             if (!search.Command.HasArguments)
@@ -212,34 +230,18 @@ namespace CSF.Core
 
             // check if input equals command length.
             if (search.Command.MaxLength == length)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
 
             // check if input is longer than command, but remainder to concatenate.
             if (search.Command.MaxLength <= length && search.Command.HasRemainder)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
 
             // check if input is shorter than command, but optional parameters to replace.
             if (search.Command.MaxLength > length && search.Command.MinLength <= length)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
 
             // input is too long or too short.
             return [];
-        }
-        #endregion
-
-        #region Checking
-        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command, CancellationToken cancellationToken)
-        {
-            context.LogDebug("Attempting validations for {}", command);
-
-            foreach (var precon in command.Preconditions)
-            {
-                var result = await precon.EvaluateAsync(context, Services, command, cancellationToken);
-
-                if (!result.Success)
-                    return result;
-            }
-            return new();
         }
         #endregion
 
@@ -248,7 +250,7 @@ namespace CSF.Core
         {
             try
             {
-                context.LogInformation("Executing {} with {} resolved arguments.", match.Command, match.Reads.Length);
+                context.LogInformation("Executing {0} with {1} resolved arguments.", match.Command, match.Reads.Length);
 
                 var targetInstance = Services.GetService(match.Command.Module.Type);
 

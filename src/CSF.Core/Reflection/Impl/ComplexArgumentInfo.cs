@@ -74,7 +74,7 @@ namespace CSF.Reflection
             var constructor = Type.GetConstructors()[0];
             var parameters = constructor.GetParameters(typeReaders);
 
-            if (parameters.Length > 0)
+            if (parameters.Length == 0)
             {
                 ThrowHelpers.InvalidOp("Complex types are expected to have at least 1 constructor parameter.");
             }

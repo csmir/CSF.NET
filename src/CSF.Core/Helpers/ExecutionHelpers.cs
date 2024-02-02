@@ -1,5 +1,6 @@
 ﻿using CSF.Core;
 using CSF.Reflection;
+using System.Reflection.Metadata;
 
 namespace CSF.Helpers
 {
@@ -22,7 +23,7 @@ namespace CSF.Helpers
                 }
                 else
                     // add the top level matches immediately.
-                    discovered.Add(new(component as CommandInfo, searchHeight));
+                    discovered.Add(new(component as CommandInfo, searchHeight + 1));
 
                 // when the ranges fail, no results should return.
             }
@@ -34,10 +35,10 @@ namespace CSF.Helpers
         {
             static async ValueTask<ConvertResult> ConvertAsync(IArgument param, ICommandContext context, IServiceProvider services, object arg, CancellationToken cancellationToken)
             {
-                if (arg.GetType() == param.Type)
+                if (param.IsNullable && arg is null or "null" or "nothing")
                     return new(arg);
 
-                if (param.IsNullable && arg is null or "null" or "nothing")
+                if (param.Type == typeof(string) || param.Type == typeof(object))
                     return new(arg);
 
                 return await param.Converter.ObjectEvaluateAsync(context, services, param, arg, cancellationToken);
