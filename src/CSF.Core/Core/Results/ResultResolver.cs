@@ -1,7 +1,7 @@
 ﻿namespace CSF.Core
 {
     /// <summary>
-    ///     Represents a container that implements an asynchronous functor to handle post-execution operations.
+    ///     A container that implements an asynchronous functor to handle post-execution operations.
     /// </summary>
     /// <param name="handler">A functor that serves as the handler for post-execution operations in this resolver.</param>
     public class ResultResolver(Func<ICommandContext, ICommandResult, IServiceProvider, Task> handler)

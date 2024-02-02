@@ -3,7 +3,7 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents the result of a match operation within the command execution pipeline.
+    ///     The result of a match operation within the command execution pipeline.
     /// </summary>
     public readonly struct MatchResult : ICommandResult
     {

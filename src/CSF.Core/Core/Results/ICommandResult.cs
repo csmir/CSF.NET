@@ -1,7 +1,7 @@
 ﻿namespace CSF
 {
     /// <summary>
-    ///     Represents the result of any operation within the command execution pipeline.
+    ///     The result of any operation within the command execution pipeline.
     /// </summary>
     /// <remarks>
     ///     This interface encompasses a number of results that each represent a different step in the execution pipeline.

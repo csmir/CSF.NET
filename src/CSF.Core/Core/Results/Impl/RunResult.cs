@@ -3,7 +3,7 @@
 namespace CSF
 {
     /// <summary>
-    ///     Represents the result of an invocation operation within the command execution pipeline.
+    ///     The result of an invocation operation within the command execution pipeline.
     /// </summary>
     public readonly struct RunResult : ICommandResult
     {

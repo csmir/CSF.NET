@@ -1,7 +1,7 @@
 ﻿namespace CSF.Exceptions
 {
     /// <summary>
-    ///     Represents an <see cref="ExecutionException"/> that is thrown when the command being executed failed to finish invocation.
+    ///     An <see cref="ExecutionException"/> that is thrown when the command being executed failed to finish invocation.
     /// </summary>
     /// <param name="message">The message that represents the reason of the exception being thrown.</param>
     /// <param name="innerException">An exception thrown by an inner operation, if present.</param>

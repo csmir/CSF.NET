@@ -1,7 +1,7 @@
 ﻿namespace CSF
 {
     /// <summary>
-    ///     Represents the result of a check operation within the command execution pipeline.
+    ///     The result of a check operation within the command execution pipeline.
     /// </summary>
     public readonly struct CheckResult : ICommandResult
     {

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace CSF.Helpers
 {
     /// <summary>
-    ///     Represents a set of methods to throw exceptions for the invalid state of objects or operations.
+    ///     A set of helper methods to throw exceptions for the invalid state of objects or operations.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ThrowHelpers

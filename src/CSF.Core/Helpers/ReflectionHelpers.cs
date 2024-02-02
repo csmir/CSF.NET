@@ -2,7 +2,6 @@
 using CSF.Preconditions;
 using CSF.Reflection;
 using CSF.TypeReaders;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace CSF.Helpers

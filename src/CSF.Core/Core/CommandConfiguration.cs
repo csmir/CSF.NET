@@ -6,7 +6,7 @@ using System.Reflection;
 namespace CSF.Core
 {
     /// <summary>
-    ///     Represents the configuration to be implemented by a new <see cref="CommandManager"/>.
+    ///     The configuration to be implemented by a new <see cref="CommandManager"/>.
     /// </summary>
     public class CommandConfiguration
     {

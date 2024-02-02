@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CSF.Helpers
 {
     /// <summary>
-    ///     Represents a set of methods to populate and configure a <see cref="IServiceCollection"/>.
+    ///     A set of helper methods to populate and configure a <see cref="IServiceCollection"/>.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static class ServiceHelpers

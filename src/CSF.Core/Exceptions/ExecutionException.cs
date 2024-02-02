@@ -1,7 +1,7 @@
 ﻿namespace CSF.Exceptions
 {
     /// <summary>
-    ///     Represents an exception thrown anywhere in the command execution pipeline.
+    ///     An exception thrown anywhere in the command execution pipeline.
     /// </summary>
     public class ExecutionException : Exception
     {
