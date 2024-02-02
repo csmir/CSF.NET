@@ -14,7 +14,7 @@ namespace CSF.Core
     /// <remarks>
     ///     This API is completely CLS compliant where it is supported, always implementing an overload that is CLS compliant, where it otherwise would not be.
     /// </remarks>
-    public class CommandManager : IDisposable
+    public class CommandManager
     {
         private readonly object _searchLock = new();
         private readonly ResultResolver _resultHandle;
@@ -312,11 +312,6 @@ namespace CSF.Core
                     return _i.Value;
                 }
             }
-        }
-
-        public void Dispose()
-        {
-
         }
     }
 }

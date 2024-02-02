@@ -65,10 +65,5 @@ namespace CSF.Hosting
         {
             throw new NotImplementedException();
         }
-
-        public void Dispose()
-        {
-
-        }
     }
 }
