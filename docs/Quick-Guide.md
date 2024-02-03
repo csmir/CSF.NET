@@ -1,11 +1,11 @@
 This guide introduces you to CSF, covering the basics for developers ranging from beginner to veteran.
 
-- [Before Coding](#-setting-up-the-basics)
-- [Defining Commands](#-defining-commands)
-- [Running your Commands](#-running-your-commands)
-- [Putting it Together](#-summary)
+- [Before Coding](#before-coding)
+- [Defining Commands](#defining-commands)
+- [Running your Commands](#running-your-commands)
+- [Putting it Together](#summary)
 
-## 📩 Before Coding
+## Before Coding
 
 Before we can start writing code, there are a few things to set up. This includes getting a fresh project to start, and installing CSF.
 
@@ -15,7 +15,7 @@ Before being able to write code, we need to give ourselves a place to do it.
 With your favourite code editor, we will create a new empty project. 
 This project can be anything, but in our case, a **Console Application** will be the focus. 
 If you are using `dotnet-cli`, you can create such a project by executing `dotnet new console`. 
-Keep in mind that the project has to target `.net6` or higher.
+Keep in mind that the project has to target `.net8` or higher.
 
 > In a visual editor such as Rider or Visual studio, you can create it by simply opening the application, navigating to 'Create New Project' and selecting the Console Application template.
 
@@ -26,7 +26,7 @@ This can be in the PM console, in your `.csproj` file or through the code editor
 We can grab the latest version from [NuGet](https://www.nuget.org/packages/CSF.NET). 
 If you prefer to use the visual tools, simply look up `csf.net` and install the first package available.
 
-## 📝 Defining Commands
+## Defining Commands
 
 ### Creating a Module
 
@@ -122,13 +122,13 @@ namespace XProject
         [Command("helloworld")]
         public void HelloWorld()
         {
-            Respond("Hello world!");
+            Console.WriteLine("Hello world!");
         }
     }
 }
 ```
 
-> To actually start testing and running the command, skip to [#
+> To actually start testing and running the command, skip to [here](#-running-your-commands).
 
 #### Command 2: Reply
 
@@ -160,7 +160,7 @@ As you can see here, the reply method accepts a parameter called `message`, and 
 
 In our case however, the command is marked with `[Remainder]`. This attribute has a special property, it ignores all parameters provided after it. Instead, it connects all of them together and makes it one long string (or object). This way you don't need to add quotation marks, making the command more intuitive to use.
 
-## 🏗️ Running your Commands
+## Running your Commands
 
 CSF is quite simple in that it does a very good job in doing things *for* you. Because of this, setting up your commands is not actually directly visible. But, there is one very important step, and for it, we need to look at a more advanced concept in programming. Dependency Injection!
 
@@ -177,44 +177,75 @@ It may look different for everyone, but for simplicity sake, we will only focus 
 
 Let's start with the basics, and define a new `ServiceCollection`. 
 This collection works like a list, and things can be added to it. 
-CSF already has the needed methods to configure everything at once, so all we have to do is call them:
+CSF already has the needed methods to configure everything, so all we have to do is call and use them:
 
 ```cs
 using CSF;
 using Microsoft.Extensions.DependencyInjection;
 
-var collection = new ServiceCollection();
+var collection = new ServiceCollection()
+    .ConfigureCommands(configuration => 
+    {
 
-collection.WithCommandManager();
-
-var services = collection.BuildServiceProvider();
+    });
 ```
 
-The `AddCommandManager` method configures everything we need, and leaves very little for us to do. 
+The `ConfigureCommands` method exposes a configuration delegate for us to use. 
+In order to handle the result of commands, we will make sure results are handled the way we want them to:
+
+```cs
+    ...
+        configuration.ConfigureResultAction((context, result, services) => 
+        {
+            if (!result.Success) 
+            {
+                Console.WriteLine(result.Exception);
+            }
+
+            return Task.CompletedTask;
+        });
+    ...
+```
+
 With that out of the way, we can build the collection into a provider. 
 To do this, we call the `BuildServiceProvider` method.
+
+```cs
+...
+var services = collection.BuildServiceProvider();
+...
+```
 
 Now that everything in the background has been built, the command manager has also been made accessible to us. 
 While staying in `Program.cs`, we can grab the manager from the new `services` variable by calling `GetRequiredService`.
 
 ```cs
+...
 var framework = services.GetRequiredService<CommandManager>();
+...
 ```
 
 Hovering over the `CommandManager` declaration, you can read some things about it. It is the root type, or class, that makes CSF work as a whole. 
 You can greatly customize it and make a lot of changes to your personal taste. 
-Though, we only need very little from it. 
+Though, we only need very little from it.
 
 ### Listening to Input
 
 The most important part of running a command is defining *what* command you want to run. 
-In our case, we want to test the `helloworld` command, so we can define that as our input.
-You can replace the way to get your input with anything you like, ranging from `Console.ReadLine` to listening to a discord message.
+In our case, we want to test commands with console input, so we will use `Console.ReadLine` to receive inputs.
+You can replace the way to get your input with anything you like, ranging from reading a game chat to listening for a discord message.
 
 ```cs
-var input = "helloworld";
+...
+var parser = new StringParser();
 
-var context = new CommandContext(input);
+while (true)
+{
+    var input = parser.Parse(Console.ReadLine());
+
+    var context = new CommandContext();
+}
+...
 ```
 
 With this input, we can create the most important component to running a command: The context. 
@@ -223,22 +254,21 @@ For regular string commands, `CommandContext` is predefined by CSF for you to us
 
 ### Running the Command
 
-With the context defined, it is time to run the command. 
-By calling `ExecuteAsync`, CSF will read your command input and try to find the most appropriate command to run. 
+With the context defined, it is time t`o run the command. 
+By calling `TryExecute` in the `while` loop, CSF will read your command input and try to find the most appropriate command to run. 
 In our case, it is an exact match to our `helloworld` command, so it will succeed the search and run it.
 
 ```cs
-var result = await framework.ExecuteAsync(context);
-
-if (result.Failed())
-    throw result.Exception;
+    ...
+    framework.TryExecute(context, input);
+    ...
 ```
 
 The final step is to handle the result of the command. 
-If the command failed in any way, the `CommandResult` returned by the execution will cover where it went wrong and contain the exception that occurred. 
+If the command failed in any way, the `ICommandResult` returned by the execution will cover where it went wrong and contain the exception that occurred. 
 Here, it is simplest to see if it failed, and then throw the exception if it did.
 
-## 📑 Summary
+## Summary
 
 Let's review what we achieved in this guide. 
 First of all, we created an empty project and installed the package.
@@ -283,20 +313,32 @@ using CSF;
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
-    .AddCommandManager();
+    .ConfigureCommands(configuration => 
+    {
+        configuration.ConfigureResultAction((context, result, services) => 
+        {
+            if (!result.Success) 
+            {
+                Console.WriteLine(result.Exception);
+            }
+
+            return Task.CompletedTask;
+        });
+    });
 
 var services = collection.BuildServiceProvider();
 
 var framework = services.GetRequiredService<CommandManager>();
+var parser = new StringParser();
 
-var input = "helloworld";
+while (true)
+{
+    var input = parser.Parse(Console.ReadLine());
 
-var context = new CommandContext(input);
+    var context = new CommandContext();
 
-var result = await framework.ExecuteAsync(context);
-
-if (result.Failed())
-    throw result.Exception;
+    framework.TryExecute(context, input);
+}
 ```
 
 If these files match yours, you're good to go. 
