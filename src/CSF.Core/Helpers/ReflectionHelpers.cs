@@ -8,6 +8,25 @@ namespace CSF.Helpers
 {
     internal static class ReflectionHelpers
     {
+        public static IEnumerable<ModuleInfo> BuildComponents(CommandConfiguration configuration)
+        {
+            var typeReaders = TypeConverter.CreateDefaultReaders().UnionBy(configuration.Converters, x => x.Type).ToDictionary(x => x.Type, x => x);
+
+            var rootType = typeof(ModuleBase);
+            foreach (var assembly in configuration.Assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (rootType.IsAssignableFrom(type)
+                        && !type.IsAbstract
+                        && !type.ContainsGenericParameters)
+                    {
+                        yield return new ModuleInfo(type, typeReaders);
+                    }
+                }
+            }
+        }
+
         public static IEnumerable<ModuleInfo> GetModules(ModuleInfo module, IDictionary<Type, TypeConverter> typeReaders)
         {
             foreach (var group in module.Type.GetNestedTypes())

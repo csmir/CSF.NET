@@ -1,4 +1,6 @@
-﻿namespace CSF.Core
+﻿using System.ComponentModel;
+
+namespace CSF.Core
 {
     /// <summary>
     ///     A container that implements an asynchronous functor to handle post-execution operations.
@@ -13,7 +15,15 @@
         /// </summary>
         public Func<ICommandContext, ICommandResult, IServiceProvider, Task> Handler { get; } = handler;
 
-        internal Task TryHandleAsync(ICommandContext context, ICommandResult result, IServiceProvider services)
+        /// <summary>
+        ///     Validates the state of the <see cref="Handler"/> and attempts to execute the delegate.
+        /// </summary>
+        /// <param name="context">Context of the current execution.</param>
+        /// <param name="result">The result of the command, being successful or containing failure information.</param>
+        /// <param name="services">The provider used to register modules and inject services.</param>
+        /// <returns>An awaitable <see cref="Task"/> that waits for the delegate to finish.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Task TryHandleAsync(ICommandContext context, ICommandResult result, IServiceProvider services)
         {
             if (Handler == null)
             {

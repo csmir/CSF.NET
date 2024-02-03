@@ -12,7 +12,7 @@ namespace CSF.Core
     ///     The root type serving as a basis for all operations and functionality as provided by the Command Standardization Framework.
     /// </summary>
     /// <remarks>
-    ///     This API is completely CLS compliant where it is supported, always implementing an overload that is CLS compliant, where it otherwise would not be.
+    ///     To learn more about use of this type and other features of CSF, check out the README on GitHub: <see href="https://github.com/csmir/CSF.NET"/>
     /// </remarks>
     public class CommandManager
     {
@@ -50,7 +50,7 @@ namespace CSF.Core
                 ThrowHelpers.InvalidArg(nameof(configuration.Assemblies));
             }
 
-            Commands = BuildComponents(configuration)
+            Commands = ReflectionHelpers.BuildComponents(configuration)
                 .SelectMany(x => x.Components)
                 .ToHashSet();
 
@@ -273,27 +273,6 @@ namespace CSF.Core
             catch (Exception exception)
             {
                 return new(match.Command, exception);
-            }
-        }
-        #endregion
-
-        #region Building
-        private IEnumerable<ModuleInfo> BuildComponents(CommandConfiguration configuration)
-        {
-            var typeReaders = TypeConverter.CreateDefaultReaders().UnionBy(configuration.Converters, x => x.Type).ToDictionary(x => x.Type, x => x);
-
-            var rootType = typeof(ModuleBase);
-            foreach (var assembly in configuration.Assemblies)
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (rootType.IsAssignableFrom(type)
-                        && !type.IsAbstract
-                        && !type.ContainsGenericParameters)
-                    {
-                        yield return new ModuleInfo(type, typeReaders);
-                    }
-                }
             }
         }
         #endregion

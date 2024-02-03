@@ -45,7 +45,7 @@ namespace CSF.TypeConverters
         public abstract Type Type { get; }
 
         /// <summary>
-        ///     Evaluates the known data about the argument to be converter into, as well as the raw value it should convert into a valid invocation parameter.
+        ///     Evaluates the known data about the argument to be converted into, as well as the raw value it should convert into a valid invocation parameter.
         /// </summary>
         /// <param name="context">Context of the current execution.</param>
         /// <param name="services">The provider used to register modules and inject services.</param>
