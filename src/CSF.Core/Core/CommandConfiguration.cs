@@ -10,7 +10,7 @@ namespace CSF.Core
     /// </summary>
     public class CommandConfiguration
     {
-        private Assembly[] _assemblies = [Assembly.GetExecutingAssembly()];
+        private Assembly[] _assemblies = [Assembly.GetEntryAssembly()];
 
         /// <summary>
         ///     Gets a collection of assemblies that the <see cref="CommandManager"/> will use to register commands.
@@ -58,7 +58,7 @@ namespace CSF.Core
             {
                 if (value == null)
                 {
-                    ThrowHelpers.InvalidArg(value);
+                    ThrowHelpers.ThrowInvalidArgument(value);
                 }
 
                 _resultResolver = value;
@@ -85,7 +85,7 @@ namespace CSF.Core
             {
                 if (value is not AsyncApproach.Await or AsyncApproach.Discard)
                 {
-                    ThrowHelpers.InvalidOp("AsyncApproach does not support values that exceed the provided options, ranging between 0 and 1.");
+                    ThrowHelpers.ThrowInvalidOperation("AsyncApproach does not support values that exceed the provided options, ranging between 0 and 1.");
                 }
 
                 _asyncApproach = value;
@@ -104,7 +104,7 @@ namespace CSF.Core
         {
             if (assemblies == null)
             {
-                ThrowHelpers.InvalidArg(assemblies);
+                ThrowHelpers.ThrowInvalidArgument(assemblies);
             }
 
             _assemblies = assemblies.Distinct().ToArray();
@@ -124,7 +124,7 @@ namespace CSF.Core
         {
             if (assembly == null)
             {
-                ThrowHelpers.InvalidArg(assembly);
+                ThrowHelpers.ThrowInvalidArgument(assembly);
             }
 
             if (_assemblies.Contains(assembly))
@@ -170,7 +170,7 @@ namespace CSF.Core
         {
             if (typeReaders == null)
             {
-                ThrowHelpers.InvalidArg(typeReaders);
+                ThrowHelpers.ThrowInvalidArgument(typeReaders);
             }
 
             _typeReaders = typeReaders.Distinct(TypeConverter.EqualityComparer.Default).ToArray();
@@ -190,7 +190,7 @@ namespace CSF.Core
         {
             if (typeReader == null)
             {
-                ThrowHelpers.InvalidArg(typeReader);
+                ThrowHelpers.ThrowInvalidArgument(typeReader);
             }
 
             if (_typeReaders.Contains(typeReader, TypeConverter.EqualityComparer.Default))
@@ -233,7 +233,7 @@ namespace CSF.Core
         {
             if (configureDelegate == null)
             {
-                ThrowHelpers.InvalidArg(configureDelegate);
+                ThrowHelpers.ThrowInvalidArgument(configureDelegate);
             }
 
             _resultResolver = new ResultResolver(configureDelegate);
@@ -244,7 +244,7 @@ namespace CSF.Core
         private void AddAsm(Assembly assembly)
         {
             var oLen = _assemblies.Length;
-            Array.Resize(ref _assemblies, oLen);
+            Array.Resize(ref _assemblies, oLen + 1);
 
             _assemblies[oLen] = assembly;
         }
@@ -252,7 +252,7 @@ namespace CSF.Core
         private void AddTr(TypeConverter typeReader)
         {
             var oLen = _typeReaders.Length;
-            Array.Resize(ref _typeReaders, oLen);
+            Array.Resize(ref _typeReaders, oLen + 1);
 
             _typeReaders[oLen] = typeReader;
         }

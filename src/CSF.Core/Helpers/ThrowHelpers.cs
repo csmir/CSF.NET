@@ -18,7 +18,7 @@ namespace CSF.Helpers
         /// <exception cref="InvalidOperationException"></exception>
         [DoesNotReturn]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void InvalidOp([DisallowNull] string failureMessage)
+        public static void ThrowInvalidOperation([DisallowNull] string failureMessage)
         {
             throw new InvalidOperationException(failureMessage);
         }
@@ -31,7 +31,7 @@ namespace CSF.Helpers
         /// <exception cref="ArgumentException"></exception>
         [DoesNotReturn]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void InvalidArg(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
+        public static void ThrowInvalidArgument(object value, [CallerArgumentExpression(nameof(value))] string arg = null)
         {
             // should resolve overload when a collection is null or empty.
             if (value is ICollection or IEnumerable)

@@ -79,7 +79,7 @@
         {
             lock (_lock)
             {
-                if (_fallback != null)
+                if (_fallback == null)
                 {
                     _fallback = result;
                 }

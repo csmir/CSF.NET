@@ -1,22 +1,24 @@
 Preconditions are checks that ensure that the command in scope is allowed to be executed. 
 Let's work on an example precondition to understand how they work. 
 
-- [Creating your Precondition](#-creating-your-precondition)
-- [Using your Precondition](#-using-your-precondition)
+- [Creating your Precondition](#creating-your-precondition)
+- [Using your Precondition](#using-your-precondition)
 
-## 🏗️ Creating your Precondition
+## Creating your Precondition
 
 All preconditions inherit `PreconditionAttribute`, which in turn inherits `Attribute`. To start creating your own precondition, you have to inherit `PreconditionAttribute` on a class:
 
 ```cs
-using CSF;
+using CSF.Core;
+using CSF.Reflection;
 
 namespace XProject
 {
     public class RequireOperatingSystemAttribute : PreconditionAttribute
     {
-        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
+        public override ValueTask<CheckResult> EvaluateAsync(ICommandContext context, IServiceProvider services, CommandInfo command, CancellationToken cancellationToken)
         {
+
         }
     }
 }
@@ -27,42 +29,40 @@ With this class defined, and the method that will operate the evaluation being i
 First of all, the restriction must be compared against. To define this, we will implement a constructor parameter, automatically resolved as an attribute parameter by the IDE or code editor:
 
 ```cs
-using CSF;
+using CSF.Core;
+using CSF.Reflection;
 
 namespace XProject
 {
-    public class RequireOperatingSystemAttribute : PreconditionAttribute
+    public class RequireOperatingSystemAttribute(PlatformID platform) : PreconditionAttribute
     {
+        public PlatformID Platform { get; } = platform;
 
-        public PlatformID Platform { get; }
-
-        public RequireOperatingSystemAttribute(PlatformID platform)
+        public override ValueTask<CheckResult> EvaluateAsync(ICommandContext context, IServiceProvider services, CommandInfo command, CancellationToken cancellationToken)
         {
-            Platform = platform;
-        }
 
-        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
-        {
         }
     }
 }
 ```
 
-After this has been defined, the `Platform` property can be used to evaluate the current operating system against. Our focus goes to the `Evaluate` method, which will run this check.
+After this has been defined, the `Platform` property can be used to evaluate the current operating system against. Our focus goes to the `EvaluateAsync` method, which will run this check.
 
 ```cs
-        public override Result Evaluate(ICommandContext context, Command command, IServiceProvider provider)
+...
+        public override ValueTask<CheckResult> EvaluateAsync(ICommandContext context, IServiceProvider services, CommandInfo command, CancellationToken cancellationToken)
         {
             if (Environment.OSVersion.Platform == Platform)
-                return Success();
+                return ValueTask.FromResult(Success());
 
-            return Failure("The platform this command was executed does not support this operation.");
+            return ValueTask.FromResult(Error("The platform does not support this operation."));
         }
+...
 ```
 
 That's it. With this done, we can look towards the application of our created precondition.
 
-## 📝 Using your Precondition
+## Using your Precondition
 
 After you have written your precondition, it is time to use it. Let's define a command that depends on the operating system to run.
 
@@ -83,12 +83,12 @@ public void Copy([Remainder] string toCopy)
     clipboardExecutable.StandardInput.Write(toCopy);
     clipboardExecutable.StandardInput.Close();
 
-    Respond("Succesfully copied the content to your clipboard.");
+    Console.Writeline("Succesfully copied the content to your clipboard.");
 }
 ```
 
-This method will use the windows clip executable to copy a string onto your clipboard. 
-This method does not work on macOS or Linux, so we have to make sure the command is executed on windows.
+This method will use the Windows clip executable to copy a string onto your clipboard. 
+Though, this clipboard approach does not work on MacOS or Linux, so we have to make sure the command is executed on windows.
 
 To do this, all we have to do is add `[RequireOperatingSystem(PlatformID.Win32NT)]` above the method, like so:
 
@@ -96,6 +96,7 @@ To do this, all we have to do is add `[RequireOperatingSystem(PlatformID.Win32NT
 [Command("copy")]
 [RequireOperatingSystem(PlatformID.Win32NT)]
 public void Copy([Remainder] string toCopy)
+...
 ```
 
-The precondition is now defined on this command, and will be called when this command is triggered.
+The precondition is now defined on this command, and will be called when this command is triggered. If the platform you run it on is indeed not Windows, it will fail.

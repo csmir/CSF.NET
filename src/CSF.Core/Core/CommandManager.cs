@@ -47,7 +47,7 @@ namespace CSF.Core
         {
             if (configuration.Assemblies == null || configuration.Assemblies.Length == 0)
             {
-                ThrowHelpers.InvalidArg(nameof(configuration.Assemblies));
+                ThrowHelpers.ThrowInvalidArgument(nameof(configuration.Assemblies));
             }
 
             Commands = ReflectionHelpers.BuildComponents(configuration)

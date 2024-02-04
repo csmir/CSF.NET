@@ -76,7 +76,7 @@ namespace CSF.Reflection
 
             if (parameters.Length == 0)
             {
-                ThrowHelpers.InvalidOp("Complex types are expected to have at least 1 constructor parameter.");
+                ThrowHelpers.ThrowInvalidOperation("Complex types are expected to have at least 1 constructor parameter.");
             }
 
             var (minLength, maxLength) = parameters.GetLength();

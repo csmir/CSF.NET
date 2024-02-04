@@ -1,7 +1,7 @@
-﻿using CSF;
+﻿using CSF.Core;
 using System.Diagnostics;
 
-namespace XProject
+namespace CSF.Samples
 {
     public class CopyModule : ModuleBase
     {
@@ -21,7 +21,7 @@ namespace XProject
             clipboardExecutable.StandardInput.Write(toCopy);
             clipboardExecutable.StandardInput.Close();
 
-            Respond("Succesfully copied the content to your clipboard.");
+            Console.WriteLine("Succesfully copied the content to your clipboard.");
         }
     }
 }

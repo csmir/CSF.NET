@@ -40,7 +40,7 @@ namespace CSF.Preconditions
         public static CheckResult Error([DisallowNull] Exception exception)
         {
             if (exception == null)
-                ThrowHelpers.InvalidArg(exception);
+                ThrowHelpers.ThrowInvalidArgument(exception);
 
             if (exception is CheckException checkEx)
             {
@@ -57,7 +57,7 @@ namespace CSF.Preconditions
         public virtual CheckResult Error([DisallowNull] string error)
         {
             if (string.IsNullOrEmpty(error))
-                ThrowHelpers.InvalidArg(error);
+                ThrowHelpers.ThrowInvalidArgument(error);
 
             return new(new CheckException(error));
         }

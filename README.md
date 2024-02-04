@@ -6,11 +6,11 @@ CSF is an attribute based framework that makes creating and processing **text ba
 
 - [Features](#features)
 - [Additional Packages](#additional-packages)
-- [Samples](#samples)
+- [Getting Started](#getting-started)
 
 ## Features
 
-#### Type Conversion:
+#### Type Conversion
 
 For raw input, automated conversion to fit command signature is supported by `TypeConverter`'s. `ValueType`, `Enum` and nullable variant types are automatically parsed by the framework and populate commands as below:
 
@@ -29,7 +29,7 @@ Outside of this, implementing and adding your own `TypeConverter`'s is also supp
 
 > See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Type-Conversion) for more.
 
-#### Preconditions:
+#### Preconditions
 
 Implementing `PreconditionAttribute` creates a new evaluation to add in the set of attributes defined above command definitions. 
 When a command is attempted to be executed, it will walk through every precondition present and abort execution if any of them fail.
@@ -47,7 +47,7 @@ public async Task Test()
 
 > See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Preconditions) for more.
 
-#### Dependency Injection:
+#### Dependency Injection
 
 You can provide an `IServiceProvider` at execution to inject modules with dependencies, in accordance to the conventions `Microsoft.Extensions.DependencyInjection` follows. The `IServiceProvider` has a number of extensions that are suggested to be used when writing your codebase with CSF. These extensions serve you and the program, reducing boilerplate in the application setup.
 
@@ -63,7 +63,7 @@ var services = new ServiceCollection()
 
 > See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Dependency-Injection) for more.
 
-#### Informative Results:
+#### Informative Results
 
 CSF.NET will return results for running commands through a `ResultResolver`. This resolver has a default implementation that can be configured through the `CommandConfiguration`
 
@@ -86,13 +86,13 @@ configuration.ConfigureResultAction(async (context, result, services) =>
 
 > See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Handling-Results) for more.
 
-#### Customization:
+#### Customization
 
 While already fully functional out of the box, the framework does not shy away from covering extensive applications with more specific needs, which in turn need more than the base features to function according to its developer's expectations. 
 
 Types such as `CommandContext`, `ModuleBase`, `TypeConverter`, `PreconditionAttribute` and `Parser` can all be inherited and custom ones created for environmental specifics, custom type conversion and more.
 
-#### Reflection:
+#### Reflection
 
 The framework saves cached command data in its own reflection types. 
 These types, such as `CommandInfo`, `ArgumentInfo` and `ModuleInfo` store informative data about a command, its root module and any submembers.
@@ -129,12 +129,20 @@ For applications to function with `CSF.Hosting`, it is necessary to install the 
 
 *For each of these packages, the minimum version is determined by CSF itself, usually being the latest or equal to the target framework upon which it was released. It is suggested to choose the latest version at time of installation.*
 
-## Samples
+## Getting Started
+
+There are various resources available in order to get started with CSF. Below, you can find samples and directions to the quick guide.
+
+#### Quick Guide
+
+You can find the quick guide [here](https://github.com/csmir/CSF.NET/wiki/Quick-Guide). 
+This guide introduces you to the basics of defining modules, commands, and how to run them.
+
+#### Samples
 
 Samples are available to learn how to implement CSF in your own programs.
 
-- [CSF.Samples.Console](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.Console)
+- [CSF.Samples.Console](https://github.com/csmir/CSF.NET/tree/master/examples/CSF.Samples.Console)
   - Shows how to implement CSF on a basic console application.
-- [CSF.Samples.Hosting](https://github.com/Rozen4334/CSF.NET/tree/master/examples/CSF.Samples.Console)
+- [CSF.Samples.Hosting](https://github.com/csmir/CSF.NET/tree/master/examples/CSF.Samples.Console)
   - Shows how to implement CSF on a hosted console application.
-

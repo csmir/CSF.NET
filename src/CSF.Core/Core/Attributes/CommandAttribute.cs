@@ -37,13 +37,13 @@ namespace CSF.Core
         public CommandAttribute([DisallowNull] string name, params string[] aliases)
         {
             if (string.IsNullOrWhiteSpace(name))
-                ThrowHelpers.InvalidArg(name);
+                ThrowHelpers.ThrowInvalidArgument(name);
 
             var arr = new string[aliases.Length + 1];
             for (int i = 0; i < aliases.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(aliases[i]))
-                    ThrowHelpers.InvalidArg(aliases);
+                    ThrowHelpers.ThrowInvalidArgument(aliases);
 
                 if (arr.Contains(aliases[i]))
                     ThrowHelpers.NotDistinct(aliases);

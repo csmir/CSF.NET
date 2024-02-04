@@ -42,9 +42,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XProject
+namespace CSF.Samples
 {
-    internal class XModule
+    internal class ExampleModule
     {
     }
 }
@@ -55,11 +55,11 @@ To do that, we need to include CSF into the usings, and change the signature of 
 With both of those steps out of the way, it should now look like this:
 
 ```cs
-using CSF;
+using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
     }
 }
@@ -80,11 +80,11 @@ Within the class declaration of the file, we will write a new method.
 The method can return `Task` or `void`, but for the sake of simplicity, we will use `void`.
 
 ```cs
-using CSF;
+using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
         public void HelloWorld()
         {
@@ -96,11 +96,11 @@ namespace XProject
 Next up, we will want to decorate the method with an attribute. The `[Command]` attribute accepts a name, and registers the command by it, so we can use that name to run it from our input source. We will call the command `helloworld`. Let's add the attribute and see how that looks:
 
 ```cs
-using CSF;
+using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
         [Command("helloworld")]
         public void HelloWorld()
@@ -113,11 +113,11 @@ namespace XProject
 Now the `HelloWorld` method will run when we run the `helloworld` command, but there is still one thing missing. The method is empty! You can add anything here, but in our case, a simple reply will do:
 
 ```cs
-using CSF;
+using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
         [Command("helloworld")]
         public void HelloWorld()
@@ -135,11 +135,11 @@ namespace XProject
 Our next command will be quite simple as well. Just like before, we can create a new method, mark it with an attribute and give it a name. Except this time, it will accept input, and respond with it. Let's create this functionality:
 
 ```cs
-using CSF;
+using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
         [Command("helloworld")]
         public void HelloWorld()
@@ -180,7 +180,11 @@ This collection works like a list, and things can be added to it.
 CSF already has the needed methods to configure everything, so all we have to do is call and use them:
 
 ```cs
-using CSF;
+using CSF.Core;
+using CSF.Helpers;
+using CSF.Parsing;
+using CSF.Samples;
+
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
@@ -190,8 +194,10 @@ var collection = new ServiceCollection()
     });
 ```
 
-The `ConfigureCommands` method exposes a configuration delegate for us to use. 
-In order to handle the result of commands, we will make sure results are handled the way we want them to:
+The `ConfigureCommands` method exposes a configuration delegate for us to use. With this delegate, we are free to configure some of the essential options to receive and bring in information about registration and execution of commands.
+
+If the command failed in any way, an `ICommandResult` brought forward by the execution will cover where it went wrong and contain the exception that occurred. 
+Here, it is simplest to see if it failed, and then throw the exception if it did. For this to be handled the way we expect it to, we need to configure it:
 
 ```cs
     ...
@@ -227,7 +233,7 @@ var framework = services.GetRequiredService<CommandManager>();
 
 Hovering over the `CommandManager` declaration, you can read some things about it. It is the root type, or class, that makes CSF work as a whole. 
 You can greatly customize it and make a lot of changes to your personal taste. 
-Though, we only need very little from it.
+Though, we only need very little from it for this guide.
 
 ### Listening to Input
 
@@ -250,23 +256,19 @@ while (true)
 
 With this input, we can create the most important component to running a command: The context. 
 Execution accepts `ICommandContext` and will use that to parse and run the command. 
-For regular string commands, `CommandContext` is predefined by CSF for you to use.
+For regular console commands, `CommandContext` is predefined by CSF for you to use.
 
 ### Running the Command
 
-With the context defined, it is time t`o run the command. 
+With the context defined, it is time to run the command. 
 By calling `TryExecute` in the `while` loop, CSF will read your command input and try to find the most appropriate command to run. 
-In our case, it is an exact match to our `helloworld` command, so it will succeed the search and run it.
+In our case, it is an exact match to our `helloworld` command, so querying this after starting the program will succeed the search and run it.
 
 ```cs
     ...
     framework.TryExecute(context, input);
     ...
 ```
-
-The final step is to handle the result of the command. 
-If the command failed in any way, the `ICommandResult` returned by the execution will cover where it went wrong and contain the exception that occurred. 
-Here, it is simplest to see if it failed, and then throw the exception if it did.
 
 ## Summary
 
@@ -309,7 +311,9 @@ namespace XProject
 
 ```cs
 #Program.cs
-using CSF;
+using CSF.Core;
+using CSF.Helpers;
+using CSF.Parsing;
 using Microsoft.Extensions.DependencyInjection;
 
 var collection = new ServiceCollection()
@@ -321,7 +325,6 @@ var collection = new ServiceCollection()
             {
                 Console.WriteLine(result.Exception);
             }
-
             return Task.CompletedTask;
         });
     });

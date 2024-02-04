@@ -1,22 +1,21 @@
-﻿using CSF;
+﻿// Documentation of this file can be found at: https://github.com/csmir/CSF.NET/wiki/Preconditions.
 
-namespace XProject
+using CSF.Core;
+using CSF.Preconditions;
+using CSF.Reflection;
+
+namespace CSF.Samples
 {
-    public class RequireOperatingSystemAttribute : PreconditionAttribute
+    public class RequireOperatingSystemAttribute(PlatformID platform) : PreconditionAttribute
     {
-        public PlatformID Platform { get; }
+        public PlatformID Platform { get; } = platform;
 
-        public RequireOperatingSystemAttribute(PlatformID platform)
-        {
-            Platform = platform;
-        }
-
-        public override Result EvaluateAsync(ICommandContext context, Command command, IServiceProvider provider)
+        public override ValueTask<CheckResult> EvaluateAsync(ICommandContext context, IServiceProvider services, CommandInfo command, CancellationToken cancellationToken)
         {
             if (Environment.OSVersion.Platform == Platform)
-                return Success();
+                return ValueTask.FromResult(Success());
 
-            return Failure("The platform this command was executed does not support this operation.");
+            return ValueTask.FromResult(Error("The platform does not support this operation."));
         }
     }
 }

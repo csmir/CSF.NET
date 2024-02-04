@@ -71,11 +71,13 @@ namespace CSF.TypeConverters
         public virtual ConvertResult Error([DisallowNull] Exception exception)
         {
             if (exception == null)
-                ThrowHelpers.InvalidArg(exception);
-
-            if (exception is ConvertException readEx)
             {
-                return new(readEx);
+                ThrowHelpers.ThrowInvalidArgument(exception);
+            }
+
+            if (exception is ConvertException convertEx)
+            {
+                return new(convertEx);
             }
             return new(new ConvertException(string.Format(_exHeader, Type.Name), exception));
         }
@@ -88,7 +90,9 @@ namespace CSF.TypeConverters
         public virtual ConvertResult Error([DisallowNull] string error)
         {
             if (string.IsNullOrEmpty(error))
-                ThrowHelpers.InvalidArg(error);
+            {
+                ThrowHelpers.ThrowInvalidArgument(error);
+            }
 
             return new(new ConvertException(error));
         }
@@ -105,15 +109,15 @@ namespace CSF.TypeConverters
 
         internal static TypeConverter[] CreateDefaultReaders()
         {
-            var range = BaseTypeConverter.CreateBaseReaders();
+            var arr = BaseTypeConverter.CreateBaseReaders();
 
-            int length = range.Length;
-            Array.Resize(ref range, length + 2);
+            int i = arr.Length;
+            Array.Resize(ref arr, i + 2);
 
-            range[length++] = new TimeSpanConverter();
-            range[length++] = new ColorConverter();
+            arr[i++] = new TimeSpanConverter();
+            arr[i++] = new ColorConverter();
 
-            return range;
+            return arr;
         }
 
         internal class EqualityComparer : IEqualityComparer<TypeConverter>

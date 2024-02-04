@@ -30,7 +30,7 @@ namespace CSF.Tests
 
                 if (args.Length == 0)
                 {
-                    ThrowHelpers.InvalidArg(args);
+                    ThrowHelpers.ThrowInvalidArgument(args);
                 }
 
                 var guid = Guid.NewGuid();

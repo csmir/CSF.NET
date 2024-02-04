@@ -1,25 +1,28 @@
-﻿using CSF;
+﻿using CSF.Core;
 
-namespace XProject
+namespace CSF.Samples
 {
     public class XModule : ModuleBase
     {
         [Command("helloworld")]
         public void HelloWorld()
         {
-            Respond("Hello world!");
+            Console.WriteLine("Hello world!");
         }
 
         [Command("reply")]
         public void Reply([Remainder] string message)
         {
-            Respond(message);
+            Console.WriteLine(message);
         }
 
-        [Command("guid")]
-        public void Guid(Guid guid)
+        [Command("type-info", "typeinfo", "type")]
+        public void TypeInfo(Type type)
         {
-            Respond("Here is your guid: " + guid.ToString());
+            Console.WriteLine($"Information about: {type.Name}");
+
+            Console.WriteLine($"Fullname: {type.FullName}");
+            Console.WriteLine($"Assembly: {type.Assembly.FullName}");
         }
     }
 }
