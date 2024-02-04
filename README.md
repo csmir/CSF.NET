@@ -84,7 +84,7 @@ configuration.ConfigureResultAction(async (context, result, services) =>
 ```
 
 
-> See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Handling-Results) for more.
+> See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Results) for more.
 
 #### Customization
 

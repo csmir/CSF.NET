@@ -2,7 +2,7 @@
 
 namespace CSF.Samples
 {
-    public class XModule : ModuleBase
+    public class ExampleModule : ModuleBase
     {
         [Command("helloworld")]
         public void HelloWorld()
