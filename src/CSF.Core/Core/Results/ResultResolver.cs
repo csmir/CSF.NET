@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 
 namespace CSF.Core
 {
@@ -20,17 +21,24 @@ namespace CSF.Core
         /// </summary>
         /// <param name="context">Context of the current execution.</param>
         /// <param name="result">The result of the command, being successful or containing failure information.</param>
-        /// <param name="services">The provider used to register modules and inject services.</param>
+        /// <param name="scope">The provider used to register modules and inject services.</param>
         /// <returns>An awaitable <see cref="Task"/> that waits for the delegate to finish.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Task TryHandleAsync(ICommandContext context, ICommandResult result, IServiceProvider services)
+        public async Task TryHandleAsync(ICommandContext context, ICommandResult result, IServiceScope scope)
         {
-            if (Handler == null)
+            if (Handler != null)
             {
-                return Task.CompletedTask;
+                await Handler(context, result, scope.ServiceProvider);
             }
 
-            return Handler(context, result, services);
+            if (scope is AsyncServiceScope asyncScope)
+            {
+                await asyncScope.DisposeAsync();
+            }
+            else
+            {
+                scope.Dispose();
+            }
         }
 
         internal static ResultResolver Default

@@ -149,7 +149,7 @@ namespace CSF.Core
                 {
                     var result = await RunAsync(context, scope, match, cancellationToken);
 
-                    await _resultHandle.TryHandleAsync(context, result, scope.ServiceProvider);
+                    await _resultHandle.TryHandleAsync(context, result, scope);
 
                     return;
                 }
@@ -167,7 +167,7 @@ namespace CSF.Core
             // if there is a fallback present, we send matchfailure.
             if (context.TryGetFallback(out var fallback))
             {
-                await _resultHandle.TryHandleAsync(context, fallback, scope.ServiceProvider);
+                await _resultHandle.TryHandleAsync(context, fallback, scope);
             }
         }
         #endregion
