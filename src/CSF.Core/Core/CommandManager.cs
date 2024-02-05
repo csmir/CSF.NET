@@ -134,20 +134,22 @@ namespace CSF.Core
         {
             var searches = Search(args);
 
+            var scope = Services.CreateScope(Configuration);
+
             var c = 0;
 
             foreach (var search in searches.OrderByDescending(x => x.Command.Priority))
             {
                 c++;
 
-                var match = await MatchAsync(context, search, args, cancellationToken);
+                var match = await MatchAsync(context, scope, search, args, cancellationToken);
 
                 // enter the invocation logic when a match is successful.
                 if (match.Success)
                 {
-                    var result = await RunAsync(context, match, cancellationToken);
+                    var result = await RunAsync(context, scope, match, cancellationToken);
 
-                    await _resultHandle.TryHandleAsync(context, result, Services);
+                    await _resultHandle.TryHandleAsync(context, result, scope.ServiceProvider);
 
                     return;
                 }
@@ -165,23 +167,23 @@ namespace CSF.Core
             // if there is a fallback present, we send matchfailure.
             if (context.TryGetFallback(out var fallback))
             {
-                await _resultHandle.TryHandleAsync(context, fallback, Services);
+                await _resultHandle.TryHandleAsync(context, fallback, scope.ServiceProvider);
             }
         }
         #endregion
 
         #region Matching
-        private async ValueTask<MatchResult> MatchAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
+        private async ValueTask<MatchResult> MatchAsync(ICommandContext context, IServiceScope scope, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
             // check command preconditions.
-            var check = await CheckAsync(context, search.Command, cancellationToken);
+            var check = await CheckAsync(context, scope, search.Command, cancellationToken);
 
             // verify check success, if not, return the failure.
             if (!check.Success)
                 return new(search.Command, new MatchException("Command failed to reach execution state. View inner exception for more details.", check.Exception));
 
             // read the command parameters in right order.
-            var readResult = await ConvertAsync(context, search, args, cancellationToken);
+            var readResult = await ConvertAsync(context, scope, search, args, cancellationToken);
 
             // exchange the reads for result, verifying successes in the process.
             var reads = new object[readResult.Length];
@@ -200,13 +202,13 @@ namespace CSF.Core
         #endregion
 
         #region Checking
-        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, CommandInfo command, CancellationToken cancellationToken)
+        private async ValueTask<CheckResult> CheckAsync(ICommandContext context, IServiceScope scope, CommandInfo command, CancellationToken cancellationToken)
         {
             context.LogDebug("Attempting validations for {0}", command);
 
             foreach (var precon in command.Preconditions)
             {
-                var result = await precon.EvaluateAsync(context, Services, command, cancellationToken);
+                var result = await precon.EvaluateAsync(context, scope.ServiceProvider, command, cancellationToken);
 
                 if (!result.Success)
                     return result;
@@ -217,7 +219,7 @@ namespace CSF.Core
         #endregion
 
         #region Reading
-        private async ValueTask<ConvertResult[]> ConvertAsync(ICommandContext context, SearchResult search, object[] args, CancellationToken cancellationToken)
+        private async ValueTask<ConvertResult[]> ConvertAsync(ICommandContext context, IServiceScope scope, SearchResult search, object[] args, CancellationToken cancellationToken)
         {
             context.LogDebug("Attempting argument conversion for {0}", search.Command);
 
@@ -230,15 +232,15 @@ namespace CSF.Core
 
             // check if input equals command length.
             if (search.Command.MaxLength == length)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, scope, args[^length..], 0, cancellationToken);
 
             // check if input is longer than command, but remainder to concatenate.
             if (search.Command.MaxLength <= length && search.Command.HasRemainder)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, scope, args[^length..], 0, cancellationToken);
 
             // check if input is shorter than command, but optional parameters to replace.
             if (search.Command.MaxLength > length && search.Command.MinLength <= length)
-                return await search.Command.Arguments.RecursiveConvertAsync(context, Services, args[^length..], 0, cancellationToken);
+                return await search.Command.Arguments.RecursiveConvertAsync(context, scope, args[^length..], 0, cancellationToken);
 
             // input is too long or too short.
             return [];
@@ -246,7 +248,7 @@ namespace CSF.Core
         #endregion
 
         #region Running
-        private async ValueTask<RunResult> RunAsync(ICommandContext context, MatchResult match, CancellationToken cancellationToken)
+        private async ValueTask<RunResult> RunAsync(ICommandContext context, IServiceScope scope, MatchResult match, CancellationToken cancellationToken)
         {
             try
             {
@@ -256,11 +258,11 @@ namespace CSF.Core
 
                 var module = targetInstance != null 
                     ? targetInstance as ModuleBase 
-                    : ActivatorUtilities.CreateInstance(Services, match.Command.Module.Type) as ModuleBase;
+                    : ActivatorUtilities.CreateInstance(scope.ServiceProvider, match.Command.Module.Type) as ModuleBase;
 
                 module.Context = context;
                 module.Command = match.Command;
-                module.Services = Services;
+                module.Services = scope.ServiceProvider;
 
                 await module.BeforeExecuteAsync(cancellationToken);
 
@@ -286,7 +288,7 @@ namespace CSF.Core
                 return null;
             }
 
-            public static ServiceProvider Default
+            public static IServiceProvider Default
             {
                 get
                 {

@@ -81,5 +81,22 @@ namespace CSF.Helpers
 
             return collection;
         }
+
+        /// <summary>
+        ///     Generates a <see cref="IServiceScope"/> by resolving the configured <see cref="AsyncApproach"/> within <paramref name="configuration"/>.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="configuration">The configuration for generating <see cref="IServiceScope"/>'s</param>
+        /// <returns>A <see cref="IServiceScope"/> matching the configured logic, being async when <see cref="AsyncApproach.Discard"/> is set.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IServiceScope CreateScope(this IServiceProvider provider, CommandConfiguration configuration)
+        {
+            if (configuration.AsyncApproach == AsyncApproach.Await)
+            {
+                return provider.CreateScope();
+            }
+
+            return provider.CreateAsyncScope();
+        }
     }
 }

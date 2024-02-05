@@ -68,21 +68,20 @@ var services = new ServiceCollection()
 CSF.NET will return results for running commands through a `ResultResolver`. This resolver has a default implementation that can be configured through the `CommandConfiguration`
 
 ```cs
-...
-configuration.ConfigureResultAction(async (context, result, services) =>
-{
-    if (result.Success)
-    {
-        await Task.CompletedTask;
-    }
-    else
-    {
-        Console.WriteLine(result.Exception);
-    }
-});
-...
+    ...
+        configuration.ConfigureResultAction(async (context, result, services) =>
+        {
+            if (result.Success)
+            {
+                await Task.CompletedTask;
+            }
+            else
+            {
+                Console.WriteLine(result.Exception);
+            }
+        });
+    ...
 ```
-
 
 > See feature [documentation](https://github.com/csmir/CSF.NET/wiki/Results) for more.
 

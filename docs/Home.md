@@ -5,7 +5,7 @@ For this claim to have any value, a great deal is done to help a developer write
 
 #### [[Quick Guide|Quick-Guide]]
 
-A quick start to CSF and various practices.
+A quick start to CSF and introduction to basic practices.
 
 #### [[Using Preconditions|Preconditions]]
 
