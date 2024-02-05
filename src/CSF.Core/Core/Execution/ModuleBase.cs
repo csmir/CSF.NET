@@ -28,8 +28,10 @@ namespace CSF.Core
     /// <remarks>
     ///      All derived types must be known in <see cref="CommandConfiguration.Assemblies"/> to be discoverable and automatically registered during the creation of a <see cref="CommandManager"/>.
     /// </remarks>
-    public abstract class ModuleBase
+    public abstract class ModuleBase : IDisposable, IAsyncDisposable
     {
+        private bool disposedValue;
+
         /// <summary>
         ///     Gets the command context containing metadata and logging access for the command currently in scope.
         /// </summary>
@@ -81,7 +83,7 @@ namespace CSF.Core
             return false;
         }
 
-        internal virtual async Task<RunResult> ResolveInvocationResultAsync(object value)
+        internal async Task<RunResult> ResolveInvocationResultAsync(object value)
         {
             switch (value)
             {
@@ -102,6 +104,50 @@ namespace CSF.Core
                         return new(Command);
                     }
             }
+        }
+
+        /// <summary>
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">Defines whether to dispose managed objects or not.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">Defines whether to dispose managed objects or not.</param>
+        /// <returns>A <see cref="ValueTask"/> holding the state of disposing.</returns>
+        protected virtual ValueTask DisposeAsync(bool disposing)
+        {
+            Dispose(disposing: disposing);
+            return ValueTask.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsync(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

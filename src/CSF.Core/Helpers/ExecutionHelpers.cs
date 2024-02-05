@@ -32,9 +32,9 @@ namespace CSF.Helpers
             return discovered;
         }
 
-        public static async Task<ConvertResult[]> RecursiveConvertAsync(this IArgument[] param, ICommandContext context, IServiceScope scope, object[] args, int index, CancellationToken cancellationToken)
+        public static async Task<ConvertResult[]> RecursiveConvertAsync(this IArgument[] param, ICommandContext context, IServiceProvider services, object[] args, int index, CancellationToken cancellationToken)
         {
-            static async ValueTask<ConvertResult> ConvertAsync(IArgument param, ICommandContext context, IServiceScope scope, object arg, CancellationToken cancellationToken)
+            static async ValueTask<ConvertResult> ConvertAsync(IArgument param, ICommandContext context, IServiceProvider services, object arg, CancellationToken cancellationToken)
             {
                 if (param.IsNullable && arg is null or "null" or "nothing")
                     return new(arg);
@@ -42,7 +42,7 @@ namespace CSF.Helpers
                 if (param.Type == typeof(string) || param.Type == typeof(object))
                     return new(arg);
 
-                return await param.Converter.ObjectEvaluateAsync(context, scope.ServiceProvider, param, arg, cancellationToken);
+                return await param.Converter.ObjectEvaluateAsync(context, services, param, arg, cancellationToken);
             }
 
             var results = new ConvertResult[param.Length];
@@ -57,7 +57,7 @@ namespace CSF.Helpers
                     if (parameter.Type == typeof(string))
                         results[i] = new(input);
                     else
-                        results[i] = await ConvertAsync(parameter, context, scope, input, cancellationToken);
+                        results[i] = await ConvertAsync(parameter, context, services, input, cancellationToken);
 
                     break;
                 }
@@ -70,7 +70,7 @@ namespace CSF.Helpers
 
                 if (parameter is ComplexArgumentInfo complex)
                 {
-                    var result = await complex.Arguments.RecursiveConvertAsync(context, scope, args, index, cancellationToken);
+                    var result = await complex.Arguments.RecursiveConvertAsync(context, services, args, index, cancellationToken);
 
                     index += result.Length;
 
@@ -89,7 +89,7 @@ namespace CSF.Helpers
                     continue;
                 }
 
-                results[i] = await ConvertAsync(parameter, context, scope, args[index], cancellationToken);
+                results[i] = await ConvertAsync(parameter, context, services, args[index], cancellationToken);
                 index++;
             }
 

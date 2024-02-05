@@ -2,7 +2,8 @@
 
 # CSF.NET - Command Standardization Framework for .NET
 
-CSF is an attribute based framework that makes creating and processing **text based commands** easy for any platform. It implements a modular, easy to implement pipeline for registering and executing commands, as well as a wide range of customization options to make development on different platforms as easy as possible.
+CSF is an attribute based framework that makes creating and processing **text based commands** easy for any platform. 
+It implements a modular, easy to implement pipeline for registering and executing commands, as well as a wide range of customization options to make development on different platforms as easy as possible.
 
 - [Features](#features)
 - [Additional Packages](#additional-packages)
@@ -12,7 +13,8 @@ CSF is an attribute based framework that makes creating and processing **text ba
 
 #### Type Conversion
 
-For raw input, automated conversion to fit command signature is supported by `TypeConverter`'s. `ValueType`, `Enum` and nullable variant types are automatically parsed by the framework and populate commands as below:
+For raw input, automated conversion to fit command signature is supported by `TypeConverter`'s. 
+`ValueType`, `Enum` and nullable variant types are automatically parsed by the framework and populate commands as below:
 
 ```cs
 ...
@@ -49,7 +51,9 @@ public async Task Test()
 
 #### Dependency Injection
 
-You can provide an `IServiceProvider` at execution to inject modules with dependencies, in accordance to the conventions `Microsoft.Extensions.DependencyInjection` follows. The `IServiceProvider` has a number of extensions that are suggested to be used when writing your codebase with CSF. These extensions serve you and the program, reducing boilerplate in the application setup.
+You can provide an `IServiceProvider` at execution to inject modules with dependencies, in accordance to the conventions `Microsoft.Extensions.DependencyInjection` follows. 
+The `IServiceProvider` has a number of extensions that are suggested to be used when writing your codebase with CSF. 
+These extensions serve you and the program, reducing boilerplate in the application setup.
 
 ```cs
 ...
@@ -65,7 +69,8 @@ var services = new ServiceCollection()
 
 #### Informative Results
 
-CSF.NET will return results for running commands through a `ResultResolver`. This resolver has a default implementation that can be configured through the `CommandConfiguration`
+CSF.NET will return results for running commands through a `ResultResolver`. 
+This resolver has a default implementation that can be configured through the `CommandConfiguration`
 
 ```cs
     ...

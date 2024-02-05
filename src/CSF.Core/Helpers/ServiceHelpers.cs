@@ -91,12 +91,23 @@ namespace CSF.Helpers
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IServiceScope CreateScope(this IServiceProvider provider, CommandConfiguration configuration)
         {
-            if (configuration.AsyncApproach == AsyncApproach.Await)
+            switch (configuration.ScopeApproach)
             {
-                return provider.CreateScope();
+                case ScopeApproach.ByAsyncApproach when configuration.AsyncApproach is AsyncApproach.Discard:
+                case ScopeApproach.OnlyAsync:
+                    {
+                        return provider.CreateAsyncScope();
+                    }
+                case ScopeApproach.ByAsyncApproach when configuration.AsyncApproach is AsyncApproach.Await:
+                case ScopeApproach.OnlySync:
+                    {
+                        return provider.CreateScope();
+                    }
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
             }
-
-            return provider.CreateAsyncScope();
         }
     }
 }

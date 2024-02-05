@@ -16,7 +16,7 @@ namespace CSF.Core
     ///         <item>
     ///             <see cref="Discard"/> is a setting to be treated with care. 
     ///             Instead of waiting for the full execution before returning control, the execution will return immediately after the entrypoint is called, slipping thread for the rest of execution. 
-    ///             When more than one input source is expected to be handled, this is generally the adviced method of execution. 
+    ///             When more than one input source is expected to be handled, this is generally the advised method of execution. 
     ///         </item>
     ///     </list>
     /// </remarks>

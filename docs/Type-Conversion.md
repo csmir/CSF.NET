@@ -26,7 +26,7 @@ namespace CSF.Samples
 }
 ```
 
-With this class defined and the method that will operate the evaluation being implemented, we can now write our code which defines the succession and failure conditions. In case of success, we also need to pass in the parsed object that the typereader expects to see returned.
+With this class defined and the method that will operate the evaluation being implemented, we can now write our code which defines the succession and failure conditions. In case of success, we also need to pass in the parsed object that the TypeConverter expects to see returned.
 
 ```cs
     ...
